@@ -363,11 +363,13 @@ class c2c_YearsAgoToday {
 	public static function add_user_email_footer( $user_id, $html_body ) {
 		$html_body .= "<br>\n<br>\n<hr>\n<p>";
 		$html_body .= sprintf(
+			/* translators: %s: site name */
 			__( 'You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site %s, which is using the Years Ago Today plugin.', 'years-ago-today' ),
 			wp_specialchars_decode( get_option('blogname'), ENT_QUOTES )
 		);
 		$html_body .= "</p>\n<p>";
 		$html_body .= sprintf(
+			/* translators: %s: URL to user profile on the site */
 			__( 'If you wish to discontinue receiving these emails, simply log into the site and visit your profile at %s to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."', 'years-ago-today' ),
 			get_edit_profile_url( $user_id )
 		);

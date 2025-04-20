@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * Change: Discontinue unnecessary explicit loading of textdomain
+* Change: Add missing translator comments for strings with one placeholder
 * Fix: Fix translator string that referenced an extraneous placeholder
 * Change: Note compatibility through WP 6.8+
 * Change: Note compatibility through PHP 8.3+
