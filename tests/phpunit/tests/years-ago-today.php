@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) or die();
 
 class Years_Ago_Today_Test extends WP_UnitTestCase {
 
-	public static function setUpBeforeClass() {
+	public static function setUpBeforeClass(): void {
 		// Make all requests as if in the admin, which is the only place the plugin
 		// affects.
 		define( 'WP_ADMIN', true );
@@ -13,7 +13,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		c2c_YearsAgoToday::init();
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		global $wp_meta_boxes;
 
 		parent::tearDown();

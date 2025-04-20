@@ -5,6 +5,8 @@
 * Change: Note compatibility through WP 6.8+
 * Change: Note compatibility through PHP 8.3+
 * Change: Update copyright date (2025)
+* Unit tests:
+    * Change: Explicitly define return type for overridden methods
 
 ## 1.6 _(2024-08-09)_
 * Fix: Convert use of deprecated string interpolation syntax to prevent notice under PHP8.2. Props Simounet.
