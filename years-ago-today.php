@@ -457,7 +457,7 @@ class c2c_YearsAgoToday {
 		if ( $q->have_posts() ) :
 			echo '<p>';
 			echo sprintf(
-				/* translators: 1: number of posts, 2: site name, 2: date string for today */
+				/* translators: 1: site name, 2: date string for today */
 				_n(
 					'<strong>%1$d</strong> post has been published on <strong>%2$s</strong> in a previous year:',
 					'<strong>%1$d</strong> posts have been published on <strong>%2$s</strong> in previous years:',
