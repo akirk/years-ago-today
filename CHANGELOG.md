@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * Change: Note compatibility through WP 6.8+
+* Change: Note compatibility through PHP 8.3+
 * Change: Update copyright date (2025)
 
 ## 1.6 _(2024-08-09)_
