@@ -107,9 +107,6 @@ class c2c_YearsAgoToday {
 
 		register_deactivation_hook( __FILE__, array( __CLASS__, 'deactivate' ) );
 
-		// Load textdomain.
-		load_plugin_textdomain( 'years-ago-today' );
-
 		/* Register hooks. */
 
 		// Register dashboard widget.
