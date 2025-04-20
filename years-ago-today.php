@@ -459,12 +459,15 @@ class c2c_YearsAgoToday {
 		if ( $q->have_posts() ) :
 			echo '<p>';
 			echo sprintf(
-				/* translators: 1: site name, 2: date string for today */
-				_n(
-					'<strong>%1$d</strong> post has been published on <strong>%2$s</strong> in a previous year:',
-					'<strong>%1$d</strong> posts have been published on <strong>%2$s</strong> in previous years:',
-					$q->post_count,
-					'years-ago-today'
+				wp_kses(
+					/* translators: 1: site name, 2: date string for today */
+					_n(
+						'<strong>%1$d</strong> post has been published on <strong>%2$s</strong> in a previous year:',
+						'<strong>%1$d</strong> posts have been published on <strong>%2$s</strong> in previous years:',
+						$q->post_count,
+						'years-ago-today'
+					),
+					array( 'strong' => array() )
 				),
 				$q->post_count,
 				self::get_formatted_date_string()
@@ -478,7 +481,7 @@ class c2c_YearsAgoToday {
 				// Only output the year once.
 				if ( $year != $this_year ) {
 					$year = $this_year;
-					echo "<li class='years-ago-today-year'><h4>$year</h4></li>\n";
+					echo '<li class="years-ago-today-year"><h4>' . intval( $year ) . "</h4></li>\n";
 				}
 
 				the_title( '<li><a href="' . esc_url( get_permalink() ) . '">', '</a></li>' );
@@ -615,11 +618,11 @@ class c2c_YearsAgoToday {
 ?>
 		<table class="form-table">
 		<tr>
-			<th scope="row"><?php _e( '"Years Ago Today" email', 'years-ago-today' ); ?></th>
+			<th scope="row"><?php esc_html_e( '"Years Ago Today" email', 'years-ago-today' ); ?></th>
 			<td>
 				<label for="<?php echo esc_attr( self::$option_name ); ?>">
 					<input name="<?php echo esc_attr( self::$option_name ); ?>" type="checkbox" id="<?php echo esc_attr( self::$option_name ); ?>" value="<?php echo esc_attr( self::$enabled_option_value ); ?>"<?php echo $checked; ?><?php echo $disabled; ?> />
-					<?php echo $label; ?>
+					<?php echo esc_html( $label ); ?>
 				</label>
 			</td>
 		</tr>

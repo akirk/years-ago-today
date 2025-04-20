@@ -1,6 +1,7 @@
 # Changelog
 
 ## _(in-progress)_
+* Change: Prevent translated strings from containing unintended markup
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder
 * Fix: Fix translator string that referenced an extraneous placeholder
