@@ -137,20 +137,40 @@ class c2c_YearsAgoToday {
 	 * @since 1.0
 	 */
 	public static function activate() {
-		if ( ! wp_next_scheduled( self::$cron_name ) ) {
-			/**
-			 * Filters the time of the day that the daily Years Ago Today email is sent.
-			 *
-			 * @since 1.1.0
-			 *
-			 * @param string $time The time of day to email the Years Ago Today email to
-			 *                     those who have opted-in to it. Default "9:00 am".
-			 */
-			$time = apply_filters( 'c2c_years_ago_today-email_cron_time', '9:00 am' );
-			$timestamp = ( strtotime( $time ) > time() ) ? strtotime( $time ) : strtotime( 'tomorrow ' . $time );
-
-			wp_schedule_event( $timestamp, 'daily', self::$cron_name );
+		// Bail if cron task is already scheduled.
+		if ( wp_next_scheduled( self::$cron_name ) ) {
+			return;
 		}
+
+		$default_time_string = '9:00 am';
+
+		/**
+		 * Filters the time of the day that the daily Years Ago Today email is sent.
+		 *
+		 * @since 2.0
+		 *
+		 * @param string $time The time of day to email the Years Ago Today email to
+		 *                     those who have opted-in to it. Default "9:00 am".
+		 */
+		$time_string = apply_filters( 'c2c_years_ago_today-email_cron_time', $default_time_string );
+
+		// Get the site’s TZ.
+		$tz = wp_timezone();
+
+		// Parse the time in that TZ.
+		$dt = date_create_immutable( $time_string, $tz );
+
+		// Use default if the string couldn’t be parsed for some reason.
+		if ( false === $dt ) {
+			$dt = new DateTimeImmutable( $default_time_string, $tz );
+		}
+
+		// If the desired send time has already passed today, schedule for tomorrow.
+		if ( $dt->getTimestamp() <= time() ) {
+			$dt = $dt->modify( '+1 day' );
+		}
+
+		wp_schedule_event( $dt->getTimestamp(), 'daily', self::$cron_name );
 	}
 
 	/**
