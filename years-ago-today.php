@@ -471,7 +471,7 @@ class c2c_YearsAgoToday {
 	public static function dashboard_setup() {
 		wp_add_dashboard_widget(
 			'dashboard_years_ago_today',
-			__( 'Years Ago Today', 'years-ago-today' ),
+			_x( 'Years Ago Today', 'Title of the dashboard widget', 'years-ago-today' ),
 			array( __CLASS__, 'wp_dashboard_years_ago_today' )
 		);
 	}

@@ -5,6 +5,7 @@
 * Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Fix: Ensure timing of emails is consistent with site's timezone rather than the server's
 * Change: Prevent translated strings from containing unintended markup
+* Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder
 * Fix: Fix translator string that referenced an extraneous placeholder
