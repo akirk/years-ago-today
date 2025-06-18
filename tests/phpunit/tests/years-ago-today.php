@@ -349,7 +349,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			'1 post has been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in a previous year:',
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
@@ -377,7 +377,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			'2 posts have been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in previous years:',
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
