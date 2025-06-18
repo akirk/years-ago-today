@@ -325,7 +325,10 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	 */
 
 	public function test_get_email_body_with_no_posts() {
-		$this->assertEmpty( c2c_YearsAgoToday::get_email_body() );
+		$body = c2c_YearsAgoToday::get_email_body();
+
+		$this->assertEmpty( $body['text'] );
+		$this->assertEmpty( $body['html'] );
 	}
 
 	public function test_get_email_body_with_no_posts_but_email_forced() {
@@ -337,7 +340,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 				'Test Blog',
 				current_time( 'M jS' )
 			),
-			c2c_YearsAgoToday::get_email_body()
+			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
 
@@ -348,7 +351,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertContains(
 			'1 post has been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in a previous year:',
-			c2c_YearsAgoToday::get_email_body()
+			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
 
@@ -364,7 +367,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$email,
-			c2c_YearsAgoToday::get_email_body()
+			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
 
@@ -376,7 +379,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertContains(
 			'2 posts have been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in previous years:',
-			c2c_YearsAgoToday::get_email_body()
+			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
 
@@ -396,7 +399,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$email,
-			c2c_YearsAgoToday::get_email_body()
+			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
 
@@ -569,7 +572,7 @@ HTML;
 				current_time( 'M jS' ),
 				'Test Blog'
 			),
-			c2c_YearsAgoToday::get_email_body()
+			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
 

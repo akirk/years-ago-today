@@ -18,6 +18,5 @@ The following list comprises ideas, suggestions, and known issues, all of which 
 * Unit tests: Add tests for `cron_email()`, `option_save()`
 * bcc: chunks of the email list if of sufficient size (or always) instead of individual email submissions
 * Widget could allow specifying a specific date to list posts from that given date
-* Send emails as multipart with HTML and text parts
 
 Feel free to make your own suggestions or champion for something already on the list (via the [plugin's support forum on WordPress.org](https://wordpress.org/support/plugin/years-ago-today/) or on [GitHub](https://github.com/coffee2code/years-ago-today/) as an issue or PR).

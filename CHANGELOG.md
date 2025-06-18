@@ -1,6 +1,8 @@
 # Changelog
 
 ## _(in-progress)_
+* New: Send full HTML of posts in the email alongside plaintext version. Fixes #5. Props akirk.
+* Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Change: Prevent translated strings from containing unintended markup
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder

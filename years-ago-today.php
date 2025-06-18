@@ -215,6 +215,8 @@ class c2c_YearsAgoToday {
 
 		$site_name = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
 
+		$html_body = '<html><head><title>' . self::get_email_subject() . '</title></head><body>';
+
 		// If there are no posts to include in the email.
 		if ( ! $query->have_posts() ) {
 			/**
@@ -249,10 +251,11 @@ class c2c_YearsAgoToday {
 					$site_name,
 					self::get_formatted_date_string()
 				);
+				$html_body .= '<p>' . $body . '</p>';
 			}
 			// Else don't define an email body.
 			else {
-				$body = '';
+				$body = $html_body = '';
 			}
 		}
 		// Else there are posts to include in the email.
@@ -271,7 +274,6 @@ class c2c_YearsAgoToday {
 				self::get_formatted_date_string()
 			);
 
-			$html_body = '<html><head><title>' . self::get_email_subject() . '</title></head><body>';
 			$html_body .= '<p>' . esc_html( $body ) . '</p>';
 
 			$year = '';
@@ -287,22 +289,32 @@ class c2c_YearsAgoToday {
 				$body .= '* ' . get_the_title() .  ' : ' . esc_url( get_permalink() ) . "\n";
 				$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '">' . esc_html( get_the_title() ) . '</a></h3>';
 				$html_body .= wp_kses_post( self::get_resized_content() );
-
 			endwhile;
+		}
+
+		if ( $html_body ) {
+			$html_body .= '</body></html>';
 		}
 
 		return array(
 			'text' => $body,
-			'html' => $html_body . '</body></html>',
+			'html' => $html_body,
 		);
 
 	}
 
+	/**
+	 * Replaces image file references with reduced-sized versions.
+	 *
+	 * @since 2.0
+	 *
+	 * @param string $size The size for resized images.
+	 * @return string The post content with images resized.
+	 */
 	private static function get_resized_content( $size = 'medium' ) {
 		$content = get_the_content();
 
 		$pattern = '/<img (.*?)src=["\'](.*?)["\'](.*?)>/i';
-
 
 		$callback = function( $matches ) use ( $size ) {
 			$full_image_url = $matches[2];
@@ -310,7 +322,6 @@ class c2c_YearsAgoToday {
 			$attachment_id = attachment_url_to_postid( $full_image_url );
 
 			if ( $attachment_id ) {
-
 				$image_src = wp_get_attachment_image_src( $attachment_id, $size );
 
 				if ( $image_src ) {
@@ -326,7 +337,7 @@ class c2c_YearsAgoToday {
 			return $matches[0];
 		};
 
-		$new_content = preg_replace_callback($pattern, $callback, $content);
+		$new_content = preg_replace_callback( $pattern, $callback, $content );
 
 		return $new_content;
 	}
@@ -396,12 +407,13 @@ class c2c_YearsAgoToday {
 		// Get the content of the email.
 		$subject = self::get_email_subject();
 		$body    = self::get_email_body();
+		$headers = array();
 
 		// If no subject or body for the email, then there's nothing else to do.
 		if ( ! $subject || ! $body['text'] ) {
 			return;
 		}
-		$headers = array();
+
 		if ( is_array( $body ) ) {
 			if ( isset( $body['html'] ) ) {
 				if ( isset( $body['text'] ) ) {
