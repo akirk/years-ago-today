@@ -610,4 +610,48 @@ HTML;
 
 		$this->assertEquals( '2014', c2c_YearsAgoToday::get_first_published_year() );
 	}
+
+	/*
+	 * get_post_types()
+	 */
+
+	public function test_get_post_types__default() {
+		$this->assertEquals( [ 'post' ], c2c_YearsAgoToday::get_post_types() );
+	}
+
+	/*
+	 * filter: c2c_years_ago_today-post_types
+	 */
+
+	public function test_c2c_years_ago_today_post_types() {
+		register_post_type( 'book', [ 'public' => true, 'name' => 'Book' ] );
+		add_filter(
+			'c2c_years_ago_today-post_types',
+			static function ( $post_types ) {
+				$post_types[] = 'book';
+				return $post_types;
+			}
+		);
+
+		$this->assertEquals( [ 'post', 'book' ], c2c_YearsAgoToday::get_post_types() );
+	}
+
+	public function test_c2c_years_ago_today_post_types__ignores_invalid_post_type() {
+		add_filter(
+			'c2c_years_ago_today-post_types',
+			static function ( $post_types ) {
+				$post_types[] = 'story';
+				return $post_types;
+			}
+		);
+
+		$this->assertEquals( [ 'post' ], c2c_YearsAgoToday::get_post_types() );
+	}
+
+	public function test_c2c_years_ago_today_post_types__uses_default_with_invalid_filter_value() {
+		add_filter( 'c2c_years_ago_today-post_types', '__return_false' );
+
+		$this->assertEquals( [ 'post' ], c2c_YearsAgoToday::get_post_types() );
+	}
+
 }

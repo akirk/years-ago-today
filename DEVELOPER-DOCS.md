@@ -2,7 +2,7 @@
 
 ## Hooks
 
-The plugin is further customizable via four hooks. Such code should ideally be put into a mu-plugin or site-specific plugin (which is beyond the scope of this readme to explain).
+The plugin is further customizable via five hooks. Such code should ideally be put into a mu-plugin or site-specific plugin (which is beyond the scope of this readme to explain).
 
 
 ### `c2c_years_ago_today-email_cron_time` _(filter)_
@@ -66,4 +66,19 @@ The `c2c_years_ago_today-first_published_year` filter allows defining the earlie
 ```php
 // Set the earliest published post year for Years Ago Today.
 add_filter( 'c2c_years_ago_today-first_published_year', function ( $year ) { return '2009'; } );
+```
+
+### `c2c_years_ago_today-post_types` _(filter)_
+
+The `c2c_years_ago_today-post_types` filter customization of the post types that are considered for inclusion by the plugin. By default, only the 'post' post type is included.
+
+#### Arguments:
+
+* **$post_types** _(string[])_: The included post types. Default `['posts']`.
+
+#### Example:
+
+```php
+// Also include the 'book' post type for Years Ago Today consideration.
+add_filter( 'c2c_years_ago_today-post_types', function ( $post_types ) { $post_types[] = 'book'; return $post_types; } );
 ```

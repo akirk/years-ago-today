@@ -2,6 +2,7 @@
 
 ## _(in-progress)_
 * New: Send full HTML of posts in the email alongside plaintext version. Fixes #5. Props akirk.
+* New: Add support for including additional post types via new 'c2c_years_ago_today-post_types' filter
 * Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Fix: Ensure timing of emails is consistent with site's timezone rather than the server's
 * Hardening: Prevent translated and generated strings from containing unintended markup

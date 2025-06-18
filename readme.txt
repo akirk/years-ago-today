@@ -67,6 +67,7 @@ Developer documentation can be found in [DEVELOPER-DOCS.md](https://github.com/c
 * `c2c_years_ago_today-email-if-no-posts` : Override whether the daily Years Ago Today email is sent out on days that don't have any posts in prior years. By default this value is false, meaning no email is sent in such circumstances.
 * `c2c_years_ago_today-email-body-no-posts` : Customize the content of the body of the daily Years Ago Today email when it is sent on days that had no posts in prior years. 
 * `c2c_years_ago_today-first_published_year` : Explicitly define the earliest year to be considered when finding earlier published posts.
+* `c2c_years_ago_today-post_types` : Customize the post types included for consideration. Default `['post']`.
 
 
 == Changelog ==

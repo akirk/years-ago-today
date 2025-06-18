@@ -586,6 +586,36 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Returns the post types that should be included in the widget.
+	 *
+	 * @since 2.0
+	 *
+	 * @return string[]
+	 */
+	public static function get_post_types() {
+		$default = array( 'post' );
+
+		/**
+		 * Filters the post types that get included in Years Ago Today widgets.
+		 *
+		 * @since 2.0
+		 *
+		 * @param string[] $post_types The included post types. Default `['post']`.
+		 */
+		$post_types = (array) apply_filters( 'c2c_years_ago_today-post_types', $default );
+
+		// Verify returned post types.
+		$post_types = array_filter(
+			$post_types,
+			static function ( $pt ) {
+				return is_string( $pt ) && post_type_exists( $pt );
+			}
+		);
+
+		return $post_types ?: $default;
+	}
+
+	/**
 	 * Returns the query object after a years ago post query, or the posts that
 	 * were found.
 	 *
@@ -605,9 +635,8 @@ class c2c_YearsAgoToday {
 		$day   = current_time( 'd' );
 
 		$query = new WP_Query( array(
-			'post_parent'    => '',
 			'post_status'    => array( 'publish' ),
-			'post_type'      => array( 'post' ),
+			'post_type'      => self::get_post_types(),
 			'posts_per_page' => -1,
 			'date_query'     => array(
 				'year'  => $years,
