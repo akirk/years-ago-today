@@ -424,36 +424,55 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	}
 
 	/*
-	 * add_user_email_footer()
+	 * get_email_footer()
 	 */
 
-	public function test_add_user_email_footer() {
-		$user_id = $this->factory->user->create();
-		$user_profile_url = get_edit_profile_url( $user_id );
+	public function test_get_email_footer__for_text() {
+		$profile_url = admin_url( 'profile.php' );
+
 		$text = <<<HTML
-Hi!
+
 
 
 -------------------------------
 You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.
 
-If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$user_profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
+If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
 
 HTML;
 
-		$this->assertEquals( $text, c2c_YearsAgoToday::add_user_email_footer( $user_id, 'Hi!' ) );
+		$this->assertEquals( $text, c2c_YearsAgoToday::get_email_footer( 'text' ) );
 	}
 
-	/*
-	 * add_admin_css()
-	 */
+	public function test_get_email_footer__invalid_format_treated_as_text() {
+		$profile_url = admin_url( 'profile.php' );
 
-	public function test_add_admin_css() {
-		$this->assertFalse( has_action( 'admin_head', array( 'c2c_YearsAgoToday', 'admin_css' ) ) );
+		$text = <<<HTML
 
-		c2c_YearsAgoToday::add_admin_css();
 
-		$this->assertEquals( 10, has_action( 'admin_head', array( 'c2c_YearsAgoToday', 'admin_css' ) ) );
+
+-------------------------------
+You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.
+
+If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
+
+HTML;
+
+		$this->assertEquals( $text, c2c_YearsAgoToday::get_email_footer( 'invalid' ) );
+	}
+
+	public function test_get_email_footer__for_html() {
+		$profile_url = admin_url( 'profile.php' );
+		$html = <<<HTML
+<br>
+<br>
+<hr>
+<p>You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.</p>
+<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."</p>
+
+HTML;
+
+		$this->assertEquals( $html, c2c_YearsAgoToday::get_email_footer( 'html' ) );
 	}
 
 	/*

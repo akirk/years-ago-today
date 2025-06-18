@@ -387,27 +387,45 @@ class c2c_YearsAgoToday {
 	 * stop it.
 	 *
 	 * @since 1.2
+	 * @since 2.0 Remove `$user_id` and `$html_body` arguments and simply return the footer.
 	 *
-	 * @param  int    $user_id The user ID.
-	 * @param  string $body.   The email body.
+	 * @param string $type The format for the footer. Either 'text' or 'html'. Default 'text'.
 	 * @return string
 	 */
-	public static function add_user_email_footer( $user_id, $html_body ) {
-		$html_body .= "<br>\n<br>\n<hr>\n<p>";
-		$html_body .= sprintf(
+	public static function get_email_footer( $format = 'text' ) {
+		if ( 'html' !== $format ) {
+			$format = 'text';
+		}
+
+		$footer = '';
+
+		$is_html = ( 'html' === $format );
+
+		$footer .= $is_html
+			? "<br>\n<br>\n<hr>\n<p>"
+			: "\n\n\n-------------------------------\n";;
+
+		$footer .= sprintf(
 			/* translators: %s: site name */
 			__( 'You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site %s, which is using the Years Ago Today plugin.', 'years-ago-today' ),
 			wp_specialchars_decode( get_option('blogname'), ENT_QUOTES )
 		);
-		$html_body .= "</p>\n<p>";
-		$html_body .= sprintf(
+
+		$footer .= $is_html
+			? "</p>\n<p>"
+			: "\n\n";
+
+		$footer .= sprintf(
 			/* translators: %s: URL to user profile on the site */
 			__( 'If you wish to discontinue receiving these emails, simply log into the site and visit your profile at %s to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."', 'years-ago-today' ),
-			get_edit_profile_url( $user_id )
+			admin_url( 'profile.php' )
 		);
-		$html_body .= "</p>\n";
 
-		return $html_body;
+		$footer .= $is_html
+			? "</p>\n"
+			: "\n";
+
+		return $footer;
 	}
 
 	/**
@@ -445,23 +463,23 @@ class c2c_YearsAgoToday {
 
 				$headers[]    = 'Content-type: text/html';
 				$alt_function = function ( $mailer ) use ( $plain_text ) {
-					$mailer->{'AltBody'} = $plain_text;
+					$mailer->{'AltBody'} = $plain_text . self::get_email_footer( 'text' );
 				};
 				add_action(
 					'phpmailer_init',
 					$alt_function
 				);
 
-				$body = $body['html'];
+				$body = $body['html'] . self::get_email_footer( 'html' );
 			} elseif ( isset( $body['text'] ) ) {
-				$body = $body['text'];
+				$body = $body['text'] . self::get_email_footer( 'text' );
 			}
 		}
 
 		// Send email to each user.
 		foreach ( $users as $user ) {
 			if ( $user->user_email ) {
-				wp_mail( $user->user_email, $subject, self::add_user_email_footer( $user->ID, $body ), $headers );
+				wp_mail( $user->user_email, $subject, $body, $headers );
 			}
 		}
 	}
