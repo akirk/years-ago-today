@@ -306,7 +306,7 @@ class c2c_YearsAgoToday {
 					$body .= "\n\n== $year ==\n";
 					$html_body .= '<h2>' . $year . '</h2>';
 				}
-				$body .= '* ' . get_the_title() .  ' : ' . esc_url( get_permalink() ) . "\n";
+				$body .= '* ' . wp_strip_all_tags( get_the_title() ) .  ' : ' . esc_url( get_permalink() ) . "\n";
 				$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '">' . esc_html( get_the_title() ) . '</a></h3>';
 				$html_body .= wp_kses_post( self::get_resized_content() );
 			endwhile;
@@ -502,8 +502,8 @@ class c2c_YearsAgoToday {
 					),
 					array( 'strong' => array() )
 				),
-				$q->post_count,
-				self::get_formatted_date_string()
+				(int) $q->post_count,
+				esc_html( self::get_formatted_date_string() )
 			);
 			echo '</p>';
 			echo '<ul class="years-ago-today-posts">';
@@ -523,9 +523,12 @@ class c2c_YearsAgoToday {
 		else :
 			echo '<p>';
 			printf(
-				/* translators: %s: date string for today */
-				__( 'No posts were published on <strong>%s</strong> from any past year.', 'years-ago-today' ),
-				self::get_formatted_date_string()
+				wp_kses(
+					/* translators: %s: date string for today */
+					__( 'No posts were published on <strong>%s</strong> from any past year.', 'years-ago-today' ),
+					array( 'strong' => array() )
+				),
+				esc_html( self::get_formatted_date_string() )
 			);
 			echo '</p>';
 		endif;

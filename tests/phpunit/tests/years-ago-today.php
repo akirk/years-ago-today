@@ -403,6 +403,26 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_email_body_removes_html_from_titles() {
+		$post_title1 = 'A <strong>blast</strong> from the past';
+		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2012' ) ) );
+		$post_title2 = 'Days of <em>future</em> years past';
+		$post2 = $this->factory->post->create( array( 'post_title' => $post_title2, 'post_date' => $this->get_date( '2014' ) ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$email  = '2 posts have been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in previous years:';
+		$email .= "\n\n== 2014 ==\n";
+		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
+		$email .= "\n\n== 2012 ==\n";
+		$email .= "* " . wp_strip_all_tags( $post_title1 ) . " : " . get_permalink( $post1 ) . "\n";
+
+		$this->assertEquals(
+			$email,
+			c2c_YearsAgoToday::get_email_body()['text']
+		);
+	}
+
 	/*
 	 * add_user_email_footer()
 	 */
