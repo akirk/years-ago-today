@@ -301,7 +301,7 @@ class c2c_YearsAgoToday {
 				$query->the_post();
 				$this_year = get_the_date( 'Y' );
 				// Only output the year once.
-				if ( $year != $this_year ) {
+				if ( $year !== $this_year ) {
 					$year = $this_year;
 					$body .= "\n\n== $year ==\n";
 					$html_body .= '<h2>' . $year . '</h2>';
@@ -512,7 +512,7 @@ class c2c_YearsAgoToday {
 				$q->the_post();
 				$this_year = get_the_date( 'Y' );
 				// Only output the year once.
-				if ( $year != $this_year ) {
+				if ( $year !== $this_year ) {
 					$year = $this_year;
 					echo '<li class="years-ago-today-year"><h4>' . intval( $year ) . "</h4></li>\n";
 				}
