@@ -468,7 +468,7 @@ HTML;
 		$expected = <<<HTML
 		<table class="form-table">
 		<tr>
-			<th scope="row">"Years Ago Today" email</th>
+			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" disabled='disabled' />
@@ -491,7 +491,7 @@ HTML;
 		$expected = <<<HTML
 		<table class="form-table">
 		<tr>
-			<th scope="row">"Years Ago Today" email</th>
+			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" checked='checked' disabled='disabled' />
@@ -514,7 +514,7 @@ HTML;
 		$expected = <<<HTML
 		<table class="form-table">
 		<tr>
-			<th scope="row">"Years Ago Today" email</th>
+			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" disabled='disabled' />
@@ -538,7 +538,7 @@ HTML;
 		$expected = <<<HTML
 		<table class="form-table">
 		<tr>
-			<th scope="row">"Years Ago Today" email</th>
+			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" checked='checked' disabled='disabled' />
