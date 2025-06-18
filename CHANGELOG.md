@@ -8,6 +8,7 @@
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder
+* Change: Prevent unwarranted PHPCS complaints
 * Fix: Fix translator string that referenced an extraneous placeholder
 * Change: Note compatibility through WP 6.8+
 * Change: Note compatibility through PHP 8.3+

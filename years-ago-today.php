@@ -193,7 +193,9 @@ class c2c_YearsAgoToday {
 		global $wpdb;
 
 		$query = new WP_User_Query( array(
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'meta_key'   => $wpdb->get_blog_prefix() . self::$option_name,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			'meta_value' => self::$enabled_option_value,
 		) );
 
@@ -332,6 +334,7 @@ class c2c_YearsAgoToday {
 	private static function get_resized_content( $size = 'medium' ) {
 		$content = get_the_content();
 
+		// phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- This is just a regex used to find images in the post.
 		$pattern = '/<img (.*?)src=["\'](.*?)["\'](.*?)>/i';
 
 		$callback = function( $matches ) use ( $size ) {
@@ -564,6 +567,7 @@ class c2c_YearsAgoToday {
 		// If not in the cache, figure it out.
 		if ( false === $first_year ) {
 			// Query for the earliest published year.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- This is the best way to get this value, which is then cached.
 			$first_year = $wpdb->get_var( "SELECT YEAR(MIN(post_date)) FROM $wpdb->posts WHERE post_status IN ( 'publish', 'private' )" );
 
 			// If nothing was found, assume current year.
@@ -674,6 +678,7 @@ class c2c_YearsAgoToday {
 			return false;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
 		if ( isset( $_POST[ self::$option_name ] ) && self::$enabled_option_value === $_POST[ self::$option_name ] ) {
 			return update_user_option( $user_id, self::$option_name, self::$enabled_option_value );
 		} else {
