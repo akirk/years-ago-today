@@ -544,7 +544,18 @@ HTML;
 
 HTML;
 
-		$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+		if ( is_multisite() ) {
+			$user = get_user_by( 'ID', $user_id );
+			// In multisite, admins can't edit users.
+			$this->assertEmpty( c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+			// Explicitly allow them to edit users.
+			grant_super_admin( $user_id );
+			$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+			revoke_super_admin( $user_id );
+		} else {
+			$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+		}
+
 	}
 
 	public function test_add_daily_email_optin_checkbox_for_another_user_when_that_user_has_checkbox_checked() {
@@ -568,7 +579,17 @@ HTML;
 
 HTML;
 
-		$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+		if ( is_multisite() ) {
+			$user = get_user_by( 'ID', $user_id );
+			// In multisite, admins can't edit users.
+			$this->assertEmpty( c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+			// Explicitly allow them to edit users.
+			grant_super_admin( $user_id );
+			$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+			revoke_super_admin( $user_id );
+		} else {
+			$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+		}
 	}
 
 	public function test_add_daily_email_optin_checkbox_for_another_user_when_current_user_cannot_edit_that_user() {
