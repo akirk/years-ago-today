@@ -101,10 +101,6 @@ class c2c_YearsAgoToday {
 	 * @since 1.0
 	 */
 	public static function init() {
-		if ( ! is_admin() ) {
-			return false;
-		}
-
 		/* Register hooks. */
 
 		// Register dashboard widget.

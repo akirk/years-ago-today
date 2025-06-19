@@ -9,6 +9,7 @@
 * Hardening: Prevent translated and generated strings from containing unintended markup
 * Change: Rename `add_user_email_footer()` to `get_email_footer()` and remove arguments and just return the footer based on a format ('text' or 'html')
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
+* Change: Remove `is_admin()` guard from `init()`, which isn't strictly necessary and impedes unit tests
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder
 * Change: Prevent unwarranted PHPCS complaints
