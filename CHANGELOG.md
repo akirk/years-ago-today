@@ -25,6 +25,7 @@
     * Change: Explicitly define return type for overridden methods
     * Change: Use `assertStringContainsString()` instead of deprecated `assertContains()`
     * New Add unit tests for plugin activation/deactivation
+    * Change: Update uses of `current_time()` to more modern `wp_date()`
 
 ## 1.6 _(2024-08-09)_
 * Fix: Convert use of deprecated string interpolation syntax to prevent notice under PHP8.2. Props Simounet.

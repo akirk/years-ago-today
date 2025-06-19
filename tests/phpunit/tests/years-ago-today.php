@@ -28,10 +28,10 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 	private function get_date( $year = null, $today = true ) {
 		if ( ! $year ) {
-			$year = current_time( 'Y' );
+			$year = wp_date( 'Y' );
 		}
 
-		$date = $year . current_time( '-m-d 13:00:04' );
+		$date = $year . wp_date( '-m-d 13:00:04' );
 
 		// If not requesting the current day, then offset a few days.
 		if ( ! $today ) {
@@ -186,7 +186,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = 'No posts were published on <strong>' . current_time( 'M jS' ) . '</strong> from any past year.';
+		$expected = 'No posts were published on <strong>' . wp_date( 'M jS' ) . '</strong> from any past year.';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
@@ -196,7 +196,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = '<strong>1</strong> post has been published on <strong>' . current_time( 'M jS' ) . '</strong> in a previous year:';
+		$expected = '<strong>1</strong> post has been published on <strong>' . wp_date( 'M jS' ) . '</strong> in a previous year:';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
@@ -207,7 +207,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = '<strong>2</strong> posts have been published on <strong>' . current_time( 'M jS' ) . '</strong> in previous years:';
+		$expected = '<strong>2</strong> posts have been published on <strong>' . wp_date( 'M jS' ) . '</strong> in previous years:';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
@@ -282,7 +282,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	 */
 
 	public function test_get_formatted_date_string() {
-		$this->assertEquals( date_i18n( 'M jS', current_time( 'timestamp' ) ), c2c_YearsAgoToday::get_formatted_date_string() );
+		$this->assertEquals( date_i18n( 'M jS', wp_date( 'timestamp' ) ), c2c_YearsAgoToday::get_formatted_date_string() );
 	}
 
 	public function test_get_formatted_date_string_with_timestamp() {
@@ -296,7 +296,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	 */
 
 	public function test_get_first_published_year_with_no_posts() {
-		$this->assertEquals( current_time( 'Y' ), c2c_YearsAgoToday::get_first_published_year() );
+		$this->assertEquals( wp_date( 'Y' ), c2c_YearsAgoToday::get_first_published_year() );
 	}
 
 	public function test_get_first_published_year_with_posts() {
@@ -338,7 +338,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			sprintf(
 				'No posts were published to the site %1$s on %2$s in any past year.',
 				'Test Blog',
-				current_time( 'M jS' )
+				wp_date( 'M jS' )
 			),
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
@@ -350,7 +350,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
 		$this->assertStringContainsString(
-			'1 post has been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in a previous year:',
+			'1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:',
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
@@ -361,7 +361,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '1 post has been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in a previous year:';
+		$email  = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
 		$email .= "\n\n== 2012 ==\n";
 		$email .= "* {$post_title} : " . get_permalink( $post ) . "\n";
 
@@ -378,7 +378,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
 		$this->assertStringContainsString(
-			'2 posts have been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in previous years:',
+			'2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:',
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
 	}
@@ -391,7 +391,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '2 posts have been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in previous years:';
+		$email  = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 		$email .= "\n\n== 2014 ==\n";
 		$email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n== 2012 ==\n";
@@ -411,7 +411,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '2 posts have been published to the site Test Blog on ' . current_time( 'M jS' ) . ' in previous years:';
+		$email  = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 		$email .= "\n\n== 2014 ==\n";
 		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n== 2012 ==\n";
@@ -639,7 +639,7 @@ HTML;
 		$this->assertEquals(
 			sprintf(
 				'Sorry, no posts were made on this day (%s) to %s in any prior year.',
-				current_time( 'M jS' ),
+				wp_date( 'M jS' ),
 				'Test Blog'
 			),
 			c2c_YearsAgoToday::get_email_body()['text']
