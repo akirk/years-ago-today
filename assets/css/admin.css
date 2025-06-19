@@ -1,3 +1,7 @@
+#dashboard-widgets .years-ago-today-posts {
+	list-style-position: inside;
+}
+
 #dashboard-widgets .years-ago-today-posts h4 {
 	font-weight: bold;
 }
@@ -5,4 +9,8 @@
 #dashboard-widgets .years-ago-today-posts li:not(.years-ago-today-year) {
 	margin-left: 30px;
 	list-style: initial;
+}
+
+#dashboard-widgets .years-ago-today-posts li:not(.years-ago-today-year)::marker {
+	color: var(--wp-admin-theme-color, currentColor);
 }
