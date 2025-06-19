@@ -603,7 +603,7 @@ class c2c_YearsAgoToday {
 
 			// If nothing was found, assume current year.
 			if ( ! $first_year ) {
-				$first_year = current_time( 'Y' );
+				$first_year = wp_date( 'Y' );
 			}
 
 			// Cache the year.
@@ -656,11 +656,11 @@ class c2c_YearsAgoToday {
 	 */
 	public static function get_posts( $return_posts = false ) {
 		$first_year   = self::get_first_published_year();
-		$current_year = mysql2date( 'Y', current_time( 'mysql' ) );
+		$current_year = wp_date( 'Y' );
 
 		$years = range( $first_year, $current_year - 1 );
-		$month = current_time( 'm' );
-		$day   = current_time( 'd' );
+		$month = wp_date( 'm' );
+		$day   = wp_date( 'd' );
 
 		$query = new WP_Query( array(
 			'post_status'    => array( 'publish' ),
