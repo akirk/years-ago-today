@@ -187,7 +187,7 @@ class c2c_YearsAgoToday {
 	public static function deactivate() {
 		wp_clear_scheduled_hook( self::$cron_name );
 
-		wp_cache_delete( 'first_published_year', 'c2c_years_ago_today' );
+		wp_cache_delete( 'first_published_year', self::$cache_group );
 	}
 
 	/**
