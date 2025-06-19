@@ -72,7 +72,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			array( 'action', 'personal_options_update',  'option_save',                    10 ),
 			array( 'action', 'edit_user_profile_update', 'option_save',                    10 ),
 			array( 'action', 'c2c_years_ago_daily_cron', 'cron_email',                     10 ),
-			array( 'action', 'load-index.php',           'add_admin_css',                  10 ),
+			array( 'action', 'admin_enqueue_scripts',    'enqueue_admin_style',            10 ),
 		);
 	}
 
@@ -580,21 +580,31 @@ HTML;
 	}
 
 	/*
-	 * admin_css()
+	 * enqueue_admin_style()
 	 */
 
-	public function test_admin_css() {
-		$expected = "<style>
-			#dashboard-widgets .years-ago-today-posts h4 {
-				font-weight: bold;
-			}
-			#dashboard-widgets .years-ago-today-posts li:not(.years-ago-today-year) {
-				margin-left: 30px;
-				list-style: initial;
-			}
-		</style>\n";
+	 public function test_enqueue_admin_style__when_not_on_admin_index() {
+		$key = 'c2c-years-ago-today-admin';
 
-		$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::admin_css() );
+		$this->assertFalse( wp_style_is( $key, 'registered' ) );
+		$this->assertFalse( wp_style_is( $key, 'enqueued' ) );
+
+		c2c_YearsAgoToday::enqueue_admin_style( 'profile.php' );
+
+		$this->assertFalse( wp_style_is( $key, 'registered' ) );
+		$this->assertFalse( wp_style_is( $key, 'enqueued' ) );
+	}
+
+	 public function test_enqueue_admin_style__when_on_admin_index() {
+		$key = 'c2c-years-ago-today-admin';
+
+		$this->assertFalse( wp_style_is( $key, 'registered' ) );
+		$this->assertFalse( wp_style_is( $key, 'enqueued' ) );
+
+		c2c_YearsAgoToday::enqueue_admin_style( 'index.php' );
+
+		$this->assertTrue( wp_style_is( $key, 'registered' ) );
+		$this->assertTrue( wp_style_is( $key, 'enqueued' ) );
 	}
 
 	/*

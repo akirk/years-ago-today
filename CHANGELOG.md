@@ -5,6 +5,7 @@
 * New: Add support for including additional post types via new 'c2c_years_ago_today-post_types' filter
 * Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Fix: Ensure timing of emails is consistent with site's timezone rather than the server's
+* New: Enqueue separate admin CSS file rather than outputting into `head`
 * Hardening: Prevent translated and generated strings from containing unintended markup
 * Change: Rename `add_user_email_footer()` to `get_email_footer()` and remove arguments and just return the footer based on a format ('text' or 'html')
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name

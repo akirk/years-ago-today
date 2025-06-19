@@ -117,8 +117,8 @@ class c2c_YearsAgoToday {
 		add_action( 'personal_options_update',  array( __CLASS__, 'option_save' ) );
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'option_save' ) );
 
-		// TODO: remove
-		add_action( 'load-index.php',           array( __CLASS__, 'add_admin_css' ) );
+		// Enqueue CSS only when the main Dashboard loads.
+		add_action( 'admin_enqueue_scripts',    array( __CLASS__, 'enqueue_admin_style' ) );
 	}
 
 	/**
@@ -580,9 +580,11 @@ class c2c_YearsAgoToday {
 		 */
 		$first_year = apply_filters( 'c2c_years_ago_today-first_published_year', false );
 
+		$cache_key = 'first_published_year';
+
 		// If not provided via filter, try to get it from the cache.
 		if ( false === $first_year ) {
-			$first_year = wp_cache_get( 'first_published_year', 'c2c_years_ago_today' );
+			$first_year = wp_cache_get( $cache_key, 'c2c_years_ago_today' );
 		}
 
 		// If not in the cache, figure it out.
@@ -597,7 +599,7 @@ class c2c_YearsAgoToday {
 			}
 
 			// Cache the year.
-			wp_cache_add( 'first_published_year', $first_year, 'c2c_years_ago_today' );
+			wp_cache_add( $cache_key, $first_year, 'c2c_years_ago_today' );
 		}
 
 		return $first_year;
@@ -667,12 +669,22 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
-	 * Adds hook to outputs CSS for the display of the Years Ago today widget.
+	 * Enqueues the admin CSS when on the dashboard page.
 	 *
-	 * @since 1.0
+	 * @since 2.0
 	 */
-	public static function add_admin_css() {
-		add_action( 'admin_head', array( __CLASS__, 'admin_css' ) );
+	public static function enqueue_admin_style( $hook_suffix ) {
+		// Bail if not on the dashboard page.
+		if ( 'index.php' !== $hook_suffix ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'c2c-years-ago-today-admin',
+			plugins_url( 'assets/css/admin.css', __FILE__ ),
+			array(),
+			self::version()
+		);
 	}
 
 	/**
@@ -734,23 +746,6 @@ class c2c_YearsAgoToday {
 		} else {
 			return delete_user_option( $user_id, self::$option_name );
 		}
-	}
-
-	/**
-	 * Outputs CSS.
-	 *
-	 * @since 1.0
-	 */
-	public static function admin_css() {
-		echo "<style>
-			#dashboard-widgets .years-ago-today-posts h4 {
-				font-weight: bold;
-			}
-			#dashboard-widgets .years-ago-today-posts li:not(.years-ago-today-year) {
-				margin-left: 30px;
-				list-style: initial;
-			}
-		</style>\n";
 	}
 
 } // end c2c_YearsAgoToday
