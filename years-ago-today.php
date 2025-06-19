@@ -63,6 +63,14 @@ class c2c_YearsAgoToday {
 	public static $cron_name = 'c2c_years_ago_daily_cron';
 
 	/**
+	 * Name for the cache group for caching plugin values.
+	 *
+	 * @var string
+	 * @access public
+	 */
+	public static $cache_group = 'c2c_years_ago_today';
+
+	/**
 	 * Default value for the meta value to indicate the user wants the daily email
 	 * of posts published on that day in years past.
 	 *
@@ -101,6 +109,10 @@ class c2c_YearsAgoToday {
 	 * @since 1.0
 	 */
 	public static function init() {
+		if ( is_multisite() ) {
+			wp_cache_add_global_groups( self::$cache_group );
+		}
+
 		/* Register hooks. */
 
 		// Register dashboard widget.
@@ -576,11 +588,11 @@ class c2c_YearsAgoToday {
 		 */
 		$first_year = apply_filters( 'c2c_years_ago_today-first_published_year', false );
 
-		$cache_key = 'first_published_year';
+		$cache_key = 'first_published_year_' . get_current_blog_id();
 
 		// If not provided via filter, try to get it from the cache.
 		if ( false === $first_year ) {
-			$first_year = wp_cache_get( $cache_key, 'c2c_years_ago_today' );
+			$first_year = wp_cache_get( $cache_key, self::$cache_group );
 		}
 
 		// If not in the cache, figure it out.
@@ -595,7 +607,7 @@ class c2c_YearsAgoToday {
 			}
 
 			// Cache the year.
-			wp_cache_add( $cache_key, $first_year, 'c2c_years_ago_today' );
+			wp_cache_add( $cache_key, $first_year, self::$cache_group );
 		}
 
 		return $first_year;
