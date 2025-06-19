@@ -801,19 +801,25 @@ class c2c_YearsAgoToday {
 		$label = $is_current_user_profile_page
 			? __( 'Email me daily about posts published on this day in years past.', 'years-ago-today' )
 			: __( 'Email this user daily about posts published on this day in years past.', 'years-ago-today' );
-?>
-		<table class="form-table">
-		<tr>
-			<th scope="row"><?php esc_html_e( '"Years Ago Today" email', 'years-ago-today' ); ?></th>
-			<td>
-				<label for="<?php echo esc_attr( self::$option_name ); ?>">
-					<input name="<?php echo esc_attr( self::$option_name ); ?>" type="checkbox" id="<?php echo esc_attr( self::$option_name ); ?>" value="<?php echo esc_attr( self::$enabled_option_value ); ?>"<?php echo $checked; ?><?php echo $disabled; ?> />
-					<?php echo esc_html( $label ); ?>
-				</label>
-			</td>
-		</tr>
-		</table>
-<?php
+
+		echo "\t\t<table class=\"form-table\">\n";
+		echo "\t\t<tr>\n";
+		echo "\t\t\t" . '<th scope="row">' . esc_html__( '"Years Ago Today" email', 'years-ago-today' ) . "</th>\n";
+		echo "\t\t\t<td>\n";
+		echo "\t\t\t\t" . sprintf( '<label for="%s">', esc_attr( self::$option_name ) ) . "\n";
+		echo "\t\t\t\t\t" . sprintf(
+			'<input name="%s" type="checkbox" id="%s" value="%s"%s%s />',
+			esc_attr( self::$option_name ),
+			esc_attr( self::$option_name ),
+			esc_attr( self::$enabled_option_value ),
+			checked( get_user_option( self::$option_name, $user->ID ), self::$enabled_option_value, false ),
+			disabled( true, defined( 'DISABLE_WP_CRON' ) && true === DISABLE_WP_CRON, false )
+		) . "\n";
+		echo "\t\t\t\t\t" . esc_html( $label );
+		echo "\t\t\t\t</label>\n";
+		echo "\t\t\t</td>\n";
+		echo "\t\t</tr>\n";
+		echo "\t\t</table>\n";
 	}
 
 	/**

@@ -16,6 +16,7 @@
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
 * Change: Remove `is_admin()` guard from `init()`, which isn't strictly necessary and impedes unit tests
 * Change: Update uses of `current_time()` and `mysql2date()` to more modern `wp_date()`
+* Change: Discontinue use of HEREDOC syntax
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder
 * Change: Prevent unwarranted PHPCS complaints
