@@ -5,6 +5,10 @@
 * New: Add support for including additional post types via new 'c2c_years_ago_today-post_types' filter
 * Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Fix: Ensure timing of emails is consistent with site's timezone rather than the server's
+* Change: Improve performance of `get_posts()`
+    * Change: Cache post IDs and only query for IDs when more is needed
+    * New: Add `clear_transient_on_publish()`, `get_post_ids_cache_key()`, and `query_post_ids()`
+    * New: Hook 'save_post' to clear transient when backporting a post to the current day in any past year
 * New: Enqueue separate admin CSS file rather than outputting into `head`
 * Change: Change caching to support multisite usage
 * Hardening: Prevent translated and generated strings from containing unintended markup

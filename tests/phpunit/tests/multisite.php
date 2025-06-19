@@ -45,9 +45,6 @@ class Years_Ago_Today_Multisite_Test extends WP_UnitTestCase {
 		$wp_object_cache->global_groups = array();
 	}
 
-	/**
-	 * @group ms-required
-	 */
 	public function test_adds_cache_group_in_multisite() {
 		global $wp_object_cache;
 
@@ -58,6 +55,13 @@ class Years_Ago_Today_Multisite_Test extends WP_UnitTestCase {
 		c2c_YearsAgoToday::init();
 
 		$this->assertArrayHasKey( c2c_YearsAgoToday::$cache_group, $wp_object_cache->global_groups );
+	}
+
+	public function test_get_post_ids_cache_key__format() {
+		switch_to_blog( self::$second_blog_id );
+		$date = wp_date( 'Ymd' );
+		$this->assertMatchesRegularExpression( '/^yat_' . self::$second_blog_id . '_20[0-9]{6}$/', c2c_YearsAgoToday::get_post_ids_cache_key() );
+		$this->assertEquals( 'yat_2_' . $date, c2c_YearsAgoToday::get_post_ids_cache_key() );
 	}
 
 }

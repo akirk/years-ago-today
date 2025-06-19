@@ -127,6 +127,9 @@ class c2c_YearsAgoToday {
 
 		// Enqueue CSS only when the main Dashboard loads.
 		add_action( 'admin_enqueue_scripts',    array( __CLASS__, 'enqueue_admin_style' ) );
+
+		// Maybe clear transients when a post gets published.
+		add_action( 'save_post',                array( __CLASS__, 'clear_transient_on_publish' ), 10, 2 );
 	}
 
 	/**
@@ -188,6 +191,34 @@ class c2c_YearsAgoToday {
 		wp_clear_scheduled_hook( self::$cron_name );
 
 		wp_cache_delete( 'first_published_year', self::$cache_group );
+	}
+
+	/**
+	 * Clears post-related transients when a post gets published.
+	 *
+	 * @since 2.0
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 */
+	public static function clear_transient_on_publish( $post_id, $post ) {
+		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		if ( 'publish' !== $post->post_status ) {
+			return;
+		}
+
+		$today_md = wp_date( 'm-d' );
+		$post_md  = wp_date( 'm-d', strtotime( $post->post_date ) );
+
+		$current_year = (int) wp_date( 'Y' );
+		$post_year    = (int) wp_date( 'Y', strtotime( $post->post_date ) );
+
+		if ( $post_md === $today_md && $post_year < $current_year ) {
+			delete_transient( self::get_post_ids_cache_key() );
+		}
 	}
 
 	/**
@@ -644,6 +675,51 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Generates and returns the cache key for today's post IDs.
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	public static function get_post_ids_cache_key() {
+		// Unique per-site prefix + today's date.
+		return 'yat_' . get_current_blog_id() . '_' . wp_date( 'Ymd' );
+	}
+
+	/**
+	 * Returns the post IDs for posts published today.
+	 *
+	 * @since 2.0
+	 *
+	 * @return int[] Array of post IDs.
+	 */
+	public static function query_post_ids() {
+		$first_year   = (int) self::get_first_published_year();
+		$current_year = (int) wp_date( 'Y' );
+
+		// Bail if this is the site's first year.
+		if ( $first_year >= $current_year ) {
+			return array();
+		}
+
+		$years = range( $first_year, $current_year - 1 );
+
+		$q = new WP_Query( array(
+			'fields'         => 'ids',
+			'post_status'    => array( 'publish' ),
+			'post_type'      => self::get_post_types(),
+			'posts_per_page' => -1,
+			'date_query'     => array(
+				'year'  => $years,
+				'month' => wp_date( 'm' ),
+				'day'   => wp_date( 'd' ),
+			),
+		) );
+
+		return $q->posts;
+	}
+
+	/**
 	 * Returns the query object after a years ago post query, or the posts that
 	 * were found.
 	 *
@@ -655,25 +731,31 @@ class c2c_YearsAgoToday {
 	 * @return array|WP_Query    Array if return_posts is true, WP_Query if false.
 	 */
 	public static function get_posts( $return_posts = false ) {
-		$first_year   = self::get_first_published_year();
-		$current_year = wp_date( 'Y' );
+		if ( false === ( $ids = get_transient( self::get_post_ids_cache_key() ) ) ) {
+			$ids = self::query_post_ids();
+			set_transient( self::get_post_ids_cache_key(), $ids, 15 * MINUTE_IN_SECONDS );
+		}
 
-		$years = range( $first_year, $current_year - 1 );
-		$month = wp_date( 'm' );
-		$day   = wp_date( 'd' );
+		// Bail early if there are no posts.
+		if ( ! $ids ) {
+			return $return_posts ? array() : new WP_Query( array( 'post__in' => array( 0 ) ) );
+		}
 
-		$query = new WP_Query( array(
+		$query_args = array(
+			'post__in'       => $ids,
 			'post_status'    => array( 'publish' ),
-			'post_type'      => self::get_post_types(),
+			'orderby'        => 'post_date',
+			'order'          => 'DESC',
 			'posts_per_page' => -1,
-			'date_query'     => array(
-				'year'  => $years,
-				'month' => $month,
-				'day'   => $day,
-			),
-		) );
+		);
 
-		return $return_posts ? $query->get_posts() : $query;
+		if ( $return_posts ) {
+			return get_posts( $query_args );
+		}
+
+		$query_args['post_type'] = self::get_post_types();
+
+		return new WP_Query( $query_args );
 	}
 
 	/**

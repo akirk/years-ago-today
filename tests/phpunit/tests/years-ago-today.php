@@ -19,6 +19,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		parent::tearDown();
 
 		$wp_meta_boxes = NULL;
+		delete_transient( c2c_YearsAgoToday::get_post_ids_cache_key() );
 	}
 
 	//
@@ -73,6 +74,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			array( 'action', 'edit_user_profile_update', 'option_save',                    10 ),
 			array( 'action', 'c2c_years_ago_daily_cron', 'cron_email',                     10 ),
 			array( 'action', 'admin_enqueue_scripts',    'enqueue_admin_style',            10 ),
+			array( 'action', 'save_post',                'clear_transient_on_publish',     10 ),
 		);
 	}
 
@@ -132,6 +134,54 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		c2c_YearsAgoToday::activate();
 
 		$this->assertNotFalse( wp_next_scheduled( c2c_YearsAgoToday::$cron_name ) );
+	}
+
+	/*
+	 * clear_transient_on_publish()
+	 */
+
+	public function test_clear_transient_on_publish__fires_on_backdated_publish() {
+		$ids = [ '15', '16' ];
+		set_transient( c2c_YearsAgoToday::get_post_ids_cache_key(), $ids );
+
+		$this->assertEquals( $ids, get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+
+		$post = $this->factory->post->create_and_get( array( 'post_status' => 'publish', 'post_date' => $this->get_date( '2021' ) ) );
+
+		$this->assertEmpty( get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+	}
+
+	public function test_clear_transient_on_publish__does_not_fire_on_publish_for_other_day() {
+		$ids = [ '15', '16' ];
+		set_transient( c2c_YearsAgoToday::get_post_ids_cache_key(), $ids );
+
+		$this->assertEquals( $ids, get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+
+		$post = $this->factory->post->create_and_get( array( 'post_status' => 'publish', 'post_date' => $this->get_date( '2021', false ) ) );
+
+		$this->assertEquals( $ids, get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+	}
+
+	public function test_clear_transient_on_publish__does_not_fire_on_publish_for_today() {
+		$ids = [ '15', '16' ];
+		set_transient( c2c_YearsAgoToday::get_post_ids_cache_key(), $ids );
+
+		$this->assertEquals( $ids, get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+
+		$post = $this->factory->post->create_and_get( array( 'post_status' => 'publish', 'post_date' => $this->get_date() ) );
+
+		$this->assertEquals( $ids, get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+	}
+
+	public function test_clear_transient_on_publish__when_explicitly_called() {
+		$post = $this->factory->post->create_and_get( array( 'post_status' => 'publish', 'post_date' => $this->get_date( '2021' ) ) );
+		c2c_YearsAgoToday::get_posts();
+
+		$this->assertEquals( [ $post->ID ], get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
+
+		c2c_YearsAgoToday::clear_transient_on_publish( $post->ID, $post );
+
+		$this->assertEmpty( get_transient( c2c_YearsAgoToday::get_post_ids_cache_key() ) );
 	}
 
 	/*
@@ -210,6 +260,35 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$expected = '<strong>2</strong> posts have been published on <strong>' . wp_date( 'M jS' ) . '</strong> in previous years:';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
+	}
+
+	/*
+	 * get_post_ids_cache_key()
+	 */
+
+	public function test_get_post_ids_cache_key__format() {
+		$date = wp_date( 'Ymd' );
+		$this->assertMatchesRegularExpression( '/^yat_1_20[0-9]{6}$/', c2c_YearsAgoToday::get_post_ids_cache_key() );
+		$this->assertEquals( 'yat_1_' . $date, c2c_YearsAgoToday::get_post_ids_cache_key() );
+	}
+
+	/*
+	 * query_post_ids()
+	 */
+
+	public function test_test_query_post_ids() {
+		$post1_id = $this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+		$post2_id = $this->factory->post->create( array( 'post_date' => $this->get_date( '2014' ) ) );
+		$this->assertEquals( [ $post2_id, $post1_id ], c2c_YearsAgoToday::query_post_ids() );
+	}
+
+	public function test_query_post_ids__when_current_year_is_first_year() {
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2014' ) ) );
+		add_filter( 'c2c_years_ago_today-first_published_year', static fn () => wp_date( 'Y' ) );
+
+		$this->assertEquals( wp_date( 'Y' ), c2c_YearsAgoToday::get_first_published_year() );
+		$this->assertEmpty( c2c_YearsAgoToday::query_post_ids() );
 	}
 
 	/*
