@@ -837,11 +837,16 @@ class c2c_YearsAgoToday {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
-		if ( isset( $_POST[ self::$option_name ] ) && self::$enabled_option_value === $_POST[ self::$option_name ] ) {
-			return update_user_option( $user_id, self::$option_name, self::$enabled_option_value );
-		} else {
-			return delete_user_option( $user_id, self::$option_name );
+		if ( isset( $_POST[ self::$option_name ] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
+			$value = sanitize_text_field( wp_unslash( $_POST[ self::$option_name ] ) );
+
+			if ( self::$enabled_option_value === $value ) {
+				return update_user_option( $user_id, self::$option_name, self::$enabled_option_value );
+			}
 		}
+
+		return delete_user_option( $user_id, self::$option_name );
 	}
 
 } // end c2c_YearsAgoToday
