@@ -10,6 +10,7 @@
     * New: Add `clear_transient_on_publish()`, `get_post_ids_cache_key()`, and `query_post_ids()`
     * New: Hook 'save_post' to clear transient when backporting a post to the current day in any past year
 * Change: Ensure list bullets are consistenly visible in all dark mode schemes
+* New: Add descriptive help text to profile setting for accessibility and clarity
 * New: Enqueue separate admin CSS file rather than outputting into `head`
 * Change: Change caching to support multisite usage
 * Hardening: Prevent translated and generated strings from containing unintended markup

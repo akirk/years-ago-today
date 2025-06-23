@@ -808,7 +808,7 @@ class c2c_YearsAgoToday {
 		echo "\t\t\t<td>\n";
 		echo "\t\t\t\t" . sprintf( '<label for="%s">', esc_attr( self::$option_name ) ) . "\n";
 		echo "\t\t\t\t\t" . sprintf(
-			'<input name="%s" type="checkbox" id="%s" value="%s"%s%s />',
+			'<input name="%s" type="checkbox" id="%s" value="%s" aria-describedby="years-ago-today-explainer"%s%s />',
 			esc_attr( self::$option_name ),
 			esc_attr( self::$option_name ),
 			esc_attr( self::$enabled_option_value ),
@@ -817,6 +817,11 @@ class c2c_YearsAgoToday {
 		) . "\n";
 		echo "\t\t\t\t\t" . esc_html( $label );
 		echo "\t\t\t\t</label>\n";
+		echo "\t\t\t\t<p id=\"years-ago-today-explainer\" class=\"description\">";
+		$is_current_user_profile_page
+			? esc_html_e( 'If checked, you\'ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.', 'years-ago-today' )
+			: esc_html_e( 'If checked, they\'ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on the profile.', 'years-ago-today' );
+		echo "</p>\n";
 		echo "\t\t\t</td>\n";
 		echo "\t\t</tr>\n";
 		echo "\t\t</table>\n";

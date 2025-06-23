@@ -569,8 +569,9 @@ HTML;
 			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
-					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" disabled='disabled' />
+					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" disabled='disabled' />
 					Email me daily about posts published on this day in years past.				</label>
+				<p id="years-ago-today-explainer" class="description">If checked, you&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.</p>
 			</td>
 		</tr>
 		</table>
@@ -592,8 +593,9 @@ HTML;
 			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
-					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" checked='checked' disabled='disabled' />
+					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" checked='checked' disabled='disabled' />
 					Email me daily about posts published on this day in years past.				</label>
+				<p id="years-ago-today-explainer" class="description">If checked, you&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.</p>
 			</td>
 		</tr>
 		</table>
@@ -615,8 +617,9 @@ HTML;
 			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
-					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" disabled='disabled' />
+					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" disabled='disabled' />
 					Email this user daily about posts published on this day in years past.				</label>
+				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on the profile.</p>
 			</td>
 		</tr>
 		</table>
@@ -650,8 +653,9 @@ HTML;
 			<th scope="row">&quot;Years Ago Today&quot; email</th>
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
-					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" checked='checked' disabled='disabled' />
+					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" checked='checked' disabled='disabled' />
 					Email this user daily about posts published on this day in years past.				</label>
+				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on the profile.</p>
 			</td>
 		</tr>
 		</table>
