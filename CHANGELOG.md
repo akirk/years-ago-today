@@ -17,6 +17,7 @@
 * Hardening: Prevent PHP warnings from any potential malicious form submission field value
 * Change: Rename `add_user_email_footer()` to `get_email_footer()` and remove arguments and just return the footer based on a format ('text' or 'html')
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
+* Change: Allow year headings in plain-text emails to be translated
 * Change: Remove `is_admin()` guard from `init()`, which isn't strictly necessary and impedes unit tests
 * Change: Update uses of `current_time()` and `mysql2date()` to more modern `wp_date()`
 * Change: Discontinue use of HEREDOC syntax

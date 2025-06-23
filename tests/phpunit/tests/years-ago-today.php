@@ -20,6 +20,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$wp_meta_boxes = NULL;
 		delete_transient( c2c_YearsAgoToday::get_post_ids_cache_key() );
+
+		remove_filter( 'gettext_years-ago-today', array( $this, 'translate_text' ) );
 	}
 
 	//
@@ -42,6 +44,13 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		return $date;
 	}
 
+	public function translate_text( $translation, $text ) {
+		if ( '== %s ==' === $text ) {
+			$translation = '~~~ < %s > ~~~';
+		}
+
+		return $translation;
+	}
 
 	//
 	//
@@ -494,6 +503,28 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$email .= "\n\n== 2014 ==\n";
 		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n== 2012 ==\n";
+		$email .= "* " . wp_strip_all_tags( $post_title1 ) . " : " . get_permalink( $post1 ) . "\n";
+
+		$this->assertEquals(
+			$email,
+			c2c_YearsAgoToday::get_email_body()['text']
+		);
+	}
+
+	public function test_get_email_body__allows_translation_of_year_headings() {
+		add_filter( 'gettext_years-ago-today', array( $this, 'translate_text' ), 10, 2 );
+
+		$post_title1 = 'A <strong>blast</strong> from the past';
+		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2012' ) ) );
+		$post_title2 = 'Days of <em>future</em> years past';
+		$post2 = $this->factory->post->create( array( 'post_title' => $post_title2, 'post_date' => $this->get_date( '2014' ) ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$email  = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$email .= "\n\n~~~ < 2014 > ~~~\n";
+		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
+		$email .= "\n\n~~~ < 2012 > ~~~\n";
 		$email .= "* " . wp_strip_all_tags( $post_title1 ) . " : " . get_permalink( $post1 ) . "\n";
 
 		$this->assertEquals(

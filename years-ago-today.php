@@ -342,7 +342,8 @@ class c2c_YearsAgoToday {
 				// Only output the year once.
 				if ( $year !== $this_year ) {
 					$year = $this_year;
-					$body .= "\n\n== $year ==\n";
+					/* translators: %s: 4-digit year. */
+					$body .= "\n\n" . sprintf( __( '== %s ==', 'years-ago-today' ), (int) $year ) . "\n";
 					$html_body .= '<h2>' . $year . '</h2>';
 				}
 				$body .= '* ' . wp_strip_all_tags( get_the_title() ) .  ' : ' . esc_url( get_permalink() ) . "\n";
