@@ -425,12 +425,6 @@ class c2c_YearsAgoToday {
 				$attrs
 			);
 
-			// Add alt if one was defined but not present.
-			if ( ! $img->hasAttribute( 'alt' ) ) {
-				$alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
-				$img->setAttribute( 'alt', trim( $alt ) );
-			}
-
 			// Import the generated, fully featured `img` into the DOM.
 			$frag = $dom->createDocumentFragment();
 			$frag->appendXML( $img_html );
