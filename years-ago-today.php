@@ -417,6 +417,11 @@ class c2c_YearsAgoToday {
 				$attrs['alt'] = $img->getAttribute( 'alt' );
 			}
 
+			if ( $img->hasAttribute( 'style' ) ) {
+				// Note: Don't bother setting 'max-width' here since it'll be done so later in order to affect ALL images. 
+				$attrs['style'] = $img->getAttribute( 'style' );
+			}
+
 			// Responsive sources for clients that support them.
 			$img_html = wp_get_attachment_image(
 				$attachment_id,

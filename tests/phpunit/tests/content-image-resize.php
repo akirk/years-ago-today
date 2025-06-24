@@ -264,4 +264,25 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'height="900"',   $out );
 	}
 
+	public function test_style_added_if_no_style_present() {
+		$orig = wp_get_attachment_url( $this->attachment_id );
+		$out  = $this->run_helper_on( '<img src="' . esc_url( $orig ) . '" />' );
+
+		$this->assertStringContainsString( 'style=";max-width:100%;height:auto;"', $out );
+	}
+
+	public function test_style_added_if_present_but_no_max_width_present() {
+		$orig = wp_get_attachment_url( $this->attachment_id );
+		$out  = $this->run_helper_on( '<img src="' . esc_url( $orig ) . '" style="background-color:#eee" />' );
+
+		$this->assertStringContainsString( 'style="background-color:#eee;max-width:100%;height:auto;"', $out );
+	}
+
+	public function test_style_not_added_if_present_and_max_width_present() {
+		$orig = wp_get_attachment_url( $this->attachment_id );
+		$out  = $this->run_helper_on( '<img src="' . esc_url( $orig ) . '" style="max-width:200px" />' );
+
+		$this->assertStringContainsString( 'style="max-width:200px"', $out );
+	}
+
 }
