@@ -827,6 +827,7 @@ class c2c_YearsAgoToday {
 		$checked  = checked( get_user_option( self::$option_name, $user->ID ), self::$enabled_option_value, false );
 		$disabled = disabled( true, defined( 'DISABLE_WP_CRON' ) && true === DISABLE_WP_CRON, false );
 		$label = $is_current_user_profile_page
+			// Note: This string is mentioned verbatim in the email footer, so reflect any changes there as well.
 			? __( 'Email me daily about posts published on this day in years past.', 'years-ago-today' )
 			: __( 'Email this user daily about posts published on this day in years past.', 'years-ago-today' );
 
