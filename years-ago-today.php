@@ -391,6 +391,12 @@ class c2c_YearsAgoToday {
 					$attributes = preg_replace( '/width=".*?"/', 'width="' . $image_src[1] . '"', $attributes );
 					$attributes = preg_replace( '/height=".*?"/', 'height="' . $image_src[2] . '"', $attributes );
 
+					// Add 'alt' attribute if not present.
+					if ( ! preg_match( '/\balt\s*=/', $matches[0] ) ) {
+						$alt = trim( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
+						$attributes .= ' alt="' . esc_attr( $alt ) . '"';
+					}
+
 					return '<img ' . $matches[1] . 'src="' . esc_url($image_src[0]) . '" ' . $attributes . '>';
 				}
 			}
