@@ -543,55 +543,82 @@ class c2c_YearsAgoToday {
 	 * @since 1.0
 	 */
 	public static function wp_dashboard_years_ago_today() {
-		echo '<div class="main">';
-
 		$q = self::get_posts();
 
-		if ( $q->have_posts() ) :
-			echo '<p>';
-			echo sprintf(
+		echo '<div class="years-ago-today-widget">';
+
+		// Output and return if no posts were published.
+		if ( ! $q->have_posts() ) {
+			printf(
+				'<p>%s</p>',
 				wp_kses(
+					sprintf(
+						/* translators: %s: date string for today */
+						__( 'No posts were published on <strong>%s</strong> from any past year.', 'years-ago-today' ),
+						esc_html( self::get_formatted_date_string() )
+					),
+					array( 'strong' => array() )
+				)
+			);
+			echo '</div>';
+			return;
+		}
+
+		// Print summary.
+		printf(
+			'<p>%s</p>',
+			wp_kses(
+				sprintf(
 					/* translators: 1: site name, 2: date string for today */
 					_n(
 						'<strong>%1$d</strong> post has been published on <strong>%2$s</strong> in a previous year:',
 						'<strong>%1$d</strong> posts have been published on <strong>%2$s</strong> in previous years:',
-						$q->post_count,
+						(int) $q->post_count,
 						'years-ago-today'
 					),
-					array( 'strong' => array() )
+					(int) $q->post_count,
+					esc_html( self::get_formatted_date_string() )
 				),
-				(int) $q->post_count,
-				esc_html( self::get_formatted_date_string() )
-			);
-			echo '</p>';
-			echo '<ul class="years-ago-today-posts">';
-			$year = '';
-			while ( $q->have_posts() ) :
-				$q->the_post();
-				$this_year = get_the_date( 'Y' );
-				// Only output the year once.
-				if ( $year !== $this_year ) {
-					$year = $this_year;
-					echo '<li class="years-ago-today-year"><h4>' . intval( $year ) . "</h4></li>\n";
+				array( 'strong' => array() )
+			)
+		);
+
+		// Group posts by year.
+		$year = '';
+		$open = false;
+
+		while ( $q->have_posts() ) :
+			$q->the_post();
+			$this_year = get_the_date( 'Y' );
+
+			if ( $this_year !== $year ) {
+				if ( $open ) {
+					echo "</ul></section>\n";
 				}
 
-				the_title( '<li><a href="' . esc_url( get_permalink() ) . '">', '</a></li>' );
-			endwhile;
-			echo '</ul>';
-		else :
-			echo '<p>';
-			printf(
-				wp_kses(
-					/* translators: %s: date string for today */
-					__( 'No posts were published on <strong>%s</strong> from any past year.', 'years-ago-today' ),
-					array( 'strong' => array() )
-				),
-				esc_html( self::get_formatted_date_string() )
-			);
-			echo '</p>';
-		endif;
+				$year = $this_year;
 
-		echo '</div>';
+				printf(
+					'<section class="years-ago-today-group" aria-labelledby="years-ago-today-year-%1$s">' .
+					'<h3 id="years-ago-today-year-%1$s" class="years-ago-today-year">%1$s</h3>' .
+					'<ul class="years-ago-today-posts">',
+					esc_attr( $year )
+				);
+
+				$open = true;
+			}
+
+			echo '<li>';
+			the_title( '<a href="' . esc_url( get_permalink() ) . '">', '</a>' );
+			echo "</li>\n";
+
+		endwhile;
+
+		if ( $open ) {
+			echo "</ul></section>\n";
+		}
+
+		echo "</div>\n";
 	}
 
 	/**

@@ -278,9 +278,12 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
 		$expected = sprintf(
-			'<div class="main"><p><strong>2</strong> posts have been published on <strong>%s</strong> in previous years:</p><ul class="years-ago-today-posts"><li class="years-ago-today-year"><h4>2014</h4></li>
-<li><a href="%s">%s</a></li><li class="years-ago-today-year"><h4>2012</h4></li>
-<li><a href="%s">%s</a></li></ul></div>',
+			'<div class="years-ago-today-widget"><p><strong>2</strong> posts have been published on <strong>%s</strong> in previous years:</p><section class="years-ago-today-group" aria-labelledby="years-ago-today-year-2014"><h3 id="years-ago-today-year-2014" class="years-ago-today-year">2014</h3><ul class="years-ago-today-posts"><li><a href="%s">%s</a></li>
+</ul></section>
+<section class="years-ago-today-group" aria-labelledby="years-ago-today-year-2012"><h3 id="years-ago-today-year-2012" class="years-ago-today-year">2012</h3><ul class="years-ago-today-posts"><li><a href="%s">%s</a></li>
+</ul></section>
+</div>
+',
 			c2c_YearsAgoToday::get_formatted_date_string(),
 			esc_url( get_permalink( $post2_id ) ),
 			get_the_title( $post2_id ),

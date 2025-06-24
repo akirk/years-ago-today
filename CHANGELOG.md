@@ -9,6 +9,7 @@
     * Change: Cache post IDs and only query for IDs when more is needed
     * New: Add `clear_transient_on_publish()`, `get_post_ids_cache_key()`, and `query_post_ids()`
     * New: Hook 'save_post' to clear transient when backporting a post to the current day in any past year
+* Change: Revamp dashboard output, more semantically putting each year within `section` tags
 * Change: Ensure list bullets are consistenly visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
 * New: Enqueue separate admin CSS file rather than outputting into `head`
