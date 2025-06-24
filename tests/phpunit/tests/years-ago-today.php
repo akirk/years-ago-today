@@ -271,6 +271,26 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
 
+	public function test_wp_dashboard_years_ago_today__full_ouput() {
+		$post1_id = $this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+		$post2_id = $this->factory->post->create( array( 'post_date' => $this->get_date( '2014' ) ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$expected = sprintf(
+			'<div class="main"><p><strong>2</strong> posts have been published on <strong>%s</strong> in previous years:</p><ul class="years-ago-today-posts"><li class="years-ago-today-year"><h4>2014</h4></li>
+<li><a href="%s">%s</a></li><li class="years-ago-today-year"><h4>2012</h4></li>
+<li><a href="%s">%s</a></li></ul></div>',
+			c2c_YearsAgoToday::get_formatted_date_string(),
+			esc_url( get_permalink( $post2_id ) ),
+			get_the_title( $post2_id ),
+			esc_url( get_permalink( $post1_id ) ),
+			get_the_title( $post1_id )
+		);
+
+		$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
+	}
+
 	/*
 	 * get_post_ids_cache_key()
 	 */
