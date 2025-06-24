@@ -265,8 +265,10 @@ class c2c_YearsAgoToday {
 	 * Returns the body of the daily email.
 	 *
 	 * @since 1.2
+	 * @since 2.0 Changed return value format so HTML body can be generated and returned alongside plaintext.
 	 *
-	 * @return array
+	 * @return array Associative array consisting of 'text' and 'html' keys with the plain-text
+	 *               and HTML email bodies, respectively.
 	 */
 	public static function get_email_body() {
 		// Get the list of posts from years ago.
@@ -368,47 +370,83 @@ class c2c_YearsAgoToday {
 	 *
 	 * @since 2.0
 	 *
-	 * @param string $size The size for resized images.
+	 * @param string $size The size for resized images. Default 'medium'.
 	 * @return string The post content with images resized.
 	 */
 	private static function get_resized_content( $size = 'medium' ) {
-		$content = get_the_content();
+		$default_size = 'medium';
 
-		// phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- This is just a regex used to find images in the post.
-		$pattern = '/<img (.*?)src=["\'](.*?)["\'](.*?)>/i';
+		// Use default if an invalid size.
+		$valid_sizes = array_merge( array( 'full' ), get_intermediate_image_sizes() );
+		if ( ! in_array( $size, $valid_sizes, true ) ) {
+			$size = $default_size;
+		}
 
-		$callback = function( $matches ) use ( $size ) {
-			$full_image_url = $matches[2];
+		$content = apply_filters( 'the_content', get_the_content() );
 
-			$attachment_id = attachment_url_to_postid( $full_image_url );
+		// Build a DOM document - tolerant mode prevents fatal errors on bad markup.
+		$dom = new DOMDocument();
+		@$dom->loadHTML(
+			mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ),
+			LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+		);
 
-			if ( $attachment_id ) {
-				$image_src = wp_get_attachment_image_src( $attachment_id, $size );
+		foreach ( $dom->getElementsByTagName( 'img' ) as $img ) {
+			$src = $img->getAttribute( 'src' );
 
-				if ( $image_src ) {
-					$attributes = $matches[3];
-					$attributes = str_replace( 'size-full', 'size-' . $size, $attributes );
-					$attributes = preg_replace( '/width=".*?"/', 'width="' . $image_src[1] . '"', $attributes );
-					$attributes = preg_replace( '/height=".*?"/', 'height="' . $image_src[2] . '"', $attributes );
-
-					// Add 'alt' attribute if not present.
-					if ( ! preg_match( '/\balt\s*=/', $matches[0] ) ) {
-						$alt = trim( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
-						$attributes .= ' alt="' . esc_attr( $alt ) . '"';
-					}
-
-					return '<img ' . $matches[1] . 'src="' . esc_url($image_src[0]) . '" ' . $attributes . '>';
-				}
+			if ( ! $src ) {
+				continue;
 			}
 
-			return $matches[0];
-		};
+			// Skip if an external image.
+			$attachment_id = attachment_url_to_postid( $src );
+			if ( ! $attachment_id ) {
+				continue;
+			}
 
-		$new_content = preg_replace_callback( $pattern, $callback, $content );
+			// Skip if the requested size can't be fetched.
+			$img_data = wp_get_attachment_image_src( $attachment_id, $size );
+			if ( ! $img_data ) {
+				continue;
+			}
 
-		return $new_content;
+			// Persist attributes to regenerated `img` tag.
+			$attrs = array( 'class' => $img->getAttribute( 'class' ) );
+
+			if ( $img->hasAttribute( 'alt' ) ) {
+				$attrs['alt'] = $img->getAttribute( 'alt' );
+			}
+
+			// Responsive sources for clients that support them.
+			$img_html = wp_get_attachment_image(
+				$attachment_id,
+				$size,
+				false,
+				$attrs
+			);
+
+			// Add alt if one was defined but not present.
+			if ( ! $img->hasAttribute( 'alt' ) ) {
+				$alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+				$img->setAttribute( 'alt', trim( $alt ) );
+			}
+
+			// Import the generated, fully featured `img` into the DOM.
+			$frag = $dom->createDocumentFragment();
+			$frag->appendXML( $img_html );
+			$img->parentNode->replaceChild( $frag, $img );
+		}
+
+		// Force all images to max-width:100% for narrow screens.
+		foreach ( $dom->getElementsByTagName( 'img' ) as $img ) {
+			$style = $img->getAttribute( 'style' );
+			if ( false === stripos( $style, 'max-width' ) ) {
+				$img->setAttribute( 'style', trim( $style . ';max-width:100%;height:auto;' ) );
+			}
+		}
+
+		return $dom->saveHTML();
 	}
-
 
 	/**
 	 * Returns the subject line for the daily email.

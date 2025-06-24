@@ -35,39 +35,33 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		$sizes = array(
 			'thumbnail' => array( 150, 150 ),
 			'medium'    => array( 300, 225 ),
+			'large'     => array( 1024, 512 ),
 			'yat-email' => array( 600, 300 ),
 		);
 
-		$meta = array(
-			'width'  => 1600,
-			'height' => 800,
-			'file'   => trailingslashit( wp_basename( $upload_dir['subdir'] ) ) . $basename,
-			'sizes'  => array(),
-		);
+		$meta = wp_generate_attachment_metadata( $this->attachment_id, $src_file );
 
 		foreach ( $sizes as $key => $dims ) {
-			$meta['sizes'][ $key ] = array(
-				'file'      => 'test-image-' . $dims[0] . 'x' . $dims[1] . '.jpg',
-				'width'     => $dims[0],
-				'height'    => $dims[1],
-				'mime-type' => 'image/jpeg',
-			);
+			// If WP couldn’t create the size (no GD/Imagick), add a placeholder.
+			if ( empty( $meta['sizes'][ $key ] ) ) {
+				$meta['sizes'][ $key ] = array(
+					'file'      => "test-image-{$dims[0]}x{$dims[1]}.jpg",
+					'width'     => $dims[0],
+					'height'    => $dims[1],
+					'mime-type' => 'image/jpeg',
+				);
+
+				// Generate zero-byte placeholder files so file_exists() passes.
+				$dummy = $subdir . $meta['sizes'][ $key ]['file'];
+				if ( ! file_exists( $dummy ) ) {
+					touch( $dummy );
+				}
+			}
 		}
 
 		wp_update_attachment_metadata( $this->attachment_id, $meta );
 		update_post_meta( $this->attachment_id, '_wp_attached_file', $meta['file'] );
 		update_post_meta( $this->attachment_id, '_wp_attachment_image_alt', 'Canola' );
-
-		// Generate zero-byte placeholder files so file_exists() passes.
-		$abs_dir = trailingslashit( $upload_dir['basedir'] ) . dirname( $meta['file'] );
-		wp_mkdir_p( $abs_dir );
-
-		foreach ( array_keys( $sizes ) as $key ) {
-			$dummy = $abs_dir . '/' . $meta['sizes'][ $key ]['file'];
-			if ( ! file_exists( $dummy ) ) {
-				touch( $dummy );
-			}
-		}
 
 		// Fix the attachment GUID so URL->ID mapping works.
 		wp_update_post( array(
