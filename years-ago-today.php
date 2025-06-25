@@ -366,6 +366,38 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Returns the desired size for images within an HTML email.
+	 *
+	 * @since 2.0
+	 *
+	 * @param string $size A valid image size. Default 'medium'.
+	 * @return string
+	 */
+	public static function get_html_email_image_size( $size = 'medium' ) {
+		$default_size = 'medium';
+
+		/**
+		 * Filters the desired size for images within an HTML email.
+		 *
+		 * @since 2.0
+		 *
+		 * @param string $size A valid image size. Default 'medium'.
+		 */
+		$size = apply_filters(
+			'c2c_years_ago_today-html_email_image_size',
+			is_string( $size ) ? $size : $default_size
+		);
+
+		// Fall back to default if an invalid size.
+		$valid_sizes = array_merge( array( 'full' ), get_intermediate_image_sizes() );
+		if ( ! in_array( $size, $valid_sizes, true ) ) {
+			$size = $default_size;
+		}
+
+		return $size;
+	}
+
+	/**
 	 * Replaces image file references with reduced-sized versions.
 	 *
 	 * @since 2.0
@@ -374,13 +406,7 @@ class c2c_YearsAgoToday {
 	 * @return string The post content with images resized.
 	 */
 	private static function get_resized_content( $size = 'medium' ) {
-		$default_size = 'medium';
-
-		// Use default if an invalid size.
-		$valid_sizes = array_merge( array( 'full' ), get_intermediate_image_sizes() );
-		if ( ! in_array( $size, $valid_sizes, true ) ) {
-			$size = $default_size;
-		}
+		$size = self::get_html_email_image_size( $size );
 
 		$content = apply_filters( 'the_content', get_the_content() );
 

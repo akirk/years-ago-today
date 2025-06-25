@@ -841,4 +841,40 @@ HTML;
 		$this->assertEquals( [ 'post' ], c2c_YearsAgoToday::get_post_types() );
 	}
 
+	/*
+	 * get_html_email_image_size()
+	 */
+
+	public function test_get_html_email_image_size__default() {
+		$this->assertEquals( 'medium', c2c_YearsAgoToday::get_html_email_image_size() );
+	}
+
+	public function test_get_html_email_image_size__uses_valid_explicit_size() {
+		$this->assertEquals( 'thumbnail', c2c_YearsAgoToday::get_html_email_image_size( 'thumbnail' ) );
+	}
+
+	public function test_get_html_email_image_size__uses_default_if_explicit_invalid_size() {
+		$this->assertEquals( 'medium', c2c_YearsAgoToday::get_html_email_image_size( 'invalid' ) );
+	}
+
+	/*
+	 * filter: c2c_years_ago_today-html_email_image_size
+	 */
+
+	public function test_filter_c2c_years_ago_today_html_email_image_size__returns_valid_size() {
+		add_filter( 'c2c_years_ago_today-html_email_image_size', static fn() => 'thumbnail' );
+
+		$this->assertEquals( 'thumbnail', c2c_YearsAgoToday::get_html_email_image_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-html_email_image_size' );
+	}
+
+	public function test_filter_c2c_years_ago_today_html_email_image_size__returns_invalid_size() {
+		add_filter( 'c2c_years_ago_today-html_email_image_size', static fn() => 'invalid' );
+
+		$this->assertEquals( 'medium', c2c_YearsAgoToday::get_html_email_image_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-html_email_image_size' );
+	}
+
 }
