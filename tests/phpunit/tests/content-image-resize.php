@@ -247,7 +247,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 
 
 	public function test_no_width_height_srcset_sizes_added_for_external_image() {
-		$out  = $this->run_helper_on( '<img src="https://example.com/images/test.jpb" />' );
+		$out  = $this->run_helper_on( '<img src="https://example.com/images/test.jpg" />' );
 
 		$this->assertStringNotContainsString( 'alt="',    $out );
 		$this->assertStringNotContainsString( 'sizes="',  $out );
@@ -257,7 +257,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 	}
 
 	public function test_width_height_not_updated_for_external_image() {
-		$out  = $this->run_helper_on( '<img src="https://example.com/images/test.jpb" alt="External" width="1200" height="900"/>' );
+		$out  = $this->run_helper_on( '<img src="https://example.com/images/test.jpg" alt="External" width="1200" height="900"/>' );
 
 		$this->assertStringContainsString( 'alt="External"', $out );
 		$this->assertStringContainsString( 'width="1200"',   $out );
