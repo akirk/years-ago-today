@@ -5,6 +5,7 @@ defined( 'ABSPATH' ) or die();
 class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 	private static $default_bcc_batch_size = 40;
+	private static $default_bcc_to = '';
 
 	public static function setUpBeforeClass(): void {
 		// Make all requests as if in the admin, which is the only place the plugin
@@ -13,6 +14,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		// Re-initialize plugin now that WP_ADMIN is true.
 		c2c_YearsAgoToday::init();
+
+		self::$default_bcc_to = 'noreply@' . wp_parse_url( home_url(), PHP_URL_HOST );
 	}
 
 	public function tearDown(): void {
@@ -929,6 +932,35 @@ HTML;
 		$this->assertEquals( self::$default_bcc_batch_size, c2c_YearsAgoToday::get_bcc_batch_size() );
 
 		remove_all_filters( 'c2c_years_ago_today-batch_size' );
+	}
+
+	/*
+	 * get_bcc_to_email_address()
+	 */
+
+	public function test_get_bcc_to_email_address__default() {
+		$this->assertEquals( self::$default_bcc_to, c2c_YearsAgoToday::get_bcc_to_email_address() );
+	}
+
+	/*
+	 * filter: c2c_years_ago_today-to_address
+	 */
+
+	public function test_filter_c2c_years_ago_today_to_address__uses_valid_email() {
+		$email = 'admin@example.com';
+		add_filter( 'c2c_years_ago_today-to_address', static function () use ( $email ) { return $email; } );
+
+		$this->assertEquals( $email, c2c_YearsAgoToday::get_bcc_to_email_address() );
+
+		remove_all_filters( 'c2c_years_ago_today-to_address' );
+	}
+
+	public function test_filter_c2c_years_ago_today_to_address__uses_default_if_invalid_email() {
+		add_filter( 'c2c_years_ago_today-to_address', static fn() => 'invalid@somewhere' );
+
+		$this->assertEquals( self::$default_bcc_to, c2c_YearsAgoToday::get_bcc_to_email_address() );
+
+		remove_all_filters( 'c2c_years_ago_today-to_address' );
 	}
 
 }

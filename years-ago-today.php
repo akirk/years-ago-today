@@ -567,6 +567,32 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Returns the 'To:' email address used for Bcc-batched emails.
+	 *
+	 * @since 2.0
+	 *
+	 * @return string The email address. Default 'noreply@{site-domain}'.
+	 */
+	public static function get_bcc_to_email_address() {
+		$default = 'noreply@' . wp_parse_url( home_url(), PHP_URL_HOST );
+
+		/**
+		 * Filters the “To:” address used for batched mails.
+		 *
+		 * Most MTAs require a non-empty “To:”.
+		 *
+		 * @since 2.0
+		 *
+		 * @param string $to The To: email address. Default 'noreply@{site-domain}'.
+		 */
+		$raw_email = (string) apply_filters( 'c2c_years_ago_today-to_address', $default );
+
+		$email = sanitize_email( $raw_email );
+
+		return is_email( $email ) ? $email : $default;
+	}
+
+	/**
 	 * Sends out daily email.
 	 *
 	 * @since 1.0
