@@ -4,6 +4,8 @@ defined( 'ABSPATH' ) or die();
 
 class Years_Ago_Today_Test extends WP_UnitTestCase {
 
+	private static $default_bcc_batch_size = 40;
+
 	public static function setUpBeforeClass(): void {
 		// Make all requests as if in the admin, which is the only place the plugin
 		// affects.
@@ -875,6 +877,58 @@ HTML;
 		$this->assertEquals( 'medium', c2c_YearsAgoToday::get_html_email_image_size() );
 
 		remove_all_filters( 'c2c_years_ago_today-html_email_image_size' );
+	}
+
+	/*
+	 * get_bcc_batch_size()
+	 */
+
+	public function test_get_bcc_batch_size__default() {
+		$this->assertEquals( self::$default_bcc_batch_size, c2c_YearsAgoToday::get_bcc_batch_size() );
+	}
+
+	/*
+	 * filter: c2c_years_ago_today-batch_size
+	 */
+
+	 public function test_filter_c2c_years_ago_today_batch_size__honors_valid_size() {
+		add_filter( 'c2c_years_ago_today-batch_size', static fn() => 50 );
+
+		$this->assertEquals( 50, c2c_YearsAgoToday::get_bcc_batch_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-batch_size' );
+	}
+
+	public function test_filter_c2c_years_ago_today_batch_size__uses_default_when_0() {
+		add_filter( 'c2c_years_ago_today-batch_size', '__return_zero' );
+
+		$this->assertEquals( self::$default_bcc_batch_size, c2c_YearsAgoToday::get_bcc_batch_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-batch_size' );
+	}
+
+	public function test_filter_c2c_years_ago_today_batch_size__uses_default_when_negative() {
+		add_filter( 'c2c_years_ago_today-batch_size', static fn() => -30 );
+
+		$this->assertEquals( self::$default_bcc_batch_size, c2c_YearsAgoToday::get_bcc_batch_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-batch_size' );
+	}
+
+	public function test_filter_c2c_years_ago_today_batch_size__uses_default_when_greater_than_100() {
+		add_filter( 'c2c_years_ago_today-batch_size', static fn() => 101 );
+
+		$this->assertEquals( self::$default_bcc_batch_size, c2c_YearsAgoToday::get_bcc_batch_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-batch_size' );
+	}
+
+	public function test_filter_c2c_years_ago_today_batch_size__uses_default_when_invalid() {
+		add_filter( 'c2c_years_ago_today-batch_size', static fn() => 'invalid' );
+
+		$this->assertEquals( self::$default_bcc_batch_size, c2c_YearsAgoToday::get_bcc_batch_size() );
+
+		remove_all_filters( 'c2c_years_ago_today-batch_size' );
 	}
 
 }

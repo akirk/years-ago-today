@@ -538,6 +538,35 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Returns the number of people to email per batch.
+	 *
+	 * @since 2.0
+	 *
+	 * @return int The batch size. Default 40.
+	 */
+	public static function get_bcc_batch_size() {
+		$default = 40;
+
+		/**
+		 * Filters the maximum number of recipients per outgoing batch.
+		 *
+		 * Some mail servers cap the length of the Bcc header; 40 keeps us well
+		 * below common limits (~ 2 kB).
+		 *
+		 * @since 2.0
+		 *
+		 * @param int $size Batch size. Default 40.
+		 */
+		$batch_size = (int) apply_filters( 'c2c_years_ago_today-batch_size', $default );
+
+		if ( 0 >= $batch_size || 100 < $batch_size ) {
+			$batch_size = $default;
+		}
+
+		return $batch_size;
+	}
+
+	/**
 	 * Sends out daily email.
 	 *
 	 * @since 1.0
