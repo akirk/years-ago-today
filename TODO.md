@@ -12,7 +12,6 @@ The following list comprises ideas, suggestions, and known issues, all of which 
 * In `get_first_published_year()`/`get_posts()`:
   - Don't use hardcoded post statuses of 'publish' and 'private'. Include latter only if user has relevant caps.
   - Make the statuses filterable for custom post status support
-  - Make the post types filterable (and expand default to public post types)
 * In `cron_email()`, improve handling for sending large number of emails
 * Unit tests: Add tests for `cron_email()`, `option_save()`
 * bcc: chunks of the email list if of sufficient size (or always) instead of individual email submissions
