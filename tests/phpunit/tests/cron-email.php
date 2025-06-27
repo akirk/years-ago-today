@@ -78,16 +78,16 @@ class Test_Years_Ago_Today_Cron_Email extends WP_UnitTestCase {
 		$this->assertCount( 0, $this->sent );
 	}
 
-	public function test_single_subscriber() {
+	public function test_single_subscriber_direct_send() {
 		$this->create_subscribed_user( 'alice@example.org' );
 
 		c2c_YearsAgoToday::cron_email();
 
 		$this->assertCount( 1, $this->sent );
 		$mail = $this->sent[0];
-		$this->assertSame( 'noreply@example.org', $mail['to'] );
+		$this->assertSame( 'alice@example.org', $mail['to'] );
 		$header_blob = implode( "\n", (array) $mail['headers'] );
-		$this->assertStringContainsString( 'Bcc:', $header_blob );
+		$this->assertStringNotContainsString( 'Bcc:', $header_blob );
 		$this->assertStringContainsString( 'List-Unsubscribe:', $header_blob );
 	}
 

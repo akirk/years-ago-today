@@ -104,6 +104,8 @@ add_filter( 'c2c_years_ago_today-batch_size', static fn() => 50 );
 
 The `c2c_years_ago_today-to_address` filter allows customization of the email address specified for the "To:" field of batched emails.
 
+Note: This email address is only used if multiple users are set to receive the daily email. In instances where only one user is being sent an email (either overall or as the odd person left over after batching), then that user's email address will be directly used as the 'To:' value.
+
 #### Arguments:
 
 * **$to_email** _(string)_: The email address. Default "noreply@{site-domain}".

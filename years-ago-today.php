@@ -623,7 +623,7 @@ class c2c_YearsAgoToday {
 			: $body['html'] . self::get_email_footer( 'html' );
 
 		$batch_size = self::get_bcc_batch_size();
-		$to_address = self::get_bcc_to_email_address();
+		$batch_to_address = self::get_bcc_to_email_address();
 
 		// Collect all recipient addresses.
 		$emails = array();
@@ -652,7 +652,14 @@ class c2c_YearsAgoToday {
 		// Chunk and send.
 		foreach ( array_chunk( $emails, $batch_size ) as $chunk ) {
 			$headers = $default_headers;
-			$headers[] = 'Bcc: ' . implode( ', ', $chunk );
+
+			// Forego bcc-batched emailing if only 1 user.
+			if ( 1 === count( $chunk ) ) {
+				$to_address = $chunk[0];
+			} else {
+				$to_address = $batch_to_address;
+				$headers[] = 'Bcc: ' . implode( ', ', $chunk );
+			}
 
 			add_action( 'phpmailer_init', $mailer_hook, 10, 1 );
 			wp_mail( $to_address, $subject, $html, $headers );
