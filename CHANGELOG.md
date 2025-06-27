@@ -43,7 +43,7 @@
     * New: Add multisite tests
     * Change: Explicitly define return type for overridden methods
     * Change: Use `assertStringContainsString()` instead of deprecated `assertContains()`
-    * New Add unit tests for plugin activation/deactivation
+    * New: Add unit tests for plugin activation/deactivation
     * New: Add unit tests for `cron_email()`
     * Change: Update uses of `current_time()` to more modern `wp_date()`
 

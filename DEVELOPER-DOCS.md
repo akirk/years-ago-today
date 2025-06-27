@@ -68,9 +68,10 @@ The `c2c_years_ago_today-first_published_year` filter allows defining the earlie
 add_filter( 'c2c_years_ago_today-first_published_year', function ( $year ) { return '2009'; } );
 ```
 
+
 ### `c2c_years_ago_today-post_types` _(filter)_
 
-The `c2c_years_ago_today-post_types` filter customization of the post types that are considered for inclusion by the plugin. By default, only the 'post' post type is included.
+The `c2c_years_ago_today-post_types` filter allows customization of the post types that are considered for inclusion by the plugin. By default, only the 'post' post type is included.
 
 #### Arguments:
 
