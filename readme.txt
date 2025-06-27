@@ -72,6 +72,8 @@ Developer documentation can be found in [DEVELOPER-DOCS.md](https://github.com/c
 * `c2c_years_ago_today-email-body-no-posts` : Customize the content of the body of the daily Years Ago Today email when it is sent on days that had no posts in prior years. 
 * `c2c_years_ago_today-first_published_year` : Explicitly define the earliest year to be considered when finding earlier published posts.
 * `c2c_years_ago_today-post_types` : Customize the post types included for consideration. Default `['post']`.
+* `c2c_years_ago_today-batch_size` : Customize the number of daily emails sent per batch. Default 40.
+* `c2c_years_ago_today-to_address` : Customize the email address specified for the "To:" field of batched emails. Default "noreply@{site-domain}".
 
 
 == Changelog ==

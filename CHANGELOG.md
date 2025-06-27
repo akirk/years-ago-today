@@ -12,10 +12,12 @@
     * Change: Cache post IDs and only query for IDs when more is needed
     * New: Add `clear_transient_on_publish()`, `get_post_ids_cache_key()`, and `query_post_ids()`
     * New: Hook 'save_post' to clear transient when backporting a post to the current day in any past year
-* New: Add `get_bcc_batch_size()` to get number of people to email per BCC: batch
-* New: Add filter 'c2c_years_ago_today-batch_size' to customize the number of people to email per BCC: batch
-* New: Add `get_bcc_to_email_address()` to get the 'To:' email address used for Bcc-batched emails
-* New: Add filter 'c2c_years_ago_today-to_address' to customize the 'To:' email address used for Bcc-batched emails
+* Change: Improve email-sending performance
+    * Change: Batch email users via BCC: rather than individually
+    * New: Add `get_bcc_batch_size()` to get number of people to email per BCC: batch
+    * New: Add filter 'c2c_years_ago_today-batch_size' to customize the number of people to email per BCC: batch
+    * New: Add `get_bcc_to_email_address()` to get the 'To:' email address used for Bcc-batched emails
+    * New: Add filter 'c2c_years_ago_today-to_address' to customize the 'To:' email address used for Bcc-batched emails
 * Change: Revamp dashboard output, more semantically putting each year within `section` tags
 * Change: Ensure list bullets are consistenly visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
@@ -42,6 +44,7 @@
     * Change: Explicitly define return type for overridden methods
     * Change: Use `assertStringContainsString()` instead of deprecated `assertContains()`
     * New Add unit tests for plugin activation/deactivation
+    * New: Add unit tests for `cron_email()`
     * Change: Update uses of `current_time()` to more modern `wp_date()`
 
 ## 1.6 _(2024-08-09)_

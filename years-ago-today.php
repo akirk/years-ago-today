@@ -617,34 +617,46 @@ class c2c_YearsAgoToday {
 			return;
 		}
 
-		if ( is_array( $body ) ) {
-			if ( isset( $body['html'] ) ) {
-				if ( isset( $body['text'] ) ) {
-					$plain_text = $body['text'];
-				} else {
-					$plain_text = wp_strip_all_tags( $body['html'] );
-				}
+		$plain  = $body['text'] . self::get_email_footer( 'text' );
+		$html   = empty( $body['html'] )
+			? wpautop( esc_html( $plain ) )
+			: $body['html'] . self::get_email_footer( 'html' );
 
-				$headers[]    = 'Content-type: text/html';
-				$alt_function = function ( $mailer ) use ( $plain_text ) {
-					$mailer->{'AltBody'} = $plain_text . self::get_email_footer( 'text' );
-				};
-				add_action(
-					'phpmailer_init',
-					$alt_function
-				);
+		$batch_size = self::get_bcc_batch_size();
+		$to_address = self::get_bcc_to_email_address();
 
-				$body = $body['html'] . self::get_email_footer( 'html' );
-			} elseif ( isset( $body['text'] ) ) {
-				$body = $body['text'] . self::get_email_footer( 'text' );
+		// Collect all recipient addresses.
+		$emails = array();
+		foreach ( $users as $user ) {
+			if ( is_email( $user->user_email ) ) {
+				$emails[] = $user->user_email;
 			}
 		}
 
-		// Send email to each user.
-		foreach ( $users as $user ) {
-			if ( $user->user_email ) {
-				wp_mail( $user->user_email, $subject, $body, $headers );
-			}
+		if ( ! $emails ) {
+			return;
+		}
+
+		$mailer_hook = static function ( $phpmailer ) use ( $html, $plain ) {
+			$phpmailer->isHTML( true );
+			$phpmailer->Body    = $html;
+			$phpmailer->AltBody = $plain;
+		};
+
+		// Headers included for every email that don't change per batch.
+		$default_headers = array(
+			'Content-type: text/html; charset=UTF-8', // PHPMailer would normally set this due to isHTML(true), but be explicit for testing.
+			'List-Unsubscribe: <' . esc_url_raw( admin_url( 'profile.php' ) ) . '>',
+		);
+
+		// Chunk and send.
+		foreach ( array_chunk( $emails, $batch_size ) as $chunk ) {
+			$headers = $default_headers;
+			$headers[] = 'Bcc: ' . implode( ', ', $chunk );
+
+			add_action( 'phpmailer_init', $mailer_hook, 10, 1 );
+			wp_mail( $to_address, $subject, $html, $headers );
+			remove_action( 'phpmailer_init', $mailer_hook, 10 );
 		}
 	}
 
