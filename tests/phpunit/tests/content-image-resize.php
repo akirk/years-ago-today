@@ -34,9 +34,11 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		// Create metadata for sample image sizes.
 		$sizes = array(
 			'thumbnail' => array( 150, 150 ),
+			'med_small' => array( 200, 150 ),
 			'medium'    => array( 300, 225 ),
+			'med_large' => array( 400, 300 ),
 			'large'     => array( 1024, 512 ),
-			'yat-email' => array( 600, 300 ),
+			'yat-email' => array( 600, 450 ),
 		);
 
 		$meta = wp_generate_attachment_metadata( $this->attachment_id, $src_file );
@@ -227,6 +229,64 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'srcset=', $out );
 		$this->assertStringContainsString( 'sizes=',  $out );
+	}
+
+	public function test_srcset_trimmed_to_selected_width_when_no_other_sizes_available() {
+		$meta = wp_get_attachment_metadata( $this->attachment_id );
+
+		// Ensure we start from the identical baseline as other tests.
+		unset( $meta['sizes']['med_small'] );
+		unset( $meta['sizes']['med_large'] );
+		unset( $meta['sizes']['large'] );
+		unset( $meta['sizes']['yat-email'] );
+		wp_update_attachment_metadata( $this->attachment_id, $meta );
+
+		$html = sprintf( '<img src="%s" />', wp_get_attachment_url( $this->attachment_id ) );
+		$out  = $this->run_helper_on( $html );
+
+		$this->assertStringContainsString( 'srcset=',  $out );
+		$this->assertStringContainsString( '300w',     $out );
+		$this->assertStringContainsString( '640w',     $out ); // Includes original image size to ensrue srcset has options.
+		$this->assertStringNotContainsString( '200w',  $out );
+		$this->assertStringNotContainsString( '400w',  $out );
+		// Core excludes the thumbnail because its 1:1 dimension are too far from the image's 4:3 dimensions.
+		$this->assertStringNotContainsString( '150w',  $out );
+		$this->assertStringNotContainsString( '600w',  $out );
+		$this->assertStringNotContainsString( '1024w', $out );
+	}
+
+	public function test_srcset_trimmed_to_selected_width_when_no_larger_images() {
+		$meta = wp_get_attachment_metadata( $this->attachment_id );
+
+		unset( $meta['sizes']['med_large'] );
+		unset( $meta['sizes']['large'] );
+		unset( $meta['sizes']['yat-email'] );
+		wp_update_attachment_metadata( $this->attachment_id, $meta );
+
+		add_filter( 'c2c_years_ago_today-html_email_image_size', fn() => 'med_small' );
+		$html = sprintf( '<img src="%s" />', wp_get_attachment_url( $this->attachment_id ) );
+		$out  = $this->run_helper_on( $html );
+
+		$this->assertStringContainsString( 'srcset=',  $out );
+		$this->assertStringContainsString( '200w',     $out );
+		$this->assertStringContainsString( '300w',     $out );
+		$this->assertStringNotContainsString( '400w',  $out );
+		$this->assertStringNotContainsString( '150w',  $out );
+		$this->assertStringNotContainsString( '600w',  $out );
+		$this->assertStringNotContainsString( '1024w', $out );
+	}
+
+	public function test_srcset_trim_keeps_small_candidates() {
+		$html = sprintf( '<img src="%s" />', wp_get_attachment_url( $this->attachment_id ) );
+		$out  = $this->run_helper_on( $html );
+
+		$this->assertStringContainsString( 'srcset=',  $out );
+		$this->assertStringContainsString( '200w',     $out );
+		$this->assertStringContainsString( '300w',     $out );
+		$this->assertStringContainsString( '400w',     $out );
+		$this->assertStringNotContainsString( '150w',  $out );
+		$this->assertStringNotContainsString( '600w',  $out );
+		$this->assertStringNotContainsString( '1024w', $out );
 	}
 
 	public function test_width_height_added() {

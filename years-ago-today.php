@@ -436,6 +436,30 @@ class c2c_YearsAgoToday {
 				continue;
 			}
 
+			// Limit 'srcset' values to sizes <= max width and one retina-supportive size > max_width but <= 2*max_width to prevent mail clients unnecessarily downloading larger sizes.
+			$max_width   = $img_data[1];               // width of chosen rendition
+			$srcset_trim = static function ( $sources ) use ( $max_width ) {
+				$kept = array();
+				$high_density = null;
+
+				foreach ( $sources as $w => $src ) {
+					// Keep any smaller size.
+					if ( (int) $w <= $max_width ) {
+						$kept[ $w ] = $src;
+					}
+					// Only keep the first 2x+ image as the retina companion.
+					// Note: This simple approach may not yield the perfect HiDPI version available, but it is sufficient.
+					elseif ( ! $high_density && $w <= $max_width * 2 ) {
+						$high_density = true;
+						$kept[ $w ]   = $src;
+					}
+				}
+
+				// If trimming would leave only one candidate, fall back so srcset survives.
+				return ( count( $kept ) >= 2 ) ? $kept : $sources;
+			};
+			add_filter( 'wp_calculate_image_srcset', $srcset_trim, 10, 1 );
+
 			// Persist attributes to regenerated `img` tag.
 			$attrs = array( 'class' => $img->getAttribute( 'class' ) );
 
@@ -455,6 +479,8 @@ class c2c_YearsAgoToday {
 				false,
 				$attrs
 			);
+
+			remove_filter( 'wp_calculate_image_srcset', $srcset_trim );
 
 			// Import the generated, fully featured `img` into the DOM.
 			$frag = $dom->createDocumentFragment();
