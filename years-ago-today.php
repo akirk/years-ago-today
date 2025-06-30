@@ -793,7 +793,7 @@ class c2c_YearsAgoToday {
 
 				printf(
 					'<section class="years-ago-today-group" aria-labelledby="years-ago-today-year-%1$s">' .
-					'<h3 id="years-ago-today-year-%1$s" class="years-ago-today-year">%1$s</h3>' .
+					'<h3 id="years-ago-today-year-%1$s" class="years-ago-today-year" role="heading" aria-level="3">%1$s</h3>' .
 					'<ul class="years-ago-today-posts">',
 					esc_attr( $year )
 				);
