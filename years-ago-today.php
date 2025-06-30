@@ -312,7 +312,7 @@ class c2c_YearsAgoToday {
 					$site_name,
 					self::get_formatted_date_string()
 				);
-				$html_body .= '<p>' . $body . '</p>';
+				$html_body .= wpautop( $body );
 			}
 			// Else don't define an email body.
 			else {
@@ -335,7 +335,7 @@ class c2c_YearsAgoToday {
 				self::get_formatted_date_string()
 			);
 
-			$html_body .= '<p>' . esc_html( $body ) . '</p>';
+			$html_body .= wpautop( esc_html( $body ) );
 
 			$year = '';
 			while ( $query->have_posts() ) :

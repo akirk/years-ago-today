@@ -27,6 +27,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		delete_transient( c2c_YearsAgoToday::get_post_ids_cache_key() );
 
 		remove_filter( 'gettext_years-ago-today', array( $this, 'translate_text' ) );
+		remove_all_filters( 'c2c_years_ago_today-email-if-no-posts' );
+		remove_all_filters( 'c2c_years_ago_today-email-body-no-posts' );
 	}
 
 	//
@@ -559,6 +561,15 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			$email,
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
+	}
+
+	public function test_get_email_body__uses_wpautop_for_html() {
+		add_filter( 'c2c_years_ago_today-email-if-no-posts', '__return_true' );
+		add_filter( 'c2c_years_ago_today-email-body-no-posts', static fn() => "This is a paragraph.\n\nThis is another another one.\n\nAnd yet a third paragraph." );
+
+		$html = c2c_YearsAgoToday::get_email_body()['html'];
+
+		$this->assertSame( 3, substr_count( $html, '<p>' ) );
 	}
 
 	/*
