@@ -274,7 +274,7 @@ class c2c_YearsAgoToday {
 		// Get the list of posts from years ago.
 		$query = self::get_posts();
 
-		$site_name = wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
+		$site_name = html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES );
 
 		$html_body = '<html><head><title>' . self::get_email_subject() . '</title></head><body>';
 
@@ -348,8 +348,8 @@ class c2c_YearsAgoToday {
 					$body .= "\n\n" . sprintf( __( '== %s ==', 'years-ago-today' ), (int) $year ) . "\n";
 					$html_body .= '<h2>' . $year . '</h2>';
 				}
-				$body .= '* ' . wp_strip_all_tags( get_the_title() ) .  ' : ' . esc_url( get_permalink() ) . "\n";
-				$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '">' . esc_html( get_the_title() ) . '</a></h3>';
+				$body .= '* ' . wp_kses( get_the_title(), array() ) . ' : ' . esc_url_raw( get_permalink() ) . "\n";
+				$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . '</a></h3>';
 				$html_body .= wp_kses_post( self::get_resized_content() );
 			endwhile;
 		}
@@ -510,7 +510,7 @@ class c2c_YearsAgoToday {
 		return sprintf(
 			/* translators: %s: site name in subject for daily email */
 			__( '[%s] Years Ago Today daily update', 'years-ago-today' ),
-			wp_specialchars_decode( get_option('blogname'), ENT_QUOTES )
+			html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES )
 		);
 	}
 
@@ -643,7 +643,7 @@ class c2c_YearsAgoToday {
 			return;
 		}
 
-		$plain  = $body['text'] . self::get_email_footer( 'text' );
+		$plain  = wp_kses( $body['text'], array() ) . self::get_email_footer( 'text' );
 		$html   = empty( $body['html'] )
 			? wpautop( esc_html( $plain ) )
 			: $body['html'] . self::get_email_footer( 'html' );
