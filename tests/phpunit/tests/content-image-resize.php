@@ -54,7 +54,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 				);
 
 				// Generate zero-byte placeholder files so file_exists() passes.
-				$dummy = $subdir . $meta['sizes'][ $key ]['file'];
+				$dummy = trailingslashit( $subdir ) . $meta['sizes'][ $key ]['file'];
 				if ( ! file_exists( $dummy ) ) {
 					touch( $dummy );
 				}
