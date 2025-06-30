@@ -588,9 +588,10 @@ class c2c_YearsAgoToday {
 			: "\n\n";
 
 		$footer .= sprintf(
-			/* translators: %s: URL to user profile on the site */
-			__( 'If you wish to discontinue receiving these emails, simply log into the site and visit your profile at %s to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."', 'years-ago-today' ),
-			admin_url( 'profile.php' )
+			/* translators: 1: URL to user profile on the site, 2: checkbox label */
+			__( 'If you wish to discontinue receiving these emails, simply log into the site and visit your profile at %1$s to uncheck the checkbox labeled "%2$s"', 'years-ago-today' ),
+			admin_url( 'profile.php' ),
+			esc_html( self::get_optin_label() )
 		);
 
 		$footer .= $is_html
