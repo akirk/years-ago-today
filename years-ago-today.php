@@ -424,8 +424,18 @@ class c2c_YearsAgoToday {
 				continue;
 			}
 
-			// Skip if an external image.
-			$attachment_id = attachment_url_to_postid( $src );
+			// Get an attachment ID based on URL and cache results.
+			$key = strtok( $src, '?' ); // Strip ?query=string for stable look-up.
+			$cache_key     = md5( $key );
+			$attachment_id = wp_cache_get( $cache_key, 'yat_url_to_id' );
+			if ( false === $attachment_id ) {
+				$attachment_id = attachment_url_to_postid( $key );
+
+				// Store 0 for “not found” so repeated externals are skipped quickly.
+				wp_cache_set( $cache_key, $attachment_id ? $attachment_id : 0, 'yat_url_to_id' );
+			}
+
+			// Skip if an external image or not an attachment.
 			if ( ! $attachment_id ) {
 				continue;
 			}
