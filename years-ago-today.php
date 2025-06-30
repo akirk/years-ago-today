@@ -484,9 +484,16 @@ class c2c_YearsAgoToday {
 				}
 			}
 
-			if ( $img->hasAttribute( 'style' ) ) {
-				// Note: Don't bother setting 'max-width' here since it'll be done so later in order to affect ALL images. 
-				$attrs['style'] = $img->getAttribute( 'style' );
+			$style = $img->hasAttribute( 'style' ) ? $img->getAttribute( 'style' ) : '';
+
+			// Add border:0 if not already present.
+			if ( false === stripos( $style, 'border' ) ) {
+				$style = trim( $style . ';border:0;' );
+			}
+
+			// Avoid saving an empty style attribute; max-width is added later.
+			if ( $style ) {
+				$attrs['style'] = $style;
 			}
 
 			// Responsive sources for clients that support them.
