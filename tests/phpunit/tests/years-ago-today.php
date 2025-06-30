@@ -428,6 +428,22 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	}
 
 	/*
+	 * get_optin_label()
+	 */
+
+	public function test_get_optin_label() {
+		$this->assertEquals( 'Email me daily about posts published on this day in years past.', c2c_YearsAgoToday::get_optin_label() );
+	}
+
+	public function test_get_optin_label_is_translatable() {
+		add_filter( 'gettext_years-ago-today', static function ( $string ) { return "This string is translated."; } );
+
+		$this->assertEquals( 'This string is translated.', c2c_YearsAgoToday::get_optin_label() );
+
+		remove_all_filters( 'gettext_years-ago-today' );
+	}
+
+	/*
 	 * get_email_subject()
 	 */
 

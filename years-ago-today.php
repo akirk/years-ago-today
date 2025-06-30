@@ -524,6 +524,19 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Returns the translated string used for the label of the setting to opt into daily emails.
+	 *
+	 * This is its own getter because the string is used on the settings page and in the email footer.
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	public static function get_optin_label() {
+		return __( 'Email me daily about posts published on this day in years past.', 'years-ago-today' );
+	}
+
+	/**
 	 * Returns the subject line for the daily email.
 	 *
 	 * @since 1.2
@@ -1020,8 +1033,7 @@ class c2c_YearsAgoToday {
 		$checked  = checked( get_user_option( self::$option_name, $user->ID ), self::$enabled_option_value, false );
 		$disabled = disabled( true, defined( 'DISABLE_WP_CRON' ) && true === DISABLE_WP_CRON, false );
 		$label = $is_current_user_profile_page
-			// Note: This string is mentioned verbatim in the email footer, so reflect any changes there as well.
-			? __( 'Email me daily about posts published on this day in years past.', 'years-ago-today' )
+			? self::get_optin_label()
 			: __( 'Email this user daily about posts published on this day in years past.', 'years-ago-today' );
 
 		echo "\t\t<table class=\"form-table\">\n";

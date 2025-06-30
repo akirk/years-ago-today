@@ -30,6 +30,7 @@
 * Change: Allow year headings in plain-text emails to be translated
 * Change: Remove `is_admin()` guard from `init()`, which isn't strictly necessary and impedes unit tests
 * Change: Update uses of `current_time()` and `mysql2date()` to more modern `wp_date()`
+* New: Add `get_optin_label()` to centralize the optin label since it is used in two places
 * Change: Discontinue use of HEREDOC syntax
 * Change: Discontinue unnecessary explicit loading of textdomain
 * Change: Add missing translator comments for strings with one placeholder
