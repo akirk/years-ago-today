@@ -133,6 +133,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		$out = $this->run_helper_on( $html );
 
 		$this->assertStringContainsString( 'alt="Canola"', $out );
+		$this->assertStringNotContainsString( 'role="presentation"', $out );
 	}
 
 	public function test_no_duplicate_alt() {
@@ -153,6 +154,30 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		$out = $this->run_helper_on( $html );
 
 		$this->assertStringContainsString( ' alt="Original" ', $out );
+		$this->assertStringNotContainsString( 'role="presentation"', $out );
+	}
+
+	public function test_role_presentation_added_if_empty_alt() {
+		delete_post_meta( $this->attachment_id, '_wp_attachment_image_alt' );
+		$html = sprintf(
+			'<img src="%s" alt="" />',
+			wp_get_attachment_url( $this->attachment_id )
+		);
+		$out = $this->run_helper_on( $html );
+
+		$this->assertStringContainsString( 'alt=""', $out );
+		$this->assertStringContainsString( 'role="presentation"', $out );
+	}
+
+	public function test_role_presentation_not_added_if_no_alt() {
+		delete_post_meta( $this->attachment_id, '_wp_attachment_image_alt' );
+		$html = sprintf(
+			'<img src="%s" />',
+			wp_get_attachment_url( $this->attachment_id )
+		);
+		$out = $this->run_helper_on( $html );
+
+		$this->assertStringNotContainsString( 'role="presentation"', $out );
 	}
 
 	public function test_default_size_is_medium() {

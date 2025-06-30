@@ -474,7 +474,14 @@ class c2c_YearsAgoToday {
 			$attrs = array( 'class' => $img->getAttribute( 'class' ) );
 
 			if ( $img->hasAttribute( 'alt' ) ) {
-				$attrs['alt'] = $img->getAttribute( 'alt' );
+				$alt = trim( $img->getAttribute( 'alt' ) );
+
+				if ( $alt ) {
+					$attrs['alt'] = $alt;
+				} else {
+					// Empty alt means purely decorative: mark as presentation.
+					$attrs['role'] = 'presentation';
+				}
 			}
 
 			if ( $img->hasAttribute( 'style' ) ) {
