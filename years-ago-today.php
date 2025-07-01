@@ -340,7 +340,7 @@ class c2c_YearsAgoToday {
 			$year = '';
 			while ( $query->have_posts() ) :
 				$query->the_post();
-				$this_year = mysql2date( 'Y', get_post_field( 'post_date' ) );
+				$this_year = wp_date( 'Y', get_post_field( 'post_date' ) );
 				// Only output the year once.
 				if ( $year !== $this_year ) {
 					$year = $this_year;
@@ -796,7 +796,7 @@ class c2c_YearsAgoToday {
 
 		while ( $q->have_posts() ) :
 			$q->the_post();
-			$this_year = mysql2date( 'Y', get_post_field( 'post_date' ) );
+			$this_year = wp_date( 'Y', get_post_field( 'post_date' ) );
 
 			if ( $this_year !== $year ) {
 				if ( $open ) {
