@@ -340,12 +340,12 @@ class c2c_YearsAgoToday {
 			$year = '';
 			while ( $query->have_posts() ) :
 				$query->the_post();
-				$this_year = wp_date( 'Y', get_post_field( 'post_date' ) );
+				$this_year = wp_date( 'Y', strtotime( get_post_field( 'post_date' ) ) );
 				// Only output the year once.
 				if ( $year !== $this_year ) {
 					$year = $this_year;
-					/* translators: %s: 4-digit year. */
-					$body .= "\n\n" . sprintf( __( '== %s ==', 'years-ago-today' ), (int) $year ) . "\n";
+					/* translators: %d: 4-digit year. */
+					$body .= "\n\n" . sprintf( __( '== %d ==', 'years-ago-today' ), (int) $year ) . "\n";
 					$html_body .= '<h2>' . $year . '</h2>';
 				}
 				$body .= '* ' . wp_kses( get_the_title(), array() ) . ' : ' . esc_url_raw( get_permalink() ) . "\n";
@@ -796,7 +796,7 @@ class c2c_YearsAgoToday {
 
 		while ( $q->have_posts() ) :
 			$q->the_post();
-			$this_year = wp_date( 'Y', get_post_field( 'post_date' ) );
+			$this_year = wp_date( 'Y', strtotime( get_post_field( 'post_date' ) ) );
 
 			if ( $this_year !== $year ) {
 				if ( $open ) {
@@ -806,10 +806,10 @@ class c2c_YearsAgoToday {
 				$year = $this_year;
 
 				printf(
-					'<section class="years-ago-today-group" aria-labelledby="years-ago-today-year-%1$s">' .
-					'<h3 id="years-ago-today-year-%1$s" class="years-ago-today-year" role="heading" aria-level="3">%1$s</h3>' .
+					'<section class="years-ago-today-group" aria-labelledby="years-ago-today-year-%1$d">' .
+					'<h3 id="years-ago-today-year-%1$d" class="years-ago-today-year" role="heading" aria-level="3">%1$d</h3>' .
 					'<ul class="years-ago-today-posts">',
-					esc_attr( $year )
+					(int) $year
 				);
 
 				$open = true;

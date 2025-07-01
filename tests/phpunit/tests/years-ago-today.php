@@ -52,8 +52,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	}
 
 	public function translate_text( $translation, $text ) {
-		if ( '== %s ==' === $text ) {
-			$translation = '~~~ < %s > ~~~';
+		if ( '== %d ==' === $text ) {
+			$translation = '~~~ < %d > ~~~';
 		}
 
 		return $translation;
