@@ -8,6 +8,12 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 	private $attachment_id;
 	private $ref;
 	private $post_id;
+	private static $upload_dir; // The return value of wp_upload_dir()
+
+	public static function setUpBeforeClass(): void {
+		self::$upload_dir = wp_upload_dir();
+		wp_mkdir_p( self::$upload_dir['path'] );
+	}
 
 	public function setUp(): void {
 		parent::setUp();
@@ -16,11 +22,8 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		add_image_size( 'yat-email', 600, 300 );
 
 		// Copy test image into current Y/m uploads subdirectory.
-		$upload_dir = wp_upload_dir();
-		$subdir     = $upload_dir['path'];
-		wp_mkdir_p( $subdir );
-
 		$basename = 'test-image.jpg';
+		$subdir = self::$upload_dir['path'];
 		$src_file = $subdir . '/' . $basename;
 		copy( DIR_TESTDATA . '/images/canola.jpg', $src_file );
 
@@ -28,7 +31,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		$this->attachment_id = $this->factory->attachment->create_object( array(
 			'post_mime_type' => 'image/jpeg',
 			'post_title'     => 'Canola',
-			'guid'           => $upload_dir['url'] . '/' . $basename, // temp; fixed later
+			'guid'           => self::$upload_dir['url'] . '/' . $basename, // temp; fixed later
 		) );
 
 		// Create metadata for sample image sizes.
@@ -68,7 +71,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		// Fix the attachment GUID so URL->ID mapping works.
 		wp_update_post( array(
 			'ID'   => $this->attachment_id,
-			'guid' => trailingslashit( $upload_dir['baseurl'] ) . $meta['file'],
+			'guid' => trailingslashit( self::$upload_dir['baseurl'] ) . $meta['file'],
 		) );
 
 		// Reflection for the private helper.
@@ -112,9 +115,8 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 
 	private function get_attachment_src( $attachment_id, $size = 'medium' ) {
 		$meta       = wp_get_attachment_metadata( $attachment_id );
-		$uploads    = wp_upload_dir();
 		$attach_rel = dirname( $meta['file'] ) . '/' . $meta['sizes'][ $size ]['file'];
-		return trailingslashit( $uploads['baseurl'] ) . ltrim( $attach_rel, '/' );
+		return trailingslashit( self::$upload_dir['baseurl'] ) . ltrim( $attach_rel, '/' );
 	}
 
 
