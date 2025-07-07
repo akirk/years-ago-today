@@ -11,6 +11,8 @@
 define( 'YEARS_AGO_TODAY_PLUGIN_DIR',  dirname( __FILE__, 3 ) );
 define( 'YEARS_AGO_TODAY_PLUGIN_FILE', YEARS_AGO_TODAY_PLUGIN_DIR . '/years-ago-today.php' );
 
+define( 'WP_RUNNING_TESTS', true );
+
 $polyfill_path = YEARS_AGO_TODAY_PLUGIN_DIR . '/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php';
 if ( file_exists( $polyfill_path ) ) {
 	require $polyfill_path;

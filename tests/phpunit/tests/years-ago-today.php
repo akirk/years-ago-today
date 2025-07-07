@@ -102,6 +102,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	//
 
 
+	public function test_WP_RUNNING_TESTS() {
+		$this->assertTrue( defined( 'WP_RUNNING_TESTS' ) );
+		$this->assertTrue( WP_RUNNING_TESTS );
+	}
+
 	public function test_plugin_version() {
 		$this->assertEquals( '1.6', c2c_YearsAgoToday::version() );
 	}
