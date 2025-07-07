@@ -1045,8 +1045,9 @@ class c2c_YearsAgoToday {
 			return;
 		}
 
-		$checked  = checked( get_user_option( self::$option_name, $user->ID ), self::$enabled_option_value, false );
-		$disabled = disabled( true, defined( 'DISABLE_WP_CRON' ) && true === DISABLE_WP_CRON, false );
+		$is_checked = get_user_option( self::$option_name, $user->ID );
+		$is_disabled = defined( 'DISABLE_WP_CRON' ) && ( true === DISABLE_WP_CRON );
+
 		$label = $is_current_user_profile_page
 			? self::get_optin_label()
 			: __( 'Email this user daily about posts published on this day in years past.', 'years-ago-today' );
@@ -1061,8 +1062,8 @@ class c2c_YearsAgoToday {
 			esc_attr( self::$option_name ),
 			esc_attr( self::$option_name ),
 			esc_attr( self::$enabled_option_value ),
-			checked( get_user_option( self::$option_name, $user->ID ), self::$enabled_option_value, false ),
-			disabled( true, defined( 'DISABLE_WP_CRON' ) && true === DISABLE_WP_CRON, false )
+			checked( $is_checked, self::$enabled_option_value, false ),
+			disabled( $is_disabled, true, false )
 		) . "\n";
 		echo "\t\t\t\t\t" . esc_html( $label );
 		echo "\t\t\t\t</label>\n";
