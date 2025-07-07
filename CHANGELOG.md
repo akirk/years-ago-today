@@ -21,6 +21,7 @@
 * Change: Revamp dashboard output, more semantically putting each year within `section` tags
 * Change: Ensure list bullets are consistenly visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
+* New: Enqueue JS on profile pages
 * New: Enqueue separate admin CSS file rather than outputting into `head`
 * Change: Also enqueue CSS on profile pages
 * Change: Change caching to support multisite usage

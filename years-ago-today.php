@@ -125,7 +125,7 @@ class c2c_YearsAgoToday {
 		add_action( 'personal_options_update',  array( __CLASS__, 'option_save' ) );
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'option_save' ) );
 
-		// Enqueue CSS in the admin.
+		// Enqueue CSS and JS in the admin.
 		add_action( 'admin_enqueue_scripts',    array( __CLASS__, 'enqueue_admin_style' ) );
 
 		// Maybe clear transients when a post gets published.
@@ -993,7 +993,7 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
-	 * Enqueues admin CSS when on appropriate pages.
+	 * Enqueues admin CSS and JS when on appropriate pages.
 	 *
 	 * @since 2.0
 	 */
@@ -1009,6 +1009,21 @@ class c2c_YearsAgoToday {
 			array(),
 			self::version()
 		);
+
+		// Only enqueue JS on the profile page.
+		if ( 'profile.php' === $hook_suffix ) {
+			$js_id = 'c2c-years-ago-today-admin-js';
+
+			// Register script.
+			wp_register_script( $js_id, plugins_url( 'assets/js/admin.js', __FILE__ ), array(), self::version(), true );
+
+			// Localize script.
+			wp_localize_script( $js_id, 'c2c_years_ago_today', array(
+			) );
+
+			// Enqueue script.
+			wp_enqueue_script( $js_id );
+		}
 	}
 
 	/**

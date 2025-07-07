@@ -32,6 +32,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		wp_deregister_style( 'c2c-years-ago-today-admin-css' );
 		wp_dequeue_style( 'c2c-years-ago-today-admin-css' );
+		wp_deregister_script( 'c2c-years-ago-today-admin-js' );
+		wp_dequeue_script( 'c2c-years-ago-today-admin-js' );
 	}
 
 	//
@@ -815,6 +817,42 @@ HTML;
 
 		$this->assertTrue( wp_style_is( $key, 'registered' ) );
 		$this->assertTrue( wp_style_is( $key, 'enqueued' ) );
+	}
+
+	public function test_enqueue_admin_scripts__when_not_on_admin_index() {
+		$key = 'c2c-years-ago-today-admin-js';
+
+		$this->assertFalse( wp_script_is( $key, 'registered' ) );
+		$this->assertFalse( wp_script_is( $key, 'enqueued' ) );
+
+		c2c_YearsAgoToday::enqueue_admin_style( 'plugins.php' );
+
+		$this->assertFalse( wp_script_is( $key, 'registered' ) );
+		$this->assertFalse( wp_script_is( $key, 'enqueued' ) );
+	}
+
+	 public function test_enqueue_admin_scripts__when_on_admin_index() {
+		$key = 'c2c-years-ago-today-admin-js';
+
+		$this->assertFalse( wp_script_is( $key, 'registered' ) );
+		$this->assertFalse( wp_script_is( $key, 'enqueued' ) );
+
+		c2c_YearsAgoToday::enqueue_admin_style( 'index.php' );
+
+		$this->assertFalse( wp_script_is( $key, 'registered' ) );
+		$this->assertFalse( wp_script_is( $key, 'enqueued' ) );
+	}
+
+	public function test_enqueue_admin_scripts__when_on_profile() {
+		$key = 'c2c-years-ago-today-admin-js';
+
+		$this->assertFalse( wp_script_is( $key, 'registered' ) );
+		$this->assertFalse( wp_script_is( $key, 'enqueued' ) );
+
+		c2c_YearsAgoToday::enqueue_admin_style( 'profile.php' );
+
+		$this->assertTrue( wp_script_is( $key, 'registered' ) );
+		$this->assertTrue( wp_script_is( $key, 'enqueued' ) );
 	}
 
 	/*
