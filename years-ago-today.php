@@ -1046,7 +1046,8 @@ class c2c_YearsAgoToday {
 		}
 
 		$is_checked = get_user_option( self::$option_name, $user->ID );
-		$is_disabled = defined( 'DISABLE_WP_CRON' ) && ( true === DISABLE_WP_CRON );
+		// Disable the input if cron is disabled (since emails won't go out) and unit tests aren't running (since cron is disabled for tests).
+		$is_disabled = defined( 'DISABLE_WP_CRON' ) && ( true === DISABLE_WP_CRON ) && ( ! defined( 'WP_RUNNING_TESTS' ) || ! WP_RUNNING_TESTS );
 
 		$label = $is_current_user_profile_page
 			? self::get_optin_label()
