@@ -1054,7 +1054,7 @@ class c2c_YearsAgoToday {
 		echo "\t\t\t\t<p id=\"years-ago-today-explainer\" class=\"description\">";
 		$is_current_user_profile_page
 			? esc_html_e( 'If checked, you\'ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.', 'years-ago-today' )
-			: esc_html_e( 'If checked, they\'ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on the profile.', 'years-ago-today' );
+			: esc_html_e( 'If checked, they\'ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.', 'years-ago-today' );
 		echo "</p>\n";
 		echo "\t\t\t</td>\n";
 		echo "\t\t</tr>\n";
