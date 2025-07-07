@@ -22,6 +22,7 @@
 * Change: Ensure list bullets are consistenly visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
 * New: Enqueue separate admin CSS file rather than outputting into `head`
+* Change: Also enqueue CSS on profile pages
 * Change: Change caching to support multisite usage
 * Hardening: Prevent translated and generated strings from containing unintended markup
 * Hardening: Prevent PHP warnings from any potential malicious form submission field value

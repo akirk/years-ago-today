@@ -125,7 +125,7 @@ class c2c_YearsAgoToday {
 		add_action( 'personal_options_update',  array( __CLASS__, 'option_save' ) );
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'option_save' ) );
 
-		// Enqueue CSS only when the main Dashboard loads.
+		// Enqueue CSS in the admin.
 		add_action( 'admin_enqueue_scripts',    array( __CLASS__, 'enqueue_admin_style' ) );
 
 		// Maybe clear transients when a post gets published.
@@ -993,18 +993,18 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
-	 * Enqueues the admin CSS when on the dashboard page.
+	 * Enqueues admin CSS when on appropriate pages.
 	 *
 	 * @since 2.0
 	 */
 	public static function enqueue_admin_style( $hook_suffix ) {
-		// Bail if not on the dashboard page.
-		if ( 'index.php' !== $hook_suffix ) {
+		// Bail if not on the dashboard or profile pages.
+		if ( ! in_array( $hook_suffix, array( 'index.php', 'profile.php' ) ) ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'c2c-years-ago-today-admin',
+			'c2c-years-ago-today-admin-css',
 			plugins_url( 'assets/css/admin.css', __FILE__ ),
 			array(),
 			self::version()
