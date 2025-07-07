@@ -552,11 +552,10 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
-	 * Amends a user-specific footer to an email body.
+	 * Returns the footer used for all emails.
 	 *
-	 * Adds an explanation about the email to the recipient. Serves to remind
-	 * the user why they are receiving the email, what it is about, and how to
-	 * stop it.
+	 * Contains an explanation about the email to the recipient. Serves to remind the
+	 * user why they are receiving the email, what it is about, and how to stop it.
 	 *
 	 * @since 1.2
 	 * @since 2.0 Remove `$user_id` and `$html_body` arguments and simply return the footer.
