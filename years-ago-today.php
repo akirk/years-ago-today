@@ -1066,7 +1066,7 @@ class c2c_YearsAgoToday {
 			checked( $is_checked, self::$enabled_option_value, false ),
 			disabled( $is_disabled, true, false )
 		) . "\n";
-		echo "\t\t\t\t\t" . esc_html( $label );
+		echo "\t\t\t\t\t" . esc_html( $label ) . "\n";
 		echo "\t\t\t\t</label>\n";
 		echo "\t\t\t\t<p id=\"years-ago-today-explainer\" class=\"description\">";
 		$is_current_user_profile_page
