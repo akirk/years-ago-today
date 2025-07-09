@@ -55,6 +55,26 @@ class c2c_YearsAgoToday {
 	public static $option_name = 'c2c_years_ago_today_daily_email_optin';
 
 	/**
+	 * User meta key name for user's choice of email content type.
+	 *
+	 * @since 2.0
+	 * @var string
+	 * @access public
+	 */
+	public static $meta_email_content_pref = 'c2c_years_ago_today_email_content';
+
+	/**
+	 * The default email content type.
+	 *
+	 * One of either 'list', 'excerpt', or 'full'. See `get_email_content_types()` for actual acceptable values.
+	 *
+	 * @since 2.0
+	 * @var string
+	 * @access public
+	 */
+	public static $email_content_default = 'list';
+
+	/**
 	 * Name for the cron task to send out the daily email.
 	 *
 	 * @var string
@@ -267,10 +287,12 @@ class c2c_YearsAgoToday {
 	 * @since 1.2
 	 * @since 2.0 Changed return value format so HTML body can be generated and returned alongside plaintext.
 	 *
+	 * @param string $content_type The email content type. See `get_email_content_types()` for
+	 *                             acceptable values. Default 'list'.
 	 * @return array Associative array consisting of 'text' and 'html' keys with the plain-text
 	 *               and HTML email bodies, respectively.
 	 */
-	public static function get_email_body() {
+	public static function get_email_body( $content_type = 'list' ) {
 		// Get the list of posts from years ago.
 		$query = self::get_posts();
 
@@ -337,21 +359,65 @@ class c2c_YearsAgoToday {
 
 			$html_body .= wpautop( esc_html( $body ) );
 
+			// Output the list of posts.
 			$year = '';
+			$open_ul = false;
 			while ( $query->have_posts() ) :
 				$query->the_post();
 				$this_year = wp_date( 'Y', strtotime( get_post_field( 'post_date' ) ) );
 				// Only output the year once.
 				if ( $year !== $this_year ) {
 					$year = $this_year;
+					if ( $open_ul ) {
+						$html_body .= '</ul>';
+						$open_ul = false;
+					}
+
 					/* translators: %d: 4-digit year. */
 					$body .= "\n\n" . sprintf( __( '== %d ==', 'years-ago-today' ), (int) $year ) . "\n";
-					$html_body .= '<h2>' . $year . '</h2>';
+					$html_body .= "\n<h3>" . $year . "</h3>\n<ul>";
+					$open_ul = true;
 				}
 				$body .= '* ' . wp_kses( get_the_title(), array() ) . ' : ' . esc_url_raw( get_permalink() ) . "\n";
-				$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . '</a></h3>';
-				$html_body .= wp_kses_post( self::get_resized_content() );
+				$html_body .= '<li><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></li>\n";
 			endwhile;
+
+			if ( $open_ul ) {
+				$html_body .= '</ul>';
+			}
+
+			// Optionally output excerpts or full contents of posts.
+			if ( in_array( $content_type, array( 'excerpt', 'full' ) ) ) {
+				$query->rewind_posts();
+
+				$body .= "\n\n\n";
+				$html_body .= "<br>\n<br>\n<br>\n";
+
+				while ( $query->have_posts() ) {
+					$query->the_post();
+
+					// Include post heading.
+					$body .= '==== ' . wp_kses( get_the_title(), array() ) . ' : ' . esc_url_raw( get_permalink() ) . " ====\n";
+					$body .= sprintf( __( 'Published %s by %s', 'years-ago-today' ), get_the_date(), get_the_author() ) . "\n\n";
+
+					$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h3>\n";
+					$html_body .= '<p>' . sprintf( __( 'Published <strong>%s</strong> by <a href="%s">%s</a>', 'years-ago-today' ), wp_kses( get_the_date(), array() ), esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ), wp_kses( get_the_author(), array() ) ) . "</p>\n\n";
+
+					// Include post content.
+					if ( 'excerpt' === $content_type ) {
+						$body .= wp_strip_all_tags( get_the_excerpt() );
+						$html_body .= wp_kses_post( wpautop( get_the_excerpt() ) );
+					} elseif ( 'full' === $content_type ) {
+						$body .= wp_strip_all_tags( self::get_resized_content() );
+						$html_body .= wp_kses_post( self::get_resized_content() );
+					}
+
+					$body .= "\n\n\n";
+					$html_body .= "<br>\n<br>\n";
+				}
+			}
+
+			wp_reset_postdata();
 		}
 
 		if ( $html_body ) {
@@ -1019,11 +1085,30 @@ class c2c_YearsAgoToday {
 
 			// Localize script.
 			wp_localize_script( $js_id, 'c2c_years_ago_today', array(
+				'option_id' => esc_js( self::$option_name ),
 			) );
 
 			// Enqueue script.
 			wp_enqueue_script( $js_id );
 		}
+	}
+
+	/**
+	 * Returns an array of the recognized email content types.
+	 *
+	 * @since 2.0
+	 *
+	 * @param bool $types_only Return the types only? Default true.
+	 * @return string[] If `$types_only is true, then returns an array of just the types, else
+	 *                  returns an associative array with keys of the types and values of description.
+	 */
+	public static function get_email_content_types( $types_only = true ) {
+		$formats = array(
+			'list'    => __( 'Just include the list of post titles, each linked to the post.', 'years-ago-today' ),
+			'excerpt' => __( 'After the list of post titles, include an excerpt for each post.', 'years-ago-today' ),
+			'full'    => __( 'After the list of post titles, include the full content for each post.', 'years-ago-today' ),
+		);
+		return $types_only ? array_keys( $formats ) : $formats;
 	}
 
 	/**
@@ -1073,6 +1158,24 @@ class c2c_YearsAgoToday {
 			? esc_html_e( 'If checked, you\'ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.', 'years-ago-today' )
 			: esc_html_e( 'If checked, they\'ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.', 'years-ago-today' );
 		echo "</p>\n";
+
+		$is_opted_in = (bool) get_user_option( self::$option_name, $user->ID );
+
+		echo "\t\t\t\t" . '<fieldset id="years-ago-today-content-type"' . ( $is_opted_in ? '' : ' disabled' ) . '>';
+		echo '<legend class="screen-reader-text">' . esc_html__( 'Email content type', 'years-ago-today' ) . '</legend>';
+
+		foreach ( self::get_email_content_types( false ) as $mode => $desc ) {
+			printf(
+				'<label><input type="radio" name="%1$s" value="%2$s"%3$s> %4$s &mdash; %5$s</label><br>',
+				esc_attr( self::$meta_email_content_pref ),
+				esc_attr( $mode ),
+				checked( $mode, get_user_option( self::$meta_email_content_pref, $user->ID ) ?: self::$email_content_default, false ),
+				esc_html( ucfirst( $mode ) ),
+				'<span class="description">' . esc_html( $desc ) . '</span>'
+			);
+		}
+		echo "</fieldset>\n";
+
 		echo "\t\t\t</td>\n";
 		echo "\t\t</tr>\n";
 		echo "\t\t</table>\n";
@@ -1102,7 +1205,32 @@ class c2c_YearsAgoToday {
 			}
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
+		if ( isset( $_POST[ self::$meta_email_content_pref ] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
+			$value = sanitize_key( wp_unslash( $_POST[ self::$meta_email_content_pref ] ) );
+			if ( in_array( $value, self::get_email_content_types(), true ) ) {
+				update_user_option( $user_id, self::$meta_email_content_pref, $value );
+			}
+		}
+
 		return delete_user_option( $user_id, self::$option_name );
+	}
+
+	/**
+	 * Returns the user's preference for email content type.
+	 *
+	 * Note: This merely returns whatever value may have been set. It does not verify whether
+	 * the user has opted into getting an email, nor does it validate the value that was stored.
+	 *
+	 * @since 2.0
+	 *
+	 * @param int $user_id The user ID.
+	 * @return string
+	 */
+	public static function get_user_email_content_pref( $user_id ) {
+		$pref = get_user_option( self::$meta_email_content_pref, $user_id );
+		return $pref ?: self::$email_content_default;
 	}
 
 } // end c2c_YearsAgoToday

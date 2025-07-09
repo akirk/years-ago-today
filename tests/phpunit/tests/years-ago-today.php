@@ -486,6 +486,15 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			),
 			c2c_YearsAgoToday::get_email_body()['text']
 		);
+
+		$this->assertEquals(
+			sprintf(
+				'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>No posts were published to the site %1$s on %2$s in any past year.</p>' . "\n" . '</body></html>',
+				'Test Blog',
+				wp_date( 'M jS' )
+			),
+			c2c_YearsAgoToday::get_email_body()['html']
+		);
 	}
 
 	public function test_get_email_body_shows_singular_message_with_single_matching_past_year_posts() {
@@ -493,9 +502,16 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
+		$expected = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
+
 		$this->assertStringContainsString(
-			'1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:',
+			$expected,
 			c2c_YearsAgoToday::get_email_body()['text']
+		);
+
+		$this->assertStringContainsString(
+			$expected,
+			c2c_YearsAgoToday::get_email_body()['html']
 		);
 	}
 
@@ -505,13 +521,28 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
-		$email .= "\n\n== 2012 ==\n";
-		$email .= "* {$post_title} : " . get_permalink( $post ) . "\n";
+		$message = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
+
+		$text_email  = $message;
+		$text_email .= "\n\n== 2012 ==\n";
+		$text_email .= "* {$post_title} : " . get_permalink( $post ) . "\n";
 
 		$this->assertEquals(
-			$email,
+			$text_email,
 			c2c_YearsAgoToday::get_email_body()['text']
+		);
+
+		$html_email  = sprintf(
+			'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n",
+			'Test Blog',
+			wp_date( 'M jS' )
+		);
+		$html_email .= "<h3>2012</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post ) . '" rel="noopener noreferrer">' . $post_title . "</a></li>\n</ul></body></html>";
+
+		$this->assertEquals(
+			$html_email,
+			c2c_YearsAgoToday::get_email_body()['html']
 		);
 	}
 
@@ -521,9 +552,16 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
+		$expected = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+
 		$this->assertStringContainsString(
-			'2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:',
+			$expected,
 			c2c_YearsAgoToday::get_email_body()['text']
+		);
+
+		$this->assertStringContainsString(
+			$expected,
+			c2c_YearsAgoToday::get_email_body()['html']
 		);
 	}
 
@@ -535,15 +573,59 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
-		$email .= "\n\n== 2014 ==\n";
-		$email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
-		$email .= "\n\n== 2012 ==\n";
-		$email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
+		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+
+		$text_email  = $message;
+		$text_email .= "\n\n== 2014 ==\n";
+		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
+		$text_email .= "\n\n== 2012 ==\n";
+		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
 
 		$this->assertEquals(
-			$email,
+			$text_email,
 			c2c_YearsAgoToday::get_email_body()['text']
+		);
+
+		$html_email  = '<html><head><title>[Test Blog] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n";
+		$html_email .= "<h3>2014</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
+		$html_email .= "<h3>2012</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul></body></html>";
+
+		$this->assertEquals(
+			$html_email,
+			c2c_YearsAgoToday::get_email_body()['html']
+		);
+	}
+
+	public function test_get_email_body_whole_email_with_multiple_matching_posts_in_a_single_year() {
+		$post_title1 = 'A blast from the past';
+		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2014' ) ) );
+		$post_title2 = 'Days of future years past';
+		$post2 = $this->factory->post->create( array( 'post_title' => $post_title2, 'post_date' => $this->get_date( '2014' ) ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+
+		$text_email  = $message;
+		$text_email .= "\n\n== 2014 ==\n";
+		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
+		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
+
+		$this->assertEquals(
+			$text_email,
+			c2c_YearsAgoToday::get_email_body()['text']
+		);
+
+		$html_email  = '<html><head><title>[Test Blog] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n";
+		$html_email .= "<h3>2014</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n";
+		$html_email .= '<li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul></body></html>";
+
+		$this->assertEquals(
+			$html_email,
+			c2c_YearsAgoToday::get_email_body()['html']
 		);
 	}
 
@@ -567,7 +649,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_email_body__allows_translation_of_year_headings() {
+	public function test_get_email_body__allows_translation_of_year_headings_for_text_emails() {
 		add_filter( 'gettext_years-ago-today', array( $this, 'translate_text' ), 10, 2 );
 
 		$post_title1 = 'A <strong>blast</strong> from the past';
@@ -596,6 +678,115 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$html = c2c_YearsAgoToday::get_email_body()['html'];
 
 		$this->assertSame( 3, substr_count( $html, '<p>' ) );
+	}
+
+	public function test_get_email_body__includes_excerpt_if_chosen() {
+		$author_id = $this->factory->user->create( array( 'role' => 'author', 'display_name' => 'Certain Author' ) );
+
+		$post_title1 = 'A blast from the past';
+		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2012' ), 'post_author' => $author_id, 'post_excerpt' => 'This is an excerpt of some post content.', 'post_content' => 'This is some post content.' ) );
+		$post_title2 = 'Days of future years past';
+		$post2 = $this->factory->post->create( array( 'post_title' => $post_title2, 'post_date' => $this->get_date( '2014' ), 'post_author' => $author_id, 'post_excerpt' => 'This is an excerpt of another post content.', 'post_content' => 'This is another post content.' ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+
+		$text_email  = $message;
+		$text_email .= "\n\n== 2014 ==\n";
+		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
+		$text_email .= "\n\n== 2012 ==\n";
+		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n\n\n\n";
+		$text_email .= "==== {$post_title2} : " . get_permalink( $post2 ) . " ====\n";
+		$text_email .= sprintf( "Published %s, 2014 by Certain Author\n\n", wp_date( 'F j' ) );
+		$text_email .= "This is an excerpt of another post content.\n\n\n";
+		$text_email .= "==== {$post_title1} : " . get_permalink( $post1 ) . " ====\n";
+		$text_email .= sprintf( "Published %s, 2012 by Certain Author\n\n", wp_date( 'F j' ) );
+		$text_email .= "This is an excerpt of some post content.\n\n\n";
+
+		$this->assertEquals(
+			$text_email,
+			c2c_YearsAgoToday::get_email_body( 'excerpt' )['text']
+		);
+
+		$html_email  = sprintf(
+			'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n",
+			'Test Blog',
+			wp_date( 'M jS' )
+		);
+		$html_email .= "<h3>2014</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
+		$html_email .= "<h3>2012</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul><br>\n<br>\n<br>\n";
+		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post2 ), $post_title2 ) . "\n";
+		$html_email .= sprintf( '<p>Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= "\n\n";
+		$html_email .= "<p>This is an excerpt of another post content.</p>\n<br>\n<br>\n";
+		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post1 ), $post_title1 ) . "\n";
+		$html_email .= sprintf( '<p>Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= "\n\n";
+		$html_email .= "<p>This is an excerpt of some post content.</p>\n<br>\n<br>\n";
+
+		$html_email .= '</body></html>';
+
+		$this->assertEquals(
+			$html_email,
+			c2c_YearsAgoToday::get_email_body( 'excerpt' )['html']
+		);
+	}
+
+	public function test_get_email_body__includes_full_content_if_chosen() {
+		$author_id = $this->factory->user->create( array( 'role' => 'author', 'display_name' => 'Certain Author' ) );
+
+		$post_title1 = 'A blast from the past';
+		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2012' ), 'post_author' => $author_id, 'post_content' => 'This is some post content.' ) );
+		$post_title2 = 'Days of future years past';
+		$post2 = $this->factory->post->create( array( 'post_title' => $post_title2, 'post_date' => $this->get_date( '2014' ), 'post_author' => $author_id, 'post_content' => 'This is another post content.' ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+
+		$text_email  = $message;
+		$text_email .= "\n\n== 2014 ==\n";
+		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
+		$text_email .= "\n\n== 2012 ==\n";
+		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n\n\n\n";
+		$text_email .= "==== {$post_title2} : " . get_permalink( $post2 ) . " ====\n";
+		$text_email .= sprintf( "Published %s, 2014 by Certain Author\n\n", wp_date( 'F j' ) );
+		$text_email .= "This is another post content.\n\n\n";
+		$text_email .= "==== {$post_title1} : " . get_permalink( $post1 ) . " ====\n";
+		$text_email .= sprintf( "Published %s, 2012 by Certain Author\n\n", wp_date( 'F j' ) );
+		$text_email .= "This is some post content.\n\n\n";
+
+		$this->assertEquals(
+			$text_email,
+			c2c_YearsAgoToday::get_email_body( 'full' )['text']
+		);
+
+		$html_email  = sprintf(
+			'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n",
+			'Test Blog',
+			wp_date( 'M jS' )
+		);
+		$html_email .= "<h3>2014</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
+		$html_email .= "<h3>2012</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul><br>\n<br>\n<br>\n";
+		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post2 ), $post_title2 ) . "\n";
+		$html_email .= sprintf( '<p>Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= "\n\n";
+		$html_email .= "<p>This is another post content.</p>\n<br>\n<br>\n";
+		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post1 ), $post_title1 ) . "\n";
+		$html_email .= sprintf( '<p>Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= "\n\n";
+		$html_email .= "<p>This is some post content.</p>\n<br>\n<br>\n";
+		$html_email .= '</body></html>';
+
+		$this->assertEquals(
+			$html_email,
+			c2c_YearsAgoToday::get_email_body( 'full' )['html']
+		);
 	}
 
 	/*
@@ -669,6 +860,7 @@ HTML;
 					Email me daily about posts published on this day in years past.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, you&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.</p>
+				<fieldset id="years-ago-today-content-type" disabled><legend class="screen-reader-text">Email content type</legend><label><input type="radio" name="c2c_years_ago_today_email_content" value="list" checked='checked'> List &mdash; <span class="description">Just include the list of post titles, each linked to the post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="excerpt"> Excerpt &mdash; <span class="description">After the list of post titles, include an excerpt for each post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="full"> Full &mdash; <span class="description">After the list of post titles, include the full content for each post.</span></label><br></fieldset>
 			</td>
 		</tr>
 		</table>
@@ -694,6 +886,7 @@ HTML;
 					Email me daily about posts published on this day in years past.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, you&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.</p>
+				<fieldset id="years-ago-today-content-type"><legend class="screen-reader-text">Email content type</legend><label><input type="radio" name="c2c_years_ago_today_email_content" value="list" checked='checked'> List &mdash; <span class="description">Just include the list of post titles, each linked to the post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="excerpt"> Excerpt &mdash; <span class="description">After the list of post titles, include an excerpt for each post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="full"> Full &mdash; <span class="description">After the list of post titles, include the full content for each post.</span></label><br></fieldset>
 			</td>
 		</tr>
 		</table>
@@ -719,6 +912,7 @@ HTML;
 					Email this user daily about posts published on this day in years past.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.</p>
+				<fieldset id="years-ago-today-content-type" disabled><legend class="screen-reader-text">Email content type</legend><label><input type="radio" name="c2c_years_ago_today_email_content" value="list" checked='checked'> List &mdash; <span class="description">Just include the list of post titles, each linked to the post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="excerpt"> Excerpt &mdash; <span class="description">After the list of post titles, include an excerpt for each post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="full"> Full &mdash; <span class="description">After the list of post titles, include the full content for each post.</span></label><br></fieldset>
 			</td>
 		</tr>
 		</table>
@@ -756,6 +950,45 @@ HTML;
 					Email this user daily about posts published on this day in years past.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.</p>
+				<fieldset id="years-ago-today-content-type"><legend class="screen-reader-text">Email content type</legend><label><input type="radio" name="c2c_years_ago_today_email_content" value="list" checked='checked'> List &mdash; <span class="description">Just include the list of post titles, each linked to the post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="excerpt"> Excerpt &mdash; <span class="description">After the list of post titles, include an excerpt for each post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="full"> Full &mdash; <span class="description">After the list of post titles, include the full content for each post.</span></label><br></fieldset>
+			</td>
+		</tr>
+		</table>
+
+HTML;
+
+		if ( is_multisite() ) {
+			$user = get_user_by( 'ID', $user_id );
+			// In multisite, admins can't edit users.
+			$this->assertEmpty( c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+			// Explicitly allow them to edit users.
+			grant_super_admin( $user_id );
+			$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+			revoke_super_admin( $user_id );
+		} else {
+			$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::add_daily_email_optin_checkbox( $user2 ) );
+		}
+	}
+
+	public function test_add_daily_email_optin_checkbox_for_another_user_when_that_user_has_checkbox_checked_and_excerpts_chosen() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		wp_set_current_user( $user_id );
+		delete_user_option( $user_id, 'c2c_years_ago_today_daily_email_optin' );
+		$user2 = $this->factory->user->create_and_get( array( 'role' => 'subscriber' ) );
+		update_user_option( $user2->ID, c2c_YearsAgoToday::$option_name, '1' );
+		update_user_option( $user2->ID, c2c_YearsAgoToday::$meta_email_content_pref, 'excerpt' );
+
+		$expected = <<<HTML
+		<table class="form-table">
+		<tr>
+			<th scope="row">&quot;Years Ago Today&quot; email</th>
+			<td>
+				<label for="c2c_years_ago_today_daily_email_optin">
+					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" checked='checked' />
+					Email this user daily about posts published on this day in years past.
+				</label>
+				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.</p>
+				<fieldset id="years-ago-today-content-type"><legend class="screen-reader-text">Email content type</legend><label><input type="radio" name="c2c_years_ago_today_email_content" value="list"> List &mdash; <span class="description">Just include the list of post titles, each linked to the post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="excerpt" checked='checked'> Excerpt &mdash; <span class="description">After the list of post titles, include an excerpt for each post.</span></label><br><label><input type="radio" name="c2c_years_ago_today_email_content" value="full"> Full &mdash; <span class="description">After the list of post titles, include the full content for each post.</span></label><br></fieldset>
 			</td>
 		</tr>
 		</table>

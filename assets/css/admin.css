@@ -1,3 +1,7 @@
+/*
+ * Admin dashboard styles
+ */
+
 #dashboard-widgets .years-ago-today-posts {
 	list-style-position: inside;
 }
@@ -13,4 +17,24 @@
 
 #dashboard-widgets .years-ago-today-posts li:not(.years-ago-today-year)::marker {
 	color: var(--wp-admin-theme-color, currentColor);
+}
+
+/*
+ * Profile styles
+ */
+
+#years-ago-today-content-type {
+	margin-top: 1em;
+}
+
+#years-ago-today-content-type[disabled] {
+	opacity: .5;
+}
+
+#years-ago-today-content-type[disabled] input {
+	cursor: not-allowed;
+}
+
+#years-ago-today-content-type .description {
+	color: #646970;
 }
