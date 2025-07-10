@@ -738,18 +738,11 @@ class c2c_YearsAgoToday {
 
 		// Get the content of the email.
 		$subject = self::get_email_subject();
-		$body    = self::get_email_body();
-		$headers = array();
 
-		// If no subject or body for the email, then there's nothing else to do.
-		if ( ! $subject || ! $body['text'] ) {
+		// Bail if no subject.
+		if ( ! $subject ) {
 			return;
 		}
-
-		$plain  = wp_kses( $body['text'], array() ) . self::get_email_footer( 'text' );
-		$html   = empty( $body['html'] )
-			? wpautop( esc_html( $plain ) )
-			: $body['html'] . self::get_email_footer( 'html' );
 
 		$batch_size = self::get_bcc_batch_size();
 		$batch_to_address = self::get_bcc_to_email_address();
@@ -758,19 +751,19 @@ class c2c_YearsAgoToday {
 		$emails = array();
 		foreach ( $users as $user ) {
 			if ( is_email( $user->user_email ) ) {
-				$emails[] = $user->user_email;
+				// Group user according to their desired email content type.
+				$type = self::get_user_email_content_pref( $user->ID );
+				if ( ! isset( $emails[ $type ] ) ) {
+					$emails[ $type ] = array();
+				}
+				$emails[ $type ][] = $user->user_email;
 			}
 		}
 
+		// Bail if somehow there is now no one to email.
 		if ( ! $emails ) {
 			return;
 		}
-
-		$mailer_hook = static function ( $phpmailer ) use ( $html, $plain ) {
-			$phpmailer->isHTML( true );
-			$phpmailer->Body    = $html;
-			$phpmailer->AltBody = $plain;
-		};
 
 		// Headers included for every email that don't change per batch.
 		$default_headers = array(
@@ -778,8 +771,29 @@ class c2c_YearsAgoToday {
 			'List-Unsubscribe: <' . esc_url_raw( admin_url( 'profile.php' ) ) . '>',
 		);
 
+		// Mail each email content type to its associated users.
+		foreach ( array_keys( $emails ) as $type ) {
+
+		$body  = self::get_email_body( $type );
+
+		// Skip if no plaintext body (which can happen if there are no posts to email about).
+		if ( ! $body['text'] ) {
+			continue;
+		}
+
+		$plain = wp_kses( $body['text'], array() ) . self::get_email_footer( 'text' );
+		$html  = empty( $body['html'] )
+			? wpautop( esc_html( $plain ) )
+			: $body['html'] . self::get_email_footer( 'html' );
+
+		$mailer_hook = static function ( $phpmailer ) use ( $html, $plain ) {
+			$phpmailer->isHTML( true );
+			$phpmailer->Body    = $html;
+			$phpmailer->AltBody = $plain;
+		};
+
 		// Chunk and send.
-		foreach ( array_chunk( $emails, $batch_size ) as $chunk ) {
+		foreach ( array_chunk( $emails[ $type ], $batch_size ) as $chunk ) {
 			$headers = $default_headers;
 
 			// Forego bcc-batched emailing if only 1 user.
@@ -793,6 +807,7 @@ class c2c_YearsAgoToday {
 			add_action( 'phpmailer_init', $mailer_hook, 10, 1 );
 			wp_mail( $to_address, $subject, $html, $headers );
 			remove_action( 'phpmailer_init', $mailer_hook, 10 );
+		}
 		}
 	}
 
