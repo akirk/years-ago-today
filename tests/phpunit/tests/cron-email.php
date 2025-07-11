@@ -32,6 +32,7 @@ class Test_Years_Ago_Today_Cron_Email extends WP_UnitTestCase {
 	public function tearDown(): void {
 		remove_filter( 'pre_wp_mail', array( $this, 'intercept_mail' ), 10 );
 		remove_all_filters( 'c2c_years_ago_today-to_address' );
+		remove_filter( 'gettext_years-ago-today', array( $this, 'translate_text' ) );
 
 		$this->sent = array();
 		parent::tearDown();
@@ -40,6 +41,14 @@ class Test_Years_Ago_Today_Cron_Email extends WP_UnitTestCase {
 	/* ----------------------------------------------------------------------
 	 * Helpers
 	 * --------------------------------------------------------------------*/
+
+	 public function translate_text( $translation, $text ) {
+		if ( '[%s] Years Ago Today daily update' === $text ) {
+			$translation = '';
+		}
+
+		return $translation;
+	}
 
 	/** Capture + short-circuit wp_mail(). */
 	public function intercept_mail( $null, $atts ) {
@@ -205,6 +214,39 @@ class Test_Years_Ago_Today_Cron_Email extends WP_UnitTestCase {
 		$footer_snippet = 'wish to discontinue receiving these emails';
 		$this->assertStringContainsString( $footer_snippet, $mail['html'] );
 		$this->assertStringContainsString( $footer_snippet, $mail['text'] );
+	}
+
+	/*
+	 * send_email_of_type()
+	 */
+
+	 public function test_send_email_of_type__when_no_one_to_email() {
+		$this->assertEquals( 0, c2c_YearsAgoToday::send_email_of_type( 'list', [] ) );
+	}
+
+	public function test_send_email_of_type__when_no_subject() {
+		add_filter( 'gettext_years-ago-today', array( $this, 'translate_text' ), 10, 2 );
+
+		$this->assertEquals( 0, c2c_YearsAgoToday::send_email_of_type( 'list', [ 'text@example.org' ] ) );
+	}
+
+	public function test_send_email_of_type__when_nothing_to_email() {
+		// Undo the override to always send an email.
+		remove_all_filters( 'c2c_years_ago_today-email-if-no-posts' );
+
+		$this->assertEquals( 0, c2c_YearsAgoToday::send_email_of_type( 'list', [ 'text@example.org' ] ) );
+	}
+
+	public function test_send_email_of_type__when_something_to_email() {
+		$this->assertEquals( 1, c2c_YearsAgoToday::send_email_of_type( 'list', [ 'text@example.org' ] ) );
+	}
+
+	public function test_send_email_of_type__when_something_to_email_multiple_addresses() {
+		$this->assertEquals( 3, c2c_YearsAgoToday::send_email_of_type( 'list', [ 'text1@example.org', 'text2@example.org', 'text3@example.org' ] ) );
+	}
+
+	public function test_send_email_of_type__when_invalid_email_content_type() {
+		$this->assertEquals( 1, c2c_YearsAgoToday::send_email_of_type( 'invalid', [ 'text@example.org' ] ) );
 	}
 
 }

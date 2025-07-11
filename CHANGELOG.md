@@ -18,6 +18,7 @@
     * New: Add filter 'c2c_years_ago_today-batch_size' to customize the number of people to email per BCC: batch
     * New: Add `get_bcc_to_email_address()` to get the 'To:' email address used for Bcc-batched emails
     * New: Add filter 'c2c_years_ago_today-to_address' to customize the 'To:' email address used for Bcc-batched emails
+    * New: Extract email handling logic out from `cron_email()` into new `send_email_send_email_of_type()`
 * Change: Revamp dashboard output, more semantically putting each year within `section` tags
 * Change: Ensure list bullets are consistenly visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity

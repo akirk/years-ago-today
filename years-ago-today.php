@@ -736,22 +736,10 @@ class c2c_YearsAgoToday {
 			return;
 		}
 
-		// Get the content of the email.
-		$subject = self::get_email_subject();
-
-		// Bail if no subject.
-		if ( ! $subject ) {
-			return;
-		}
-
-		$batch_size = self::get_bcc_batch_size();
-		$batch_to_address = self::get_bcc_to_email_address();
-
-		// Collect all recipient addresses.
+		// Group all recipient addresses according to their desired email content type.
 		$emails = array();
 		foreach ( $users as $user ) {
 			if ( is_email( $user->user_email ) ) {
-				// Group user according to their desired email content type.
 				$type = self::get_user_email_content_pref( $user->ID );
 				if ( ! isset( $emails[ $type ] ) ) {
 					$emails[ $type ] = array();
@@ -765,20 +753,48 @@ class c2c_YearsAgoToday {
 			return;
 		}
 
+		// Mail each email content type to its associated users.
+		foreach ( array_keys( $emails ) as $type ) {
+			self::send_email_of_type( $type, $emails[ $type ] );
+		}
+	}
+
+	/**
+	 * Sends out the given email type to the specified users.
+	 *
+	 * Note: This presumes that the email addresses provided are opted into the given email.
+	 *
+	 * @since 2.0
+	 *
+	 * @param string   $type   The email content type.
+	 * @param string[] $emails The already-verified email addresses that should be emailed for the content type.
+	 * @return int Count of the number of users emailed.
+	 */
+	public static function send_email_of_type( $type, $emails ) {
+		// Bail if no one to email.
+		if ( ! $emails ) {
+			return 0;
+		}
+
 		// Headers included for every email that don't change per batch.
 		$default_headers = array(
 			'Content-type: text/html; charset=UTF-8', // PHPMailer would normally set this due to isHTML(true), but be explicit for testing.
 			'List-Unsubscribe: <' . esc_url_raw( admin_url( 'profile.php' ) ) . '>',
 		);
 
-		// Mail each email content type to its associated users.
-		foreach ( array_keys( $emails ) as $type ) {
+		// Get the subject of the email and bail if there isn't one.
+		$subject = self::get_email_subject();
+		if ( ! $subject ) {
+			return 0;
+		}
 
+		$batch_size = self::get_bcc_batch_size();
+		$batch_to_address = self::get_bcc_to_email_address();
+
+		// Get the email body parts and bail if there is no plaintext body (which can happen if there are no posts to email about).
 		$body  = self::get_email_body( $type );
-
-		// Skip if no plaintext body (which can happen if there are no posts to email about).
 		if ( ! $body['text'] ) {
-			continue;
+			return 0;
 		}
 
 		$plain = wp_kses( $body['text'], array() ) . self::get_email_footer( 'text' );
@@ -793,7 +809,7 @@ class c2c_YearsAgoToday {
 		};
 
 		// Chunk and send.
-		foreach ( array_chunk( $emails[ $type ], $batch_size ) as $chunk ) {
+		foreach ( array_chunk( $emails, $batch_size ) as $chunk ) {
 			$headers = $default_headers;
 
 			// Forego bcc-batched emailing if only 1 user.
@@ -808,7 +824,8 @@ class c2c_YearsAgoToday {
 			wp_mail( $to_address, $subject, $html, $headers );
 			remove_action( 'phpmailer_init', $mailer_hook, 10 );
 		}
-		}
+
+		return count( $emails );
 	}
 
 	/**
