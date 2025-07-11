@@ -1285,4 +1285,58 @@ HTML;
 		remove_all_filters( 'c2c_years_ago_today-to_address' );
 	}
 
+	/*
+	 * get_users_to_email_grouped_by_content_type()
+	 */
+
+	public function test_get_users_to_email_grouped_by_content_type__when_no_optins() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator', 'user_email' => 'user1@example.org' ) );
+		wp_set_current_user( $user_id );
+		update_user_option( $user_id, 'c2c_years_ago_today_daily_email_optin', '0' );
+
+		$this->assertEmpty( c2c_YearsAgoToday::get_users_to_email_grouped_by_content_type() );
+	}
+
+	public function test_get_users_to_email_grouped_by_content_type__when_one_optin_with_presumed_default() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator', 'user_email' => 'user1@example.org' ) );
+		wp_set_current_user( $user_id );
+		update_user_option( $user_id, 'c2c_years_ago_today_daily_email_optin', '1' );
+
+		$this->assertEquals( [ 'list' => [ 'user1@example.org' ] ], c2c_YearsAgoToday::get_users_to_email_grouped_by_content_type() );
+	}
+
+	public function test_get_users_to_email_grouped_by_content_type__when_optins_for_each_type() {
+		$user1_id = $this->factory->user->create( array( 'role' => 'administrator', 'user_email' => 'user1@example.org' ) );
+		wp_set_current_user( $user1_id );
+		update_user_option( $user1_id, c2c_YearsAgoToday::$option_name, '1' );
+
+		$user2_id = $this->factory->user->create( array( 'role' => 'author', 'user_email' => 'user2@example.org' ) );
+		wp_set_current_user( $user2_id );
+		update_user_option( $user2_id, c2c_YearsAgoToday::$option_name, '1' );
+		update_user_option( $user2_id, c2c_YearsAgoToday::$meta_email_content_pref, 'full' );
+
+		$user3_id = $this->factory->user->create( array( 'role' => 'author', 'user_email' => 'user3@example.org' ) );
+		wp_set_current_user( $user3_id );
+		update_user_option( $user3_id, c2c_YearsAgoToday::$option_name, '1' );
+		update_user_option( $user3_id, c2c_YearsAgoToday::$meta_email_content_pref, 'excerpt' );
+
+		$user4_id = $this->factory->user->create( array( 'role' => 'author', 'user_email' => 'user4@example.org' ) );
+		wp_set_current_user( $user4_id );
+		update_user_option( $user4_id, c2c_YearsAgoToday::$option_name, '1' );
+		update_user_option( $user4_id, c2c_YearsAgoToday::$meta_email_content_pref, 'list' );
+
+		$user5_id = $this->factory->user->create( array( 'role' => 'author', 'user_email' => 'user5@example.org' ) );
+		wp_set_current_user( $user5_id );
+		update_user_option( $user5_id, c2c_YearsAgoToday::$option_name, '0' );
+		update_user_option( $user5_id, c2c_YearsAgoToday::$meta_email_content_pref, 'excerpt' );
+
+		$expected = [
+			'list' => [ 'user1@example.org', 'user4@example.org' ],
+			'excerpt' => [ 'user3@example.org' ],
+			'full' => [ 'user2@example.org' ],
+		];
+
+		$this->assertEquals( $expected, c2c_YearsAgoToday::get_users_to_email_grouped_by_content_type() );
+	}
+
 }

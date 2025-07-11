@@ -722,18 +722,17 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
-	 * Sends out daily email.
+	 * Returns an associative array of email content types and the email addresses
+	 * of users who have opted into emails of each content type.
 	 *
-	 * @since 1.0
-	 * @todo  Handle large volume of users better, perhaps via chunked BCCs.
+	 * @return array
 	 */
-	public static function cron_email() {
-		// Get list of users who want the daily email.
+	public static function get_users_to_email_grouped_by_content_type() {
 		$users = self::get_users_to_email();
 
-		// If no one wants the email, there's nothing else to do.
+		// Bail if no one has opted into getting an email.
 		if ( ! $users ) {
-			return;
+			return array();
 		}
 
 		// Group all recipient addresses according to their desired email content type.
@@ -748,7 +747,17 @@ class c2c_YearsAgoToday {
 			}
 		}
 
-		// Bail if somehow there is now no one to email.
+		return $emails;
+	}
+
+	/**
+	 * Sends out daily email.
+	 *
+	 * @since 1.0
+	 */
+	public static function cron_email() {
+		// Get list of users who want the daily email and bail if there aren't any.
+		$emails = self::get_users_to_email_grouped_by_content_type();
 		if ( ! $emails ) {
 			return;
 		}
