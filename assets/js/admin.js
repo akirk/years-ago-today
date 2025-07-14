@@ -4,6 +4,12 @@ document.addEventListener("DOMContentLoaded", function(){
 	if(!optIn || !field) return;
 
 	optIn.addEventListener("change", () => {
-		field.disabled = !optIn.checked;
+		if (this.checked) {
+			field.disabled = false;
+			fieldset.removeAttribute('aria-disabled');
+		} else {
+			field.disabled = true;
+			fieldset.setAttribute('aria-disabled', 'true');
+		}
 	});
 });

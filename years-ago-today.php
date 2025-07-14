@@ -1214,7 +1214,7 @@ class c2c_YearsAgoToday {
 
 		$is_opted_in = (bool) get_user_option( self::$option_name, $user->ID );
 
-		echo "\t\t\t\t" . '<fieldset id="years-ago-today-content-type"' . ( $is_opted_in ? '' : ' disabled' ) . '>';
+		echo "\t\t\t\t" . '<fieldset id="years-ago-today-content-type"' . ( $is_opted_in ? '' : ' disabled aria-disabled="true"' ) . '>';
 		echo '<legend class="screen-reader-text">' . esc_html__( 'Email content type', 'years-ago-today' ) . '</legend>';
 
 		foreach ( self::get_email_content_types( false ) as $mode => $desc ) {
