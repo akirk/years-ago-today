@@ -1290,9 +1290,19 @@ HTML;
 	 */
 
 	public function test_get_users_to_email_grouped_by_content_type__when_no_optins() {
+		// User with explicit opt-out.
 		$user_id = $this->factory->user->create( array( 'role' => 'administrator', 'user_email' => 'user1@example.org' ) );
-		wp_set_current_user( $user_id );
 		update_user_option( $user_id, 'c2c_years_ago_today_daily_email_optin', '0' );
+
+		// User with implicit opt-out.
+		$user_id2 = $this->factory->user->create( array( 'role' => 'administrator', 'user_email' => 'user2@example.org' ) );
+
+		$this->assertEmpty( c2c_YearsAgoToday::get_users_to_email_grouped_by_content_type() );
+	}
+
+	public function test_get_users_to_email_grouped_by_content_type__when_user_has_explicit_content_type_but_not_opted_in() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator', 'user_email' => 'user1@example.org' ) );
+		update_user_option( $user_id, c2c_YearsAgoToday::$meta_email_content_pref, 'excerpt' );
 
 		$this->assertEmpty( c2c_YearsAgoToday::get_users_to_email_grouped_by_content_type() );
 	}
