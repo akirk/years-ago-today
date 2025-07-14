@@ -398,10 +398,22 @@ class c2c_YearsAgoToday {
 
 					// Include post heading.
 					$body .= '==== ' . wp_kses( get_the_title(), array() ) . ' : ' . esc_url_raw( get_permalink() ) . " ====\n";
-					$body .= sprintf( __( 'Published %s by %s', 'years-ago-today' ), get_the_date(), get_the_author() ) . "\n\n";
+					/* translators: 1: the publication date, 2: the post author */
+					$body .= wp_kses( sprintf( _x( 'Published %1$s by %2$s', 'plaintext email post info', 'years-ago-today' ), get_the_date(), get_the_author() ), array() ) . "\n\n";
 
 					$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h3>\n";
-					$html_body .= '<p>' . sprintf( __( 'Published <strong>%s</strong> by <a href="%s">%s</a>', 'years-ago-today' ), wp_kses( get_the_date(), array() ), esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ), wp_kses( get_the_author(), array() ) ) . "</p>\n\n";
+					$html_body .= '<p>';
+					$html_body .= sprintf(
+						/* translators: 1: the publication date, 2: the post author linked to their post archive */
+						wp_kses( _x( 'Published %1$s by %2$s', 'HTML email post info', 'years-ago-today' ), array() ),
+						'<strong>' . wp_kses( get_the_date(), array() ) . '</strong>',
+						sprintf(
+							'<a href="%s">%s</a>',
+							esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+							wp_kses( get_the_author(), array() )
+						)
+					);
+					$html_body .= "</p>\n\n";
 
 					// Include post content.
 					if ( 'excerpt' === $content_type ) {
