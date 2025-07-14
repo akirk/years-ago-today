@@ -1339,4 +1339,32 @@ HTML;
 		$this->assertEquals( $expected, c2c_YearsAgoToday::get_users_to_email_grouped_by_content_type() );
 	}
 
+	/*
+	 * get_user_email_content_pref()
+	 */
+
+	public function test_get_user_email_content_pref__implied_default() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+
+		$this->assertEquals( c2c_YearsAgoToday::$email_content_default, c2c_YearsAgoToday::get_user_email_content_pref( $user_id ) );
+	}
+
+	public function test_get_user_email_content_pref__valid_value() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		update_user_option( $user_id, c2c_YearsAgoToday::$meta_email_content_pref, 'excerpt' );
+
+		$this->assertEquals( 'excerpt', c2c_YearsAgoToday::get_user_email_content_pref( $user_id ) );
+	}
+
+	public function test_get_user_email_content_pref__invalid_value_uses_default() {
+		$user_id = $this->factory->user->create( array( 'role' => 'administrator' ) );
+		update_user_option( $user_id, c2c_YearsAgoToday::$meta_email_content_pref, 'invalid' );
+
+		$this->assertEquals( c2c_YearsAgoToday::$email_content_default, c2c_YearsAgoToday::get_user_email_content_pref( $user_id ) );
+	}
+
+	/** This is mostly to acknowledge existing behavior and not that the handling is ideal. */
+	public function test_get_user_email_content_pref__invalid_user_uses_default() {
+		$this->assertEquals( c2c_YearsAgoToday::$email_content_default, c2c_YearsAgoToday::get_user_email_content_pref( 99999 ) );
+	}
 }

@@ -1261,8 +1261,8 @@ class c2c_YearsAgoToday {
 	/**
 	 * Returns the user's preference for email content type.
 	 *
-	 * Note: This merely returns whatever value may have been set. It does not verify whether
-	 * the user has opted into getting an email, nor does it validate the value that was stored.
+	 * Note: This does not verify whether the user has opted into getting an email,
+	 * just what type of email they would get if they were to be emailed.
 	 *
 	 * @since 2.0
 	 *
@@ -1271,6 +1271,12 @@ class c2c_YearsAgoToday {
 	 */
 	public static function get_user_email_content_pref( $user_id ) {
 		$pref = get_user_option( self::$meta_email_content_pref, $user_id );
+
+		// Unset the preference if it isn't valid (so that the default can be used).
+		if ( ! in_array( $pref, self::get_email_content_types() ) ) {
+			$pref = '';
+		}
+
 		return $pref ?: self::$email_content_default;
 	}
 
