@@ -6,6 +6,10 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 	private static $default_bcc_batch_size = 40;
 	private static $default_bcc_to = '';
+	private static $default_email_subject = '[Test Blog] Years Ago Today daily update';
+
+	private static $text_footer = '';
+	private static $html_footer = '';
 
 	public static function setUpBeforeClass(): void {
 		// Make all requests as if in the admin, which is the only place the plugin
@@ -16,6 +20,29 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		c2c_YearsAgoToday::init();
 
 		self::$default_bcc_to = 'noreply@' . wp_parse_url( home_url(), PHP_URL_HOST );
+
+		$profile_url = admin_url( 'profile.php' );
+
+		self::$text_footer = <<<HTML
+
+
+
+-------------------------------
+You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.
+
+If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
+
+HTML;
+
+		self::$html_footer = <<<HTML
+<br>
+<br>
+<hr>
+<p>You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.</p>
+<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."</p>
+
+HTML;
+
 	}
 
 	public function tearDown(): void {
@@ -63,6 +90,36 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		return $translation;
 	}
+
+	public function get_full_html_body( $html_body ) {
+		$html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{{subject}}</title>
+	<style type="text/css">
+		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
+		.container { max-width: 600px; margin: 20px auto; background: #fff; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 32px 24px; }
+		.footer { font-size: 13px; color: #888; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		{{body}}
+		<div class="footer">{{footer}}</div>
+	</div>
+</body>
+</html>
+HTML;
+
+		return str_replace(
+			[ '{{subject}}', '{{body}}', '{{footer}}' ],
+			[ self::$default_email_subject, $html_body, self::$html_footer ],
+			$html
+		);
+	}
+
 
 	//
 	//
@@ -459,7 +516,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 	public function test_get_email_subject() {
 		$this->assertEquals(
-			'[Test Blog] Years Ago Today daily update',
+			self::$default_email_subject,
 			c2c_YearsAgoToday::get_email_subject()
 		);
 	}
@@ -489,9 +546,9 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			$body['text']
 		);
 
-		$this->assertEquals(
+		$this->assertStringContainsString(
 			sprintf(
-				'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>No posts were published to the site %1$s on %2$s in any past year.</p>' . "\n" . '</body></html>',
+				'<p>No posts were published to the site %1$s on %2$s in any past year.</p>',
 				'Test Blog',
 				wp_date( 'M jS' )
 			),
@@ -514,7 +571,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertStringContainsString(
-			$expected,
+			'<p>' . $expected . '</p>',
 			$body['html']
 		);
 	}
@@ -538,15 +595,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			$body['text']
 		);
 
-		$html_email  = sprintf(
-			'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n",
-			'Test Blog',
-			wp_date( 'M jS' )
-		);
+		$html_email = '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2012</h3>\n";
-		$html_email .= '<ul><li><a href="' . get_permalink( $post ) . '" rel="noopener noreferrer">' . $post_title . "</a></li>\n</ul></body></html>";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post ) . '" rel="noopener noreferrer">' . $post_title . "</a></li>\n</ul>";
 
-		$this->assertEquals(
+		$this->assertStringContainsString(
 			$html_email,
 			$body['html']
 		);
@@ -573,7 +626,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_email_body_whole_email_with_multiple_matching_past_year_posts() {
+	public function test_get_email_body__with_multiple_matching_past_year_posts() {
 		$post_title1 = 'A blast from the past';
 		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2012' ) ) );
 		$post_title2 = 'Days of future years past';
@@ -596,14 +649,49 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			$body['text']
 		);
 
-		$html_email  = '<html><head><title>[Test Blog] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n";
+		$html_email  = '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
-		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul></body></html>";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul>";
+
+		$this->assertStringContainsString(
+			$html_email,
+			$body['html']
+		);
+	}
+
+	public function test_get_email_body__whole_email_with_multiple_matching_past_year_posts() {
+		$post_title1 = 'A blast from the past';
+		$post1 = $this->factory->post->create( array( 'post_title' => $post_title1, 'post_date' => $this->get_date( '2012' ) ) );
+		$post_title2 = 'Days of future years past';
+		$post2 = $this->factory->post->create( array( 'post_title' => $post_title2, 'post_date' => $this->get_date( '2014' ) ) );
+		// Extra non-matching post
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+
+		$text_email  = $message;
+		$text_email .= "\n\n== 2014 ==\n";
+		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
+		$text_email .= "\n\n== 2012 ==\n";
+		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
+
+		$body = c2c_YearsAgoToday::get_email_body( 'list', true );
 
 		$this->assertEquals(
-			$html_email,
+			$text_email . self::$text_footer,
+			$body['text']
+		);
+
+		$html_email  = '<p>' . $message . "</p>\n\n";
+		$html_email .= "<h3>2014</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
+		$html_email .= "<h3>2012</h3>\n";
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul>";
+
+		$this->assertStringContainsString(
+			self::get_full_html_body( $html_email ),
 			$body['html']
 		);
 	}
@@ -630,12 +718,12 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			$body['text']
 		);
 
-		$html_email  = '<html><head><title>[Test Blog] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n";
+		$html_email  = '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n";
-		$html_email .= '<li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul></body></html>";
+		$html_email .= '<li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>";
 
-		$this->assertEquals(
+		$this->assertStringContainsString(
 			$html_email,
 			$body['html']
 		);
@@ -681,7 +769,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$email,
-			c2c_YearsAgoToday::get_email_body()['text']
+			c2c_YearsAgoToday::get_email_body( 'list', false )['text']
 		);
 	}
 
@@ -689,7 +777,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		add_filter( 'c2c_years_ago_today-email-if-no-posts', '__return_true' );
 		add_filter( 'c2c_years_ago_today-email-body-no-posts', static fn() => "This is a paragraph.\n\nThis is another another one.\n\nAnd yet a third paragraph." );
 
-		$html = c2c_YearsAgoToday::get_email_body()['html'];
+		$html = c2c_YearsAgoToday::get_email_body( 'list', false )['html'];
 
 		$this->assertSame( 3, substr_count( $html, '<p>' ) );
 	}
@@ -706,6 +794,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 
+		$body = c2c_YearsAgoToday::get_email_body( 'excerpt', false );
+
 		$text_email  = $message;
 		$text_email .= "\n\n== 2014 ==\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
@@ -720,14 +810,10 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$text_email,
-			c2c_YearsAgoToday::get_email_body( 'excerpt' )['text']
+			$body['text']
 		);
 
-		$html_email  = sprintf(
-			'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n",
-			'Test Blog',
-			wp_date( 'M jS' )
-		);
+		$html_email  = '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
@@ -741,11 +827,9 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$html_email .= "\n\n";
 		$html_email .= "<p>This is an excerpt of some post content.</p>\n<br>\n<br>\n";
 
-		$html_email .= '</body></html>';
-
-		$this->assertEquals(
+		$this->assertStringContainsString(
 			$html_email,
-			c2c_YearsAgoToday::get_email_body( 'excerpt' )['html']
+			$body['html']
 		);
 	}
 
@@ -780,11 +864,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 			$body['text']
 		);
 
-		$html_email  = sprintf(
-			'<html><head><title>[%1$s] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n",
-			'Test Blog',
-			wp_date( 'M jS' )
-		);
+		$html_email = '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
@@ -797,9 +877,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$html_email .= sprintf( '<p>Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
 		$html_email .= "\n\n";
 		$html_email .= "<p>This is some post content.</p>\n<br>\n<br>\n";
-		$html_email .= '</body></html>';
 
-		$this->assertEquals(
+		$this->assertStringContainsString(
 			$html_email,
 			$body['html']
 		);
@@ -810,51 +889,15 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	 */
 
 	public function test_get_email_footer__for_text() {
-		$profile_url = admin_url( 'profile.php' );
-
-		$text = <<<HTML
-
-
-
--------------------------------
-You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.
-
-If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
-
-HTML;
-
-		$this->assertEquals( $text, c2c_YearsAgoToday::get_email_footer( 'text' ) );
+		$this->assertEquals( self::$text_footer, c2c_YearsAgoToday::get_email_footer( 'text' ) );
 	}
 
 	public function test_get_email_footer__invalid_format_treated_as_text() {
-		$profile_url = admin_url( 'profile.php' );
-
-		$text = <<<HTML
-
-
-
--------------------------------
-You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.
-
-If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
-
-HTML;
-
-		$this->assertEquals( $text, c2c_YearsAgoToday::get_email_footer( 'invalid' ) );
+		$this->assertEquals( self::$text_footer, c2c_YearsAgoToday::get_email_footer( 'invalid' ) );
 	}
 
 	public function test_get_email_footer__for_html() {
-		$profile_url = admin_url( 'profile.php' );
-		$html = <<<HTML
-<br>
-<br>
-<hr>
-<p>You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.</p>
-<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."</p>
-
-HTML;
-
-		$this->assertEquals( $html, c2c_YearsAgoToday::get_email_footer( 'html' ) );
+		$this->assertEquals( self::$html_footer, c2c_YearsAgoToday::get_email_footer( 'html' ) );
 	}
 
 	/*
@@ -1395,4 +1438,66 @@ HTML;
 	public function test_get_user_email_content_pref__invalid_user_uses_default() {
 		$this->assertEquals( c2c_YearsAgoToday::$email_content_default, c2c_YearsAgoToday::get_user_email_content_pref( 99999 ) );
 	}
+
+	/*
+	 * get_html_email()
+	 */
+
+	public function test_get_html_email__has_single_html_and_body_tags() {
+		$subject = 'Test Subject';
+		$body = '<p>Body content</p>';
+		$footer = '<p>Footer content</p>';
+		$html = c2c_YearsAgoToday::get_html_email($subject, $body, $footer);
+
+		// Only one <html> and one </html>
+		$this->assertEquals(1, substr_count($html, '<html>'));
+		$this->assertEquals(1, substr_count($html, '</html>'));
+
+		// Only one <body> and one </body>
+		$this->assertEquals(1, substr_count($html, '<body>'));
+		$this->assertEquals(1, substr_count($html, '</body>'));
+
+		// </html> is the last tag in the string (ignoring whitespace)
+		$this->assertMatchesRegularExpression('/<\/html>\s*$/', $html);
+	}
+
+	public function test_get_html_email__has_meta_charset_and_title() {
+		$subject = 'Test Subject';
+		$body = '<p>Body content</p>';
+		$footer = '<p>Footer content</p>';
+		$html = c2c_YearsAgoToday::get_html_email($subject, $body, $footer);
+
+		$this->assertMatchesRegularExpression('/<head>.*<meta charset="UTF-8">.*<\/head>/s', $html);
+		$this->assertMatchesRegularExpression('/<head>.*<title>Test Subject<\/title>.*<\/head>/s', $html);
+	}
+
+	public function test_get_html_email__footer_is_inside_body_tag() {
+		$subject = 'Test Subject';
+		$body = '<p>Body content</p>';
+		$footer = '<p id="footer-marker">Footer content</p>';
+		$html = c2c_YearsAgoToday::get_html_email( $subject, $body, $footer );
+
+		$footerPos = strpos( $html, $footer );
+		$bodyClosePos = strpos( $html, '</body>' );
+
+		$this->assertNotFalse( $footerPos, 'Footer not found in HTML' );
+		$this->assertNotFalse( $bodyClosePos, 'No closing </body> tag found' );
+		$this->assertLessThan( $bodyClosePos, $footerPos, 'Footer appears after </body>' );
+	}
+
+	public function test_get_html_email__is_well_formed() {
+		$subject = 'Test Subject';
+		$body = '<p>Body content</p>';
+		$footer = '<p>Footer content</p>';
+		$html = c2c_YearsAgoToday::get_html_email( $subject, $body, $footer );
+
+		$dom = new DOMDocument();
+		libxml_use_internal_errors( true );
+		$dom->loadHTML( $html );
+		$errors = libxml_get_errors();
+		libxml_clear_errors();
+
+		$this->assertEmpty( $errors, 'HTML is not well-formed: ' . print_r( $errors, true ) );
+	}
+
 }

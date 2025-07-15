@@ -2,9 +2,12 @@
 
 ## _(in-progress)_
 * New: Send full HTML of posts in the email alongside plaintext version. Fixes #5. Props akirk.
+    * New: Extract HTML email generation logic out from `get_email_body()` into new `get_html_email()`
+    * New: Add `get_html_email_template()` to return the template used for HTML emails, with placeholders for subject, body, and footer
     * New: Add `get_resized_content()` to rewrite image tags in post content to use smaller-sized versions
     * New: Add `get_html_email_image_size()` to get image size used in HTML emails
     * New: Add filter 'c2c_years_ago_today-html_email_image_size' to customize image size used in HTML emails
+    * Change: Move amending of footer into `get_email_body()` and add optional arg to disable that behavior
 * New: Add support for including additional post types via new 'c2c_years_ago_today-post_types' filter
 * Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Fix: Ensure timing of emails is consistent with site's timezone rather than the server's

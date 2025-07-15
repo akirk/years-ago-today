@@ -282,6 +282,61 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
+	 * Returns the full HTML for the HTML part of an email with the given content
+	 * inserted into appropriate locations.
+	 *
+	 * @since 2.0
+	 *
+	 * @param string $subject The email subject.
+	 * @param string $body    The HTML content for the body of the email.
+	 * @param string $footer  The HTML content for the footer of the email.
+	 * @return string
+	 */
+	public static function get_html_email( $subject, $body, $footer ) {
+		$template = self::get_html_email_template();
+		return str_replace(
+			[ '{{subject}}', '{{body}}', '{{footer}}' ],
+			[ $subject, $body, $footer ],
+			$template
+		);
+	}
+
+	/**
+	 * Returns the HTML email template with placeholders for subject, body, and footer.
+	 *
+	 * The placeholders are:
+	 * - {{subject}}
+	 * - {{body}}
+	 * - {{footer}}
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	private static function get_html_email_template() {
+		return <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{{subject}}</title>
+	<style type="text/css">
+		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
+		.container { max-width: 600px; margin: 20px auto; background: #fff; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 32px 24px; }
+		.footer { font-size: 13px; color: #888; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		{{body}}
+		<div class="footer">{{footer}}</div>
+	</div>
+</body>
+</html>
+HTML;
+	}
+
+	/**
 	 * Returns the body of the daily email.
 	 *
 	 * @since 1.2
@@ -289,16 +344,15 @@ class c2c_YearsAgoToday {
 	 *
 	 * @param string $content_type The email content type. See `get_email_content_types()` for
 	 *                             acceptable values. Default 'list'.
+	 * @param bool   $include_footer Whether to include the footer in the email. Default true.
 	 * @return array Associative array consisting of 'text' and 'html' keys with the plain-text
 	 *               and HTML email bodies, respectively.
 	 */
-	public static function get_email_body( $content_type = 'list' ) {
+	public static function get_email_body( $content_type = 'list', $include_footer = true ) {
 		// Get the list of posts from years ago.
 		$query = self::get_posts();
 
 		$site_name = html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES );
-
-		$html_body = '<html><head><title>' . self::get_email_subject() . '</title></head><body>';
 
 		// If there are no posts to include in the email.
 		if ( ! $query->have_posts() ) {
@@ -334,7 +388,7 @@ class c2c_YearsAgoToday {
 					$site_name,
 					self::get_formatted_date_string()
 				);
-				$html_body .= wpautop( $body );
+				$html_body = wpautop( $body );
 			}
 			// Else don't define an email body.
 			else {
@@ -357,7 +411,7 @@ class c2c_YearsAgoToday {
 				self::get_formatted_date_string()
 			);
 
-			$html_body .= wpautop( esc_html( $body ) );
+			$html_body = wpautop( esc_html( $body ) );
 
 			// Output the list of posts.
 			$year = '';
@@ -432,8 +486,12 @@ class c2c_YearsAgoToday {
 			wp_reset_postdata();
 		}
 
+		if ( $body && $include_footer ) {
+			$body .= self::get_email_footer( 'text' );
+		}
+
 		if ( $html_body ) {
-			$html_body .= '</body></html>';
+			$html_body = self::get_html_email( self::get_email_subject(), $html_body, $include_footer ? self::get_email_footer( 'html' ) : '' );
 		}
 
 		return array(
@@ -818,10 +876,10 @@ class c2c_YearsAgoToday {
 			return 0;
 		}
 
-		$plain = wp_kses( $body['text'], array() ) . self::get_email_footer( 'text' );
+		$plain = wp_kses( $body['text'], array() );
 		$html  = empty( $body['html'] )
 			? wpautop( esc_html( $plain ) )
-			: $body['html'] . self::get_email_footer( 'html' );
+			: $body['html'];
 
 		$mailer_hook = static function ( $phpmailer ) use ( $html, $plain ) {
 			$phpmailer->isHTML( true );
