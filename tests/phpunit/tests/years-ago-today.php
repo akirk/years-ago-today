@@ -478,13 +478,15 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	public function test_get_email_body_with_no_posts_but_email_forced() {
 		add_filter( 'c2c_years_ago_today-email-if-no-posts', '__return_true' );
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertEquals(
 			sprintf(
 				'No posts were published to the site %1$s on %2$s in any past year.',
 				'Test Blog',
 				wp_date( 'M jS' )
 			),
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 
 		$this->assertEquals(
@@ -493,7 +495,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 				'Test Blog',
 				wp_date( 'M jS' )
 			),
-			c2c_YearsAgoToday::get_email_body()['html']
+			$body['html']
 		);
 	}
 
@@ -504,14 +506,16 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$expected = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertStringContainsString(
 			$expected,
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 
 		$this->assertStringContainsString(
 			$expected,
-			c2c_YearsAgoToday::get_email_body()['html']
+			$body['html']
 		);
 	}
 
@@ -527,9 +531,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$text_email .= "\n\n== 2012 ==\n";
 		$text_email .= "* {$post_title} : " . get_permalink( $post ) . "\n";
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertEquals(
 			$text_email,
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 
 		$html_email  = sprintf(
@@ -542,7 +548,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$html_email,
-			c2c_YearsAgoToday::get_email_body()['html']
+			$body['html']
 		);
 	}
 
@@ -554,14 +560,16 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$expected = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertStringContainsString(
 			$expected,
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 
 		$this->assertStringContainsString(
 			$expected,
-			c2c_YearsAgoToday::get_email_body()['html']
+			$body['html']
 		);
 	}
 
@@ -581,9 +589,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$text_email .= "\n\n== 2012 ==\n";
 		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertEquals(
 			$text_email,
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 
 		$html_email  = '<html><head><title>[Test Blog] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n";
@@ -594,7 +604,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$html_email,
-			c2c_YearsAgoToday::get_email_body()['html']
+			$body['html']
 		);
 	}
 
@@ -613,9 +623,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertEquals(
 			$text_email,
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 
 		$html_email  = '<html><head><title>[Test Blog] Years Ago Today daily update</title></head><body><p>' . $message . "</p>\n\n";
@@ -625,7 +637,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$html_email,
-			c2c_YearsAgoToday::get_email_body()['html']
+			$body['html']
 		);
 	}
 
@@ -643,9 +655,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$email .= "\n\n== 2012 ==\n";
 		$email .= "* " . wp_strip_all_tags( $post_title1 ) . " : " . get_permalink( $post1 ) . "\n";
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertEquals(
 			$email,
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 	}
 
@@ -759,9 +773,11 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		$text_email .= sprintf( "Published %s, 2012 by Certain Author\n\n", wp_date( 'F j' ) );
 		$text_email .= "This is some post content.\n\n\n";
 
+		$body = c2c_YearsAgoToday::get_email_body( 'full', false );
+
 		$this->assertEquals(
 			$text_email,
-			c2c_YearsAgoToday::get_email_body( 'full' )['text']
+			$body['text']
 		);
 
 		$html_email  = sprintf(
@@ -785,7 +801,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			$html_email,
-			c2c_YearsAgoToday::get_email_body( 'full' )['html']
+			$body['html']
 		);
 	}
 
@@ -1100,13 +1116,15 @@ HTML;
 		add_filter( 'c2c_years_ago_today-email-if-no-posts',  '__return_true' );
 		add_filter( 'c2c_years_ago_today-email-body-no-posts', array( $this, 'email_body_no_posts' ) );
 
+		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
+
 		$this->assertEquals(
 			sprintf(
 				'Sorry, no posts were made on this day (%s) to %s in any prior year.',
 				wp_date( 'M jS' ),
 				'Test Blog'
 			),
-			c2c_YearsAgoToday::get_email_body()['text']
+			$body['text']
 		);
 	}
 
