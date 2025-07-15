@@ -11,6 +11,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	private static $text_footer = '';
 	private static $html_footer = '';
 
+	private $ref;
+
 	public static function setUpBeforeClass(): void {
 		// Make all requests as if in the admin, which is the only place the plugin
 		// affects.
@@ -43,6 +45,15 @@ HTML;
 
 HTML;
 
+	}
+
+	public function setUp(): void {
+		parent::setUp();
+
+		// Reflection for the private helper.
+		$rm = new ReflectionMethod( 'c2c_YearsAgoToday', 'get_html_email_template' );
+		$rm->setAccessible( true );
+		$this->ref = $rm;
 	}
 
 	public function tearDown(): void {
@@ -1500,4 +1511,51 @@ HTML;
 		$this->assertEmpty( $errors, 'HTML is not well-formed: ' . print_r( $errors, true ) );
 	}
 
+	/*
+	 * get_html_email_template()
+	 */
+
+	public function test_get_html_email_template__has_placeholders() {
+		$template = $this->ref->invoke( null );
+
+		$this->assertStringContainsString( '{{subject}}', $template );
+		$this->assertStringContainsString( '{{body}}', $template );
+		$this->assertStringContainsString( '{{footer}}', $template );
+	}
+
+	public function test_get_html_email_template__full_html_body() {
+		$template = $this->ref->invoke( null );
+
+		$this->assertStringContainsString( '<html>', $template );
+		$this->assertStringContainsString( '</html>', $template );
+		$this->assertStringContainsString( '<body>', $template );
+		$this->assertStringContainsString( '</body>', $template );
+	}
+
+	public function test_get_html_email_template__full_output() {
+		$template = $this->ref->invoke( null );
+
+		$expected = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{{subject}}</title>
+	<style type="text/css">
+		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
+		.container { max-width: 600px; margin: 20px auto; background: #fff; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 32px 24px; }
+		.footer { font-size: 13px; color: #888; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		{{body}}
+		<div class="footer">{{footer}}</div>
+	</div>
+</body>
+</html>
+HTML;
+
+		$this->assertEquals( $expected, $template );
+	}
 }
