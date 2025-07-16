@@ -318,7 +318,9 @@ class c2c_YearsAgoToday {
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<meta charset="UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
 	<style type="text/css">
 		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }

@@ -107,7 +107,9 @@ HTML;
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<meta charset="UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
 	<style type="text/css">
 		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
@@ -1478,7 +1480,8 @@ HTML;
 		$footer = '<p>Footer content</p>';
 		$html = c2c_YearsAgoToday::get_html_email($subject, $body, $footer);
 
-		$this->assertMatchesRegularExpression('/<head>.*<meta charset="UTF-8">.*<\/head>/s', $html);
+		$this->assertMatchesRegularExpression('/<head>.*<meta charset="UTF-8" \/>.*<\/head>/s', $html);
+		$this->assertMatchesRegularExpression('/<head>.*<meta http-equiv="Content-Type" content="text\/html; charset=UTF-8" \/>.*<\/head>/s', $html);
 		$this->assertMatchesRegularExpression('/<head>.*<title>Test Subject<\/title>.*<\/head>/s', $html);
 	}
 
@@ -1539,7 +1542,9 @@ HTML;
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<meta charset="UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
 	<style type="text/css">
 		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
