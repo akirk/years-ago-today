@@ -722,12 +722,22 @@ HTML;
 			? "</p>\n<p>"
 			: "\n\n";
 
+		$unsubscribe_url = admin_url( 'profile.php' );
+
 		$footer .= sprintf(
 			/* translators: 1: URL to user profile on the site, 2: checkbox label */
 			__( 'If you wish to discontinue receiving these emails, simply log into the site and visit your profile at %1$s to uncheck the checkbox labeled "%2$s"', 'years-ago-today' ),
-			admin_url( 'profile.php' ),
+			$unsubscribe_url,
 			esc_html( self::get_optin_label() )
 		);
+
+		if ( $is_html ) {
+			$footer = str_replace(
+				$unsubscribe_url,
+				'<a href="' . esc_url( $unsubscribe_url ) . '">' . $unsubscribe_url . '</a>',
+				$footer
+			);
+		}
 
 		$footer .= $is_html
 			? "</p>\n"
