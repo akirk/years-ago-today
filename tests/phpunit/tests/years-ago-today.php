@@ -111,16 +111,11 @@ HTML;
 	<meta charset="UTF-8" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
-	<style type="text/css">
-		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
-		.container { max-width: 600px; margin: 20px auto; background: #fff; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 32px 24px; }
-		.footer { font-size: 13px; color: #888; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px; }
-	</style>
 </head>
-<body>
-	<div class="container">
+<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fff;margin:0;padding:0;">
+	<div class="container" style="max-width:600px;margin:20px auto;background:#fff;border:1px solid #eee;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.03);padding:32px 24px;">
 		{{body}}
-		<div class="footer">{{footer}}</div>
+		<div class="footer" style="font-size:13px;color:#888;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
 	</div>
 </body>
 </html>
@@ -1467,7 +1462,7 @@ HTML;
 		$this->assertEquals(1, substr_count($html, '</html>'));
 
 		// Only one <body> and one </body>
-		$this->assertEquals(1, substr_count($html, '<body>'));
+		$this->assertEquals(1, substr_count($html, '<body style="'));
 		$this->assertEquals(1, substr_count($html, '</body>'));
 
 		// </html> is the last tag in the string (ignoring whitespace)
@@ -1531,7 +1526,7 @@ HTML;
 
 		$this->assertStringContainsString( '<html>', $template );
 		$this->assertStringContainsString( '</html>', $template );
-		$this->assertStringContainsString( '<body>', $template );
+		$this->assertStringContainsString( '<body style="', $template );
 		$this->assertStringContainsString( '</body>', $template );
 	}
 
@@ -1546,16 +1541,11 @@ HTML;
 	<meta charset="UTF-8" />
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
-	<style type="text/css">
-		body { font-family: Arial, sans-serif; font-size: 16px; color: #222; background: #fff; margin: 0; padding: 0; }
-		.container { max-width: 600px; margin: 20px auto; background: #fff; border: 1px solid #eee; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 32px 24px; }
-		.footer { font-size: 13px; color: #888; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px; }
-	</style>
 </head>
-<body>
-	<div class="container">
+<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fff;margin:0;padding:0;">
+	<div class="container" style="max-width:600px;margin:20px auto;background:#fff;border:1px solid #eee;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.03);padding:32px 24px;">
 		{{body}}
-		<div class="footer">{{footer}}</div>
+		<div class="footer" style="font-size:13px;color:#888;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
 	</div>
 </body>
 </html>
