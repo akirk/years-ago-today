@@ -7,6 +7,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 	private static $default_bcc_batch_size = 40;
 	private static $default_bcc_to = '';
 	private static $default_email_subject = '[Test Blog] Years Ago Today daily update';
+	private static $default_title = 'Years Ago Today on Test Blog';
 
 	private static $text_footer = '';
 	private static $html_footer = '';
@@ -37,9 +38,6 @@ If you wish to discontinue receiving these emails, simply log into the site and 
 HTML;
 
 		self::$html_footer = <<<HTML
-<br>
-<br>
-<hr>
 <p>You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.</p>
 <p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at <a href="{$profile_url}">{$profile_url}</a> to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."</p>
 
@@ -112,10 +110,10 @@ HTML;
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
 </head>
-<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fff;margin:0;padding:0;">
+<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fbfbfb;margin:0;padding:0;">
 	<div class="container" style="max-width:600px;margin:20px auto;background:#fff;border:1px solid #eee;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.03);padding:32px 24px;">
 		{{body}}
-		<div class="footer" style="font-size:13px;color:#888;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
+		<div class="footer" style="font-size:13px;color:#888;margin-top:48px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
 	</div>
 </body>
 </html>
@@ -547,7 +545,7 @@ HTML;
 
 		$this->assertEquals(
 			sprintf(
-				'No posts were published to the site %1$s on %2$s in any past year.',
+				'= Years Ago Today on Test Blog =' . "\n\n" . 'No posts were published to the site %1$s on %2$s in any past year.',
 				'Test Blog',
 				wp_date( 'M jS' )
 			),
@@ -574,12 +572,12 @@ HTML;
 		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
 
 		$this->assertStringContainsString(
-			$expected,
+			'= ' . self::$default_title . " =\n\n" . $expected,
 			$body['text']
 		);
 
 		$this->assertStringContainsString(
-			'<p>' . $expected . '</p>',
+			'<h2>' . self::$default_title . '</h2>' . "\n\n" . '<p>' . $expected . '</p>',
 			$body['html']
 		);
 	}
@@ -592,7 +590,8 @@ HTML;
 
 		$message = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
 
-		$text_email  = $message;
+		$text_email  = '= ' . self::$default_title . " =\n\n";
+		$text_email .= $message;
 		$text_email .= "\n\n== 2012 ==\n";
 		$text_email .= "* {$post_title} : " . get_permalink( $post ) . "\n";
 
@@ -603,7 +602,8 @@ HTML;
 			$body['text']
 		);
 
-		$html_email = '<p>' . $message . "</p>\n\n";
+		$html_email  = '<h2>' . self::$default_title . '</h2>' . "\n\n";
+		$html_email .= '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2012</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post ) . '" rel="noopener noreferrer">' . $post_title . "</a></li>\n</ul>";
 
@@ -624,12 +624,12 @@ HTML;
 		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
 
 		$this->assertStringContainsString(
-			$expected,
+			'= ' . self::$default_title . " =\n\n" . $expected,
 			$body['text']
 		);
 
 		$this->assertStringContainsString(
-			$expected,
+			'<h2>' . self::$default_title . '</h2>' . "\n\n" . '<p>' . $expected . '</p>',
 			$body['html']
 		);
 	}
@@ -644,7 +644,8 @@ HTML;
 
 		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 
-		$text_email  = $message;
+		$text_email  = '= ' . self::$default_title . " =\n\n";
+		$text_email .= $message;
 		$text_email .= "\n\n== 2014 ==\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
 		$text_email .= "\n\n== 2012 ==\n";
@@ -657,7 +658,8 @@ HTML;
 			$body['text']
 		);
 
-		$html_email  = '<p>' . $message . "</p>\n\n";
+		$html_email  = '<h2>' . self::$default_title . '</h2>' . "\n\n";
+		$html_email .= '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
@@ -679,7 +681,8 @@ HTML;
 
 		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 
-		$text_email  = $message;
+		$text_email  = '= ' . self::$default_title . " =\n\n";
+		$text_email .= $message;
 		$text_email .= "\n\n== 2014 ==\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
 		$text_email .= "\n\n== 2012 ==\n";
@@ -692,14 +695,15 @@ HTML;
 			$body['text']
 		);
 
-		$html_email  = '<p>' . $message . "</p>\n\n";
+		$html_email  = '<h2>' . self::$default_title . '</h2>' . "\n\n";
+		$html_email .= '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul>";
 
 		$this->assertStringContainsString(
-			self::get_full_html_body( $html_email ),
+			$html_email,
 			$body['html']
 		);
 	}
@@ -714,7 +718,8 @@ HTML;
 
 		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 
-		$text_email  = $message;
+		$text_email  = '= ' . self::$default_title . " =\n\n";
+		$text_email .= $message;
 		$text_email .= "\n\n== 2014 ==\n";
 		$text_email .= "* {$post_title1} : " . get_permalink( $post1 ) . "\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
@@ -726,7 +731,8 @@ HTML;
 			$body['text']
 		);
 
-		$html_email  = '<p>' . $message . "</p>\n\n";
+		$html_email  = '<h2>' . self::$default_title . '</h2>' . "\n\n";
+		$html_email .= '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n";
 		$html_email .= '<li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>";
@@ -745,7 +751,8 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$email  = '= ' . self::$default_title . " =\n\n";
+		$email .= '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 		$email .= "\n\n== 2014 ==\n";
 		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n== 2012 ==\n";
@@ -769,7 +776,8 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$email  = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$email  = '= ' . self::$default_title . " =\n\n";
+		$email .= '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 		$email .= "\n\n~~~ < 2014 > ~~~\n";
 		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n~~~ < 2012 > ~~~\n";
@@ -804,7 +812,8 @@ HTML;
 
 		$body = c2c_YearsAgoToday::get_email_body( 'excerpt', false );
 
-		$text_email  = $message;
+		$text_email  = '= ' . self::$default_title . " =\n\n";
+		$text_email .= $message;
 		$text_email .= "\n\n== 2014 ==\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
 		$text_email .= "\n\n== 2012 ==\n";
@@ -821,19 +830,23 @@ HTML;
 			$body['text']
 		);
 
-		$html_email  = '<p>' . $message . "</p>\n\n";
+		$h3_style = 'margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;';
+		$p_style = 'margin-top:0; font-size:smaller;';
+
+		$html_email  = '<h2>' . self::$default_title . '</h2>' . "\n\n";
+		$html_email .= '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
-		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul><br>\n<br>\n<br>\n";
-		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post2 ), $post_title2 ) . "\n";
-		$html_email .= sprintf( '<p>Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul><br>\n";
+		$html_email .= sprintf( '<h3 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h3>', esc_attr( $h3_style ), get_permalink( $post2 ), $post_title2 ) . "\n";
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
 		$html_email .= "\n\n";
-		$html_email .= "<p>This is an excerpt of another post content.</p>\n<br>\n<br>\n";
-		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post1 ), $post_title1 ) . "\n";
-		$html_email .= sprintf( '<p>Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= "<p>This is an excerpt of another post content.</p>\n";
+		$html_email .= sprintf( '<h3 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h3>', esc_attr( $h3_style ), get_permalink( $post1 ), $post_title1 ) . "\n";
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
 		$html_email .= "\n\n";
-		$html_email .= "<p>This is an excerpt of some post content.</p>\n<br>\n<br>\n";
+		$html_email .= "<p>This is an excerpt of some post content.</p>\n";
 
 		$this->assertStringContainsString(
 			$html_email,
@@ -853,7 +866,8 @@ HTML;
 
 		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
 
-		$text_email  = $message;
+		$text_email  = '= ' . self::$default_title . " =\n\n";
+		$text_email .= $message;
 		$text_email .= "\n\n== 2014 ==\n";
 		$text_email .= "* {$post_title2} : " . get_permalink( $post2 ) . "\n";
 		$text_email .= "\n\n== 2012 ==\n";
@@ -872,19 +886,23 @@ HTML;
 			$body['text']
 		);
 
-		$html_email = '<p>' . $message . "</p>\n\n";
+		$h3_style = 'margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;';
+		$p_style = 'margin-top:0; font-size:smaller;';
+
+		$html_email = '<h2>' . self::$default_title . '</h2>' . "\n\n";
+		$html_email .= '<p>' . $message . "</p>\n\n";
 		$html_email .= "<h3>2014</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
-		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul><br>\n<br>\n<br>\n";
-		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post2 ), $post_title2 ) . "\n";
-		$html_email .= sprintf( '<p>Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul><br>\n";
+		$html_email .= sprintf( '<h3 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h3>', esc_attr( $h3_style ), esc_url( get_permalink( $post2 ) ), $post_title2 ) . "\n";
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
 		$html_email .= "\n\n";
-		$html_email .= "<p>This is another post content.</p>\n<br>\n<br>\n";
-		$html_email .= sprintf( '<h3><a href="%s" rel="noopener noreferrer">%s</a></h3>', get_permalink( $post1 ), $post_title1 ) . "\n";
-		$html_email .= sprintf( '<p>Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', wp_date( 'F j' ), $author_id );
+		$html_email .= "<p>This is another post content.</p>\n";
+		$html_email .= sprintf( '<h3 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h3>', esc_attr( $h3_style ), esc_url( get_permalink( $post1 ) ), $post_title1 ) . "\n";
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
 		$html_email .= "\n\n";
-		$html_email .= "<p>This is some post content.</p>\n<br>\n<br>\n";
+		$html_email .= "<p>This is some post content.</p>\n";
 
 		$this->assertStringContainsString(
 			$html_email,
@@ -1171,7 +1189,7 @@ HTML;
 
 		$this->assertEquals(
 			sprintf(
-				'Sorry, no posts were made on this day (%s) to %s in any prior year.',
+				'= ' . self::$default_title . " =\n\n" . 'Sorry, no posts were made on this day (%s) to %s in any prior year.',
 				wp_date( 'M jS' ),
 				'Test Blog'
 			),
@@ -1542,10 +1560,10 @@ HTML;
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
 </head>
-<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fff;margin:0;padding:0;">
+<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fbfbfb;margin:0;padding:0;">
 	<div class="container" style="max-width:600px;margin:20px auto;background:#fff;border:1px solid #eee;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.03);padding:32px 24px;">
 		{{body}}
-		<div class="footer" style="font-size:13px;color:#888;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
+		<div class="footer" style="font-size:13px;color:#888;margin-top:48px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
 	</div>
 </body>
 </html>

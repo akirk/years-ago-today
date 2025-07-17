@@ -323,10 +323,10 @@ class c2c_YearsAgoToday {
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>{{subject}}</title>
 </head>
-<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fff;margin:0;padding:0;">
+<body style="font-family:Arial,sans-serif;font-size:16px;color:#222;background:#fbfbfb;margin:0;padding:0;">
 	<div class="container" style="max-width:600px;margin:20px auto;background:#fff;border:1px solid #eee;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.03);padding:32px 24px;">
 		{{body}}
-		<div class="footer" style="font-size:13px;color:#888;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
+		<div class="footer" style="font-size:13px;color:#888;margin-top:48px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
 	</div>
 </body>
 </html>
@@ -350,6 +350,10 @@ HTML;
 		$query = self::get_posts();
 
 		$site_name = html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES );
+
+		/* translators: %s: site name */
+		$head = sprintf( __( 'Years Ago Today on %s', 'years-ago-today' ), $site_name );
+		$html_head = '<h2>' . $head . "</h2>";
 
 		// If there are no posts to include in the email.
 		if ( ! $query->have_posts() ) {
@@ -442,7 +446,7 @@ HTML;
 				$query->rewind_posts();
 
 				$body .= "\n\n\n";
-				$html_body .= "<br>\n<br>\n<br>\n";
+				$html_body .= "<br>\n";
 
 				while ( $query->have_posts() ) {
 					$query->the_post();
@@ -452,8 +456,8 @@ HTML;
 					/* translators: 1: the publication date, 2: the post author */
 					$body .= wp_kses( sprintf( _x( 'Published %1$s by %2$s', 'plaintext email post info', 'years-ago-today' ), get_the_date(), get_the_author() ), array() ) . "\n\n";
 
-					$html_body .= '<h3><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h3>\n";
-					$html_body .= '<p>';
+					$html_body .= '<h3 style="margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;"><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h3>\n";
+					$html_body .= '<p style="margin-top:0; font-size:smaller;">';
 					$html_body .= sprintf(
 						/* translators: 1: the publication date, 2: the post author linked to their post archive */
 						wp_kses( _x( 'Published %1$s by %2$s', 'HTML email post info', 'years-ago-today' ), array() ),
@@ -476,11 +480,14 @@ HTML;
 					}
 
 					$body .= "\n\n\n";
-					$html_body .= "<br>\n<br>\n";
 				}
 			}
 
 			wp_reset_postdata();
+		}
+
+		if ( $body ) {
+			$body = '= ' . $head . " =\n\n" . $body;
 		}
 
 		if ( $body && $include_footer ) {
@@ -488,7 +495,11 @@ HTML;
 		}
 
 		if ( $html_body ) {
-			$html_body = self::get_html_email( self::get_email_subject(), $html_body, $include_footer ? self::get_email_footer( 'html' ) : '' );
+			$html_body = self::get_html_email(
+				self::get_email_subject(),
+				$html_head . "\n\n" . $html_body,
+				$include_footer ? self::get_email_footer( 'html' ) : ''
+			);
 		}
 
 		return array(
@@ -706,8 +717,8 @@ HTML;
 		$is_html = ( 'html' === $format );
 
 		$footer .= $is_html
-			? "<br>\n<br>\n<hr>\n<p>"
-			: "\n\n\n-------------------------------\n";;
+			? '<p>'
+			: "\n\n\n-------------------------------\n";
 
 		$footer .= sprintf(
 			/* translators: %s: site name */
