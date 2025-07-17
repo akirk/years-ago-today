@@ -353,7 +353,7 @@ HTML;
 
 		/* translators: %s: site name */
 		$head = sprintf( __( 'Years Ago Today on %s', 'years-ago-today' ), $site_name );
-		$html_head = '<h2>' . $head . "</h2>";
+		$html_head = '<h2>' . $head . '</h2>';
 
 		// If there are no posts to include in the email.
 		if ( ! $query->have_posts() ) {
@@ -438,7 +438,7 @@ HTML;
 			endwhile;
 
 			if ( $open_ul ) {
-				$html_body .= '</ul>';
+				$html_body .= "</ul>\n";
 			}
 
 			// Optionally output excerpts or full contents of posts.
@@ -446,7 +446,26 @@ HTML;
 				$query->rewind_posts();
 
 				$body .= "\n\n\n";
-				$html_body .= "<br>\n";
+				$html_body .= '<h3 style="margin-top:3em;">';
+				if ( 'excerpt' === $content_type ) {
+					$heading = __( 'Post Excerpts', 'years-ago-today' );
+					$body .= '== ' . $heading . " ==\n\n";
+					$html_body .= $heading;
+				} elseif ( 'full' === $content_type ) {
+					$heading = __( 'Posts', 'years-ago-today' );
+					$body .= '== ' . $heading . " ==\n\n";
+					$html_body .= $heading;
+				}
+				$html_body .= "</h3>\n";
+				$html_body .= '<p style="font-size:smaller;"><em>';
+				if ( 'excerpt' === $content_type ) {
+					$body .= __( 'Excerpts of these posts follows. Formatting and markup have been removed. The full content is available on the site.', 'years-ago-today' ) . "\n\n\n";
+					$html_body .= __( 'Excerpts of these posts follows. The full content is available on the site. Note: Email clients may not properly render the formatting.', 'years-ago-today' );
+				} elseif ( 'full' === $content_type ) {
+					$body .= __( 'The full content of these posts follows. Formatting and markup have been removed.', 'years-ago-today' ) . "\n\n\n";
+					$html_body .= __( 'The full content of these posts follows. Note: Email clients may not properly display the formatting of the posts.', 'years-ago-today' );
+				}
+				$html_body .= "</em></p>\n";
 
 				while ( $query->have_posts() ) {
 					$query->the_post();
@@ -456,7 +475,7 @@ HTML;
 					/* translators: 1: the publication date, 2: the post author */
 					$body .= wp_kses( sprintf( _x( 'Published %1$s by %2$s', 'plaintext email post info', 'years-ago-today' ), get_the_date(), get_the_author() ), array() ) . "\n\n";
 
-					$html_body .= '<h3 style="margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;"><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h3>\n";
+					$html_body .= '<h4 style="margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;"><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h4>\n";
 					$html_body .= '<p style="margin-top:0; font-size:smaller;">';
 					$html_body .= sprintf(
 						/* translators: 1: the publication date, 2: the post author linked to their post archive */
