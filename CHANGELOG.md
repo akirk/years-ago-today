@@ -46,7 +46,7 @@
 * Change: Note compatibility through WP 6.8+
 * Change: Drop compatibilities with versions of WP older than 5.5
 * Change: Note compatibility through PHP 8.3+
-* Change: Update copyright date (2025)
+* Change: Update copyright date (2026)
 * Unit tests:
     * New: Add multisite tests
     * New: Define `WP_RUNNING_TESTS` constant
