@@ -39,7 +39,7 @@ HTML;
 
 		self::$html_footer = <<<HTML
 <p>You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.</p>
-<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at <a href="{$profile_url}">{$profile_url}</a> to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."</p>
+<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at <a href="{$profile_url}">{$profile_url}</a> to uncheck the checkbox labeled &quot;Email me daily about posts published on this day in years past.&quot;</p>
 
 HTML;
 

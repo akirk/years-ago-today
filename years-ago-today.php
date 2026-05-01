@@ -739,11 +739,15 @@ HTML;
 			? '<p>'
 			: "\n\n\n-------------------------------\n";
 
-		$footer .= sprintf(
+		$opt_in_explanation = sprintf(
 			/* translators: %s: site name */
 			__( 'You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site %s, which is using the Years Ago Today plugin.', 'years-ago-today' ),
 			wp_specialchars_decode( get_option('blogname'), ENT_QUOTES )
 		);
+		if ( $is_html ) {
+			$opt_in_explanation = esc_html( $opt_in_explanation );
+		}
+		$footer .= $opt_in_explanation;
 
 		$footer .= $is_html
 			? "</p>\n<p>"
@@ -751,20 +755,21 @@ HTML;
 
 		$unsubscribe_url = admin_url( 'profile.php' );
 
-		$footer .= sprintf(
-			/* translators: 1: URL to user profile on the site, 2: checkbox label */
+		$unsubscribe_instructions = sprintf(
+			/* translators: 1: URL to user profile on the site, 2: the label for the opt-in checkbox in the user's profile */
 			__( 'If you wish to discontinue receiving these emails, simply log into the site and visit your profile at %1$s to uncheck the checkbox labeled "%2$s"', 'years-ago-today' ),
 			$unsubscribe_url,
-			esc_html( self::get_optin_label() )
+			self::get_optin_label()
 		);
-
+		// If HTML, convert URL to a link and escape the instructions.
 		if ( $is_html ) {
-			$footer = str_replace(
-				$unsubscribe_url,
-				'<a href="' . esc_url( $unsubscribe_url ) . '">' . $unsubscribe_url . '</a>',
-				$footer
+			$unsubscribe_instructions = str_replace(
+				esc_html( $unsubscribe_url ),
+				'<a href="' . esc_url( $unsubscribe_url ) . '">' . esc_html( $unsubscribe_url ) . '</a>',
+				esc_html( $unsubscribe_instructions )
 			);
 		}
+		$footer .= $unsubscribe_instructions;
 
 		$footer .= $is_html
 			? "</p>\n"
