@@ -713,9 +713,10 @@ HTML;
 	 */
 	public static function get_email_subject() {
 		return sprintf(
-			/* translators: %s: site name in subject for daily email */
-			__( '[%s] Years Ago Today daily update', 'years-ago-today' ),
-			html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES )
+			/* translators: 1: site name in subject for daily email, 2: date string for today */
+			__( '[%1$s] Years Ago Today - %2$s', 'years-ago-today' ),
+			html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES ),
+			self::get_formatted_date_string()
 		);
 	}
 

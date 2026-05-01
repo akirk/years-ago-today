@@ -6,7 +6,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 	private static $default_bcc_batch_size = 40;
 	private static $default_bcc_to = '';
-	private static $default_email_subject = '[Test Blog] Years Ago Today daily update';
+	private static $default_email_subject = '[Test Blog] Years Ago Today - %s';
 	private static $default_title = 'Years Ago Today on Test Blog';
 
 	private static $text_footer = '';
@@ -25,6 +25,8 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 		self::$default_bcc_to = 'noreply@' . wp_parse_url( home_url(), PHP_URL_HOST );
 
 		$profile_url = admin_url( 'profile.php' );
+
+		self::$default_email_subject = sprintf( self::$default_email_subject, wp_date( 'M jS' ) );
 
 		self::$text_footer = <<<HTML
 
