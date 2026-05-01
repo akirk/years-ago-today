@@ -75,9 +75,7 @@ class Test_Years_Ago_Today_Resized_Content extends WP_UnitTestCase {
 		) );
 
 		// Reflection for the private helper.
-		$rm = new ReflectionMethod( 'c2c_YearsAgoToday', 'get_resized_content' );
-		$rm->setAccessible( true );
-		$this->ref = $rm;
+		$this->ref = new ReflectionMethod( 'c2c_YearsAgoToday', 'get_resized_content' );
 
 		// Create dummy post.
 		$this->post_id = $this->factory->post->create();

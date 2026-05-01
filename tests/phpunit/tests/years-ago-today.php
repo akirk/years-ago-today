@@ -49,9 +49,7 @@ HTML;
 		parent::setUp();
 
 		// Reflection for the private helper.
-		$rm = new ReflectionMethod( 'c2c_YearsAgoToday', 'get_html_email_template' );
-		$rm->setAccessible( true );
-		$this->ref = $rm;
+		$this->ref = new ReflectionMethod( 'c2c_YearsAgoToday', 'get_html_email_template' );
 	}
 
 	public function tearDown(): void {
