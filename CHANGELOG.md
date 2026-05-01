@@ -47,6 +47,7 @@
 * Change: Drop compatibilities with versions of WP older than 5.5
 * Change: Note compatibility through PHP 8.5+
 * Change: Update copyright date (2026)
+* New: Add `.gitattributes` file to exclude files from GitHub packaging
 * Unit tests:
     * New: Add multisite tests
     * New: Define `WP_RUNNING_TESTS` constant
