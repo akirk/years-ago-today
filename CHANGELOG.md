@@ -45,7 +45,7 @@
 * Fix: Fix translator string that referenced an extraneous placeholder
 * Change: Note compatibility through WP 6.8+
 * Change: Drop compatibilities with versions of WP older than 5.5
-* Change: Note compatibility through PHP 8.3+
+* Change: Note compatibility through PHP 8.5+
 * Change: Update copyright date (2026)
 * Unit tests:
     * New: Add multisite tests
