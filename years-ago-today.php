@@ -551,8 +551,13 @@ HTML;
 			is_string( $size ) ? $size : $default_size
 		);
 
-		// Fall back to default if an invalid size.
-		$valid_sizes = array_merge( array( 'full' ), get_intermediate_image_sizes() );
+		// Cache valid sizes in a static variable.
+		static $valid_sizes = null;
+		if ( null === $valid_sizes ) {
+			// Fall back to default if an invalid size.
+			$valid_sizes = array_merge( array( 'full' ), get_intermediate_image_sizes() );
+		}
+
 		if ( ! in_array( $size, $valid_sizes, true ) ) {
 			$size = $default_size;
 		}
