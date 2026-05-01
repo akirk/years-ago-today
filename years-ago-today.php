@@ -446,7 +446,7 @@ HTML;
 				$query->rewind_posts();
 
 				$body .= "\n\n\n";
-				$html_body .= '<h3 style="margin-top:3em;">';
+				$html_body .= '<h3 style="margin-top:50px;">';
 				if ( 'excerpt' === $content_type ) {
 					$heading = __( 'Post Excerpts', 'years-ago-today' );
 					$body .= '== ' . $heading . " ==\n\n";
@@ -475,7 +475,7 @@ HTML;
 					/* translators: 1: the publication date, 2: the post author */
 					$body .= wp_kses( sprintf( _x( 'Published %1$s by %2$s', 'plaintext email post info', 'years-ago-today' ), get_the_date(), get_the_author() ), array() ) . "\n\n";
 
-					$html_body .= '<h4 style="margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;"><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h4>\n";
+					$html_body .= '<h4 style="margin-bottom:8px;margin-top:30px;padding-top:30px;color:#eee;border-top:1px solid #eee;"><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h4>\n";
 					$html_body .= '<p style="margin-top:0; font-size:smaller;">';
 					$html_body .= sprintf(
 						/* translators: 1: the publication date, 2: the post author linked to their post archive */

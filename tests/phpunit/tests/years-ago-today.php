@@ -832,7 +832,7 @@ HTML;
 			$body['text']
 		);
 
-		$h3_style = 'margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;';
+		$h3_style = 'margin-bottom:8px;margin-top:30px;padding-top:30px;color:#eee;border-top:1px solid #eee;';
 		$p_style = 'margin-top:0; font-size:smaller;';
 
 		$html_email  = '<h2>' . self::$default_title . '</h2>' . "\n\n";
@@ -841,7 +841,7 @@ HTML;
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul>\n";
-		$html_email .= '<h3 style="margin-top:3em;">Post Excerpts</h3>' . "\n";
+		$html_email .= '<h3 style="margin-top:50px;">Post Excerpts</h3>' . "\n";
 		$html_email .= '<p style="font-size:smaller;"><em>Excerpts of these posts follows. The full content is available on the site. Note: Email clients may not properly render the formatting.</em></p>' . "\n";
 		$html_email .= sprintf( '<h4 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h4>', esc_attr( $h3_style ), get_permalink( $post2 ), $post_title2 ) . "\n";
 		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
@@ -892,7 +892,7 @@ HTML;
 			$body['text']
 		);
 
-		$h3_style = 'margin-bottom:0.5em;margin-top:2em;padding-top:2em;color:#eee;border-top:1px solid #eee;';
+		$h3_style = 'margin-bottom:8px;margin-top:30px;padding-top:30px;color:#eee;border-top:1px solid #eee;';
 		$p_style = 'margin-top:0; font-size:smaller;';
 
 		$html_email = '<h2>' . self::$default_title . '</h2>' . "\n\n";
@@ -901,7 +901,7 @@ HTML;
 		$html_email .= '<ul><li><a href="' . get_permalink( $post2 ) . '" rel="noopener noreferrer">' . $post_title2 . "</a></li>\n</ul>\n";
 		$html_email .= "<h3>2012</h3>\n";
 		$html_email .= '<ul><li><a href="' . get_permalink( $post1 ) . '" rel="noopener noreferrer">' . $post_title1 . "</a></li>\n</ul>\n";
-		$html_email .= '<h3 style="margin-top:3em;">Posts</h3>' . "\n";
+		$html_email .= '<h3 style="margin-top:50px;">Posts</h3>' . "\n";
 		$html_email .= '<p style="font-size:smaller;"><em>The full content of these posts follows. Note: Email clients may not properly display the formatting of the posts.</em></p>' . "\n";
 		$html_email .= sprintf( '<h4 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h4>', esc_attr( $h3_style ), esc_url( get_permalink( $post2 ) ), $post_title2 ) . "\n";
 		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
