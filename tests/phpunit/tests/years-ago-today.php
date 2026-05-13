@@ -92,8 +92,8 @@ HTML;
 		return $date;
 	}
 
-	public static function get_formatted_date( $timestamp = '' ) {
-		$date_format = 'F jS';
+	public static function get_formatted_date( $timestamp = '', $include_year = false ) {
+		$date_format = $include_year ? 'F j, Y' : 'F jS';
 		return $timestamp ? date_i18n( $date_format, $timestamp ) : wp_date( $date_format );
 	}
 
@@ -485,6 +485,10 @@ HTML;
 		$timestamp = wp_date( 'U', '2012-11-12' );
 
 		$this->assertEquals( self::get_formatted_date( $timestamp ), c2c_YearsAgoToday::get_formatted_date_string( $timestamp ) );
+	}
+
+	public function test_get_formatted_date_string_with_include_year() {
+		$this->assertEquals( self::get_formatted_date( wp_date( 'timestamp' ), true ), c2c_YearsAgoToday::get_formatted_date_string( '', true ) );
 	}
 
 	/*

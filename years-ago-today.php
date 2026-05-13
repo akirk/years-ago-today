@@ -267,18 +267,25 @@ class c2c_YearsAgoToday {
 	 *
 	 * @since 1.3.0
 	 *
-	 * @param string $time The timestamp to be formatted. Default is the current
-	 *                     time's timestamp.
-	 * @return string      The timestamp formatted according to the date format
-	 *                     string, which by default is "F jS".
+	 * @param string $timestamp    The timestamp to be formatted. Default is the current
+	 *                             time's timestamp.
+	 * @param bool   $include_year Whether to include the year in the date format string.
+	 *                             Default false.
+	 * @return string The timestamp formatted according to the date format string, which
+	 *                is either "F j, Y" or "F jS" depending on whether the year is included.
 	 */
-	public static function get_formatted_date_string( $timestamp = '' ) {
+	public static function get_formatted_date_string( $timestamp = '', $include_year = false ) {
 		if ( ! $timestamp ) {
 			$timestamp = current_time( 'timestamp' );
 		}
 
-		/* translators: date string for today */
-		return date_i18n( __( 'F jS', 'years-ago-today' ), $timestamp );
+		$date_format = $include_year
+			/* translators: date format string for today, including year */
+			? __( 'F j, Y', 'years-ago-today' )
+			/* translators: date format string for today, without year */
+			: __( 'F jS', 'years-ago-today' );
+
+			return date_i18n( $date_format, $timestamp );
 	}
 
 	/**

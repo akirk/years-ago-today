@@ -10,6 +10,7 @@
     * Change: Move amending of footer into `get_email_body()` and add optional arg to disable that behavior
 * New: Add support for including additional post types via new 'c2c_years_ago_today-post_types' filter
 * Change: Add date to email subject
+* Change: Add optional `$include_year` argument to `get_formatted_date_string()`, allowing for full date with year
 * Fix: Restore proper registration of activation/deactivation hooks. Fixes #4. Props akirk.
 * Fix: Ensure timing of emails is consistent with site's timezone rather than the server's
 * Change: Improve performance of `get_posts()`
