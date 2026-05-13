@@ -24,6 +24,7 @@
     * New: Add filter 'c2c_years_ago_today-to_address' to customize the 'To:' email address used for Bcc-batched emails
     * New: Extract email handling logic out from `cron_email()` into new `send_email_of_type()`
     * New: Extract email address grouping logic out from `cron_email()` into new `get_users_to_email_grouped_by_content_type()`
+* Change: Output full month instead of 3-letter abbreviations
 * Change: Revamp dashboard output, more semantically putting each year within `section` tags
 * Change: Ensure list bullets are consistently visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
@@ -58,6 +59,7 @@
     * New: Add unit tests for `cron_email()`
     * Change: Update uses of `current_time()` to more modern `wp_date()`
     * Change: Remove use of deprecated (in PHP 8.5, noop'd in 8.1) `setAccessible()`
+    * New: Add `get_formatted_date()` helper
 
 ## 1.6 _(2024-08-09)_
 * Fix: Convert use of deprecated string interpolation syntax to prevent notice under PHP8.2. Props Simounet.

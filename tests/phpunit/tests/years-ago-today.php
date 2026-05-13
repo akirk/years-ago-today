@@ -26,7 +26,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$profile_url = admin_url( 'profile.php' );
 
-		self::$default_email_subject = sprintf( self::$default_email_subject, wp_date( 'M jS' ) );
+		self::$default_email_subject = sprintf( self::$default_email_subject, self::get_formatted_date() );
 
 		self::$text_footer = <<<HTML
 
@@ -90,6 +90,11 @@ HTML;
 		}
 
 		return $date;
+	}
+
+	public static function get_formatted_date( $timestamp = '' ) {
+		$date_format = 'F jS';
+		return $timestamp ? date_i18n( $date_format, $timestamp ) : wp_date( $date_format );
 	}
 
 	public function translate_text( $translation, $text ) {
@@ -325,7 +330,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = 'No posts were published on <strong>' . wp_date( 'M jS' ) . '</strong> from any past year.';
+		$expected = 'No posts were published on <strong>' . self::get_formatted_date() . '</strong> from any past year.';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
@@ -335,7 +340,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = '<strong>1</strong> post has been published on <strong>' . wp_date( 'M jS' ) . '</strong> in a previous year:';
+		$expected = '<strong>1</strong> post has been published on <strong>' . self::get_formatted_date() . '</strong> in a previous year:';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
@@ -346,7 +351,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = '<strong>2</strong> posts have been published on <strong>' . wp_date( 'M jS' ) . '</strong> in previous years:';
+		$expected = '<strong>2</strong> posts have been published on <strong>' . self::get_formatted_date() . '</strong> in previous years:';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
@@ -473,13 +478,13 @@ HTML;
 	 */
 
 	public function test_get_formatted_date_string() {
-		$this->assertEquals( date_i18n( 'M jS', wp_date( 'timestamp' ) ), c2c_YearsAgoToday::get_formatted_date_string() );
+		$this->assertEquals( self::get_formatted_date( wp_date( 'timestamp' ) ), c2c_YearsAgoToday::get_formatted_date_string() );
 	}
 
 	public function test_get_formatted_date_string_with_timestamp() {
 		$timestamp = wp_date( 'U', '2012-11-12' );
 
-		$this->assertEquals( date_i18n( 'M jS', $timestamp ), c2c_YearsAgoToday::get_formatted_date_string( $timestamp ) );
+		$this->assertEquals( self::get_formatted_date( $timestamp ), c2c_YearsAgoToday::get_formatted_date_string( $timestamp ) );
 	}
 
 	/*
@@ -547,7 +552,7 @@ HTML;
 			sprintf(
 				'= Years Ago Today on Test Blog =' . "\n\n" . 'No posts were published to the site %1$s on %2$s in any past year.',
 				'Test Blog',
-				wp_date( 'M jS' )
+				self::get_formatted_date()
 			),
 			$body['text']
 		);
@@ -556,7 +561,7 @@ HTML;
 			sprintf(
 				'<p>No posts were published to the site %1$s on %2$s in any past year.</p>',
 				'Test Blog',
-				wp_date( 'M jS' )
+				self::get_formatted_date()
 			),
 			$body['html']
 		);
@@ -567,7 +572,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
+		$expected = '1 post has been published to the site Test Blog on ' . self::get_formatted_date() . ' in a previous year:';
 
 		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
 
@@ -588,7 +593,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$message = '1 post has been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in a previous year:';
+		$message = '1 post has been published to the site Test Blog on ' . self::get_formatted_date() . ' in a previous year:';
 
 		$text_email  = '= ' . self::$default_title . " =\n\n";
 		$text_email .= $message;
@@ -619,7 +624,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$expected = '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 
 		$body = c2c_YearsAgoToday::get_email_body( 'list', false );
 
@@ -642,7 +647,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$message = '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 
 		$text_email  = '= ' . self::$default_title . " =\n\n";
 		$text_email .= $message;
@@ -679,7 +684,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$message = '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 
 		$text_email  = '= ' . self::$default_title . " =\n\n";
 		$text_email .= $message;
@@ -716,7 +721,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$message = '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 
 		$text_email  = '= ' . self::$default_title . " =\n\n";
 		$text_email .= $message;
@@ -752,7 +757,7 @@ HTML;
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
 		$email  = '= ' . self::$default_title . " =\n\n";
-		$email .= '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$email .= '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 		$email .= "\n\n== 2014 ==\n";
 		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n== 2012 ==\n";
@@ -777,7 +782,7 @@ HTML;
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
 		$email  = '= ' . self::$default_title . " =\n\n";
-		$email .= '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$email .= '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 		$email .= "\n\n~~~ < 2014 > ~~~\n";
 		$email .= "* " . wp_strip_all_tags( $post_title2 ) . " : " . get_permalink( $post2 ) . "\n";
 		$email .= "\n\n~~~ < 2012 > ~~~\n";
@@ -808,7 +813,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$message = '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 
 		$body = c2c_YearsAgoToday::get_email_body( 'excerpt', false );
 
@@ -868,7 +873,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$message = '2 posts have been published to the site Test Blog on ' . wp_date( 'M jS' ) . ' in previous years:';
+		$message = '2 posts have been published to the site Test Blog on ' . self::get_formatted_date() . ' in previous years:';
 
 		$text_email  = '= ' . self::$default_title . " =\n\n";
 		$text_email .= $message;
@@ -1198,7 +1203,7 @@ HTML;
 		$this->assertEquals(
 			sprintf(
 				'= ' . self::$default_title . " =\n\n" . 'Sorry, no posts were made on this day (%s) to %s in any prior year.',
-				wp_date( 'M jS' ),
+				self::get_formatted_date(),
 				'Test Blog'
 			),
 			$body['text']

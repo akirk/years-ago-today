@@ -270,7 +270,7 @@ class c2c_YearsAgoToday {
 	 * @param string $time The timestamp to be formatted. Default is the current
 	 *                     time's timestamp.
 	 * @return string      The timestamp formatted according to the date format
-	 *                     string, which by default is "M jS".
+	 *                     string, which by default is "F jS".
 	 */
 	public static function get_formatted_date_string( $timestamp = '' ) {
 		if ( ! $timestamp ) {
@@ -278,7 +278,7 @@ class c2c_YearsAgoToday {
 		}
 
 		/* translators: date string for today */
-		return date_i18n( __( 'M jS', 'years-ago-today' ), $timestamp );
+		return date_i18n( __( 'F jS', 'years-ago-today' ), $timestamp );
 	}
 
 	/**
