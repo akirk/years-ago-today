@@ -163,7 +163,7 @@ class Test_Years_Ago_Today_Cron_Email extends WP_UnitTestCase {
 
 		$mail = $this->sent[0];
 
-		$this->assertEquals( '[Test Blog] Years Ago Today - ' . wp_date( 'M jS' ), $mail['subject'] );
+		$this->assertEquals( '[Test Blog] Years Ago Today - ' . wp_date( 'F j, Y' ), $mail['subject'] );
 	}
 
 	public function test_multipart_bodies_are_populated() {

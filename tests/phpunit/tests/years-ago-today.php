@@ -26,7 +26,7 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 		$profile_url = admin_url( 'profile.php' );
 
-		self::$default_email_subject = sprintf( self::$default_email_subject, self::get_formatted_date() );
+		self::$default_email_subject = sprintf( self::$default_email_subject, self::get_formatted_date( '', true ) );
 
 		self::$text_footer = <<<HTML
 

@@ -723,7 +723,7 @@ HTML;
 			/* translators: 1: site name in subject for daily email, 2: date string for today */
 			__( '[%1$s] Years Ago Today - %2$s', 'years-ago-today' ),
 			html_entity_decode( wp_kses( get_option( 'blogname' ), array() ), ENT_QUOTES ),
-			self::get_formatted_date_string()
+			self::get_formatted_date_string( '', true )
 		);
 	}
 
