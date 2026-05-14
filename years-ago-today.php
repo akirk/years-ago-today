@@ -481,7 +481,7 @@ class c2c_YearsAgoToday {
 					// Include post heading.
 					$body .= '==== ' . wp_kses( get_the_title(), array() ) . ' : ' . esc_url_raw( get_permalink() ) . " ====\n";
 					/* translators: 1: the publication date, 2: the post author */
-					$body .= wp_kses( sprintf( _x( 'Published %1$s by %2$s', 'plaintext email post info', 'years-ago-today' ), get_the_date(), get_the_author() ), array() ) . "\n\n";
+					$body .= wp_kses( sprintf( _x( 'Published %1$s by %2$s', 'plain text email post info', 'years-ago-today' ), get_the_date(), get_the_author() ), array() ) . "\n\n";
 
 					$html_body .= '<h4 style="margin-bottom:8px;margin-top:30px;padding-top:30px;color:#eee;border-top:1px solid #eee;"><a href="' . esc_url( get_permalink() ) . '" rel="noopener noreferrer">' . esc_html( get_the_title() ) . "</a></h4>\n";
 					$html_body .= '<p style="margin-top:0; font-size:smaller;">';
@@ -1473,9 +1473,9 @@ class c2c_YearsAgoToday {
 		// Provide context for the email preview.
 		echo '<p class="header">';
 		echo esc_html( sprintf(
-			/* translators: 1: type of email (plaintext or HTML), 2: sentence describing content type (if excerpt or full) */
+			/* translators: 1: type of email (plain text or HTML), 2: sentence describing content type (if excerpt or full) */
 			__( 'This is a preview of the %1$s version of the Years Ago Today email. %2$s', 'years-ago-today' ),
-			( $type === 'text' ? __( 'plaintext', 'years-ago-today' ) : __( 'HTML', 'years-ago-today' ) ),
+			( $type === 'text' ? __( 'plain text', 'years-ago-today' ) : __( 'HTML', 'years-ago-today' ) ),
 			( $content_type !== 'list' ? sprintf(
 				/* translators: %s: type of content (excerpts or full content) */
 				__( 'The email includes %s of each post.', 'years-ago-today' ),

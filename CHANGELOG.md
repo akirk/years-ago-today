@@ -1,14 +1,14 @@
 # Changelog
 
 ## _(in-progress)_
-* New: Send full HTML of posts in the email alongside plaintext version. Fixes #5. Props akirk.
+* New: Send full HTML of posts in the email alongside plain text version. Fixes #5. Props akirk.
     * New: Extract HTML email generation logic out from `get_email_body()` into new `get_html_email()`
     * New: Add `get_html_email_template()` to return the template used for HTML emails, with placeholders for subject, body, and footer
     * New: Add `get_resized_content()` to rewrite image tags in post content to use smaller-sized versions
     * New: Add `get_html_email_image_size()` to get image size used in HTML emails
     * New: Add filter 'c2c_years_ago_today-html_email_image_size' to customize image size used in HTML emails
     * Change: Move amending of footer into `get_email_body()` and add optional arg to disable that behavior
-* New: Add email previewer to preview variations of both plaintext and HTML emails
+* New: Add email previewer to preview variations of both plain text and HTML emails
 * New: Add support for including additional post types via new 'c2c_years_ago_today-post_types' filter
 * Change: Add date to email subject
 * Change: Add optional `$include_year` argument to `get_formatted_date_string()`, allowing for full date with year
@@ -36,10 +36,10 @@
 * Change: Change caching to support multisite usage
 * Hardening: Prevent translated and generated strings from containing unintended markup
 * Hardening: Prevent PHP warnings from any potential malicious form submission field value
-* Change: Use consistent phrasing for message about no published posts in any previous year
+* Change: Use consistent phrasing across UI and documentation
 * Change: Rename `add_user_email_footer()` to `get_email_footer()` and remove arguments and just return the footer based on a format ('text' or 'html')
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
-* Change: Allow year headings in plain-text emails to be translated
+* Change: Allow year headings in plain text emails to be translated
 * Change: Remove `is_admin()` guard from `init()`, which isn't strictly necessary and impedes unit tests
 * Change: Update uses of `current_time()` and `mysql2date()` to more modern `wp_date()`
 * New: Add `get_optin_label()` to centralize the optin label since it is used in two places

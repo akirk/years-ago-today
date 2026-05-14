@@ -1730,7 +1730,7 @@ HTML;
 
 		$output = $this->capture_email_preview_output();
 
-		$this->assertStringContainsString( 'This is a preview of the plaintext version of the Years Ago Today email.', $output );
+		$this->assertStringContainsString( 'This is a preview of the plain text version of the Years Ago Today email.', $output );
 		$this->assertStringContainsString( 'class="text-container"', $output );
 
 		$this->cleanup_email_preview_environment();
