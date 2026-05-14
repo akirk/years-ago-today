@@ -1328,11 +1328,11 @@ HTML;
 		$is_opted_in = (bool) get_user_option( self::$option_name, $user->ID );
 
 		echo "\t\t\t\t" . '<fieldset id="years-ago-today-content-type"' . ( $is_opted_in ? '' : ' disabled aria-disabled="true"' ) . '>';
-		echo '<legend class="screen-reader-text">' . esc_html__( 'Email content type', 'years-ago-today' ) . '</legend>';
+		echo '<legend class="screen-reader-text">' . esc_html__( 'Email content type', 'years-ago-today' ) . "</legend>\n";
 
 		foreach ( self::get_email_content_types( false ) as $mode => $desc ) {
 			printf(
-				'<label><input type="radio" name="%1$s" value="%2$s"%3$s> %4$s &mdash; %5$s</label><br>',
+				"\t\t\t\t\t" . '<label><input type="radio" name="%1$s" value="%2$s"%3$s> %4$s &mdash; %5$s</label><br>' . "\n",
 				esc_attr( self::$meta_email_content_pref ),
 				esc_attr( $mode ),
 				checked( $mode, get_user_option( self::$meta_email_content_pref, $user->ID ) ?: self::$email_content_default, false ),
@@ -1340,7 +1340,8 @@ HTML;
 				'<span class="description">' . esc_html( $desc ) . '</span>'
 			);
 		}
-		echo "</fieldset>\n";
+
+		echo "\t\t\t\t</fieldset>\n";
 
 		echo "\t\t\t</td>\n";
 		echo "\t\t</tr>\n";
