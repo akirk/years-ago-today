@@ -36,6 +36,7 @@
 * Change: Change caching to support multisite usage
 * Hardening: Prevent translated and generated strings from containing unintended markup
 * Hardening: Prevent PHP warnings from any potential malicious form submission field value
+* Change: Use consistent phrasing for message about no published posts in any previous year
 * Change: Rename `add_user_email_footer()` to `get_email_footer()` and remove arguments and just return the footer based on a format ('text' or 'html')
 * Change: Add context to translation of dashboard widget title to differentiate it from plugin's name
 * Change: Allow year headings in plain-text emails to be translated

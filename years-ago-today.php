@@ -993,7 +993,7 @@ class c2c_YearsAgoToday {
 				wp_kses(
 					sprintf(
 						/* translators: %s: date string for today */
-						__( 'No posts were published on <strong>%s</strong> from any past year.', 'years-ago-today' ),
+						__( 'No posts were published on <strong>%s</strong> in any previous year.', 'years-ago-today' ),
 						esc_html( self::get_formatted_date_string() )
 					),
 					array( 'strong' => array() )

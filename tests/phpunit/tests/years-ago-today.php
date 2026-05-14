@@ -331,7 +331,7 @@ HTML;
 		// Extra non-matching post
 		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
 
-		$expected = 'No posts were published on <strong>' . self::get_formatted_date() . '</strong> from any past year.';
+		$expected = 'No posts were published on <strong>' . self::get_formatted_date() . '</strong> in any previous year.';
 
 		$this->expectOutputRegex( '~' . preg_quote( $expected ) . '~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
 	}
