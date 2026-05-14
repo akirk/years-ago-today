@@ -853,11 +853,11 @@ HTML;
 		$html_email .= '<h3 style="margin-top:50px;">Post Excerpts</h3>' . "\n";
 		$html_email .= '<p style="font-size:smaller;"><em>Excerpts of these posts follows. The full content is available on the site. Note: Email clients may not properly render the formatting.</em></p>' . "\n";
 		$html_email .= sprintf( '<h4 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h4>', esc_attr( $h3_style ), get_permalink( $post2 ), $post_title2 ) . "\n";
-		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="%s">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), esc_url( get_author_posts_url( $author_id ) ) );
 		$html_email .= "\n\n";
 		$html_email .= "<p>This is an excerpt of another post content.</p>\n";
 		$html_email .= sprintf( '<h4 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h4>', esc_attr( $h3_style ), get_permalink( $post1 ), $post_title1 ) . "\n";
-		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2012</strong> by <a href="%s">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), esc_url( get_author_posts_url( $author_id ) ) );
 		$html_email .= "\n\n";
 		$html_email .= "<p>This is an excerpt of some post content.</p>\n";
 
@@ -913,11 +913,11 @@ HTML;
 		$html_email .= '<h3 style="margin-top:50px;">Posts</h3>' . "\n";
 		$html_email .= '<p style="font-size:smaller;"><em>The full content of these posts follows. Note: Email clients may not properly display the formatting of the posts.</em></p>' . "\n";
 		$html_email .= sprintf( '<h4 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h4>', esc_attr( $h3_style ), esc_url( get_permalink( $post2 ) ), $post_title2 ) . "\n";
-		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2014</strong> by <a href="%s">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), esc_url( get_author_posts_url( $author_id ) ) );
 		$html_email .= "\n\n";
 		$html_email .= "<p>This is another post content.</p>\n";
 		$html_email .= sprintf( '<h4 style="%s"><a href="%s" rel="noopener noreferrer">%s</a></h4>', esc_attr( $h3_style ), esc_url( get_permalink( $post1 ) ), $post_title1 ) . "\n";
-		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2012</strong> by <a href="http://example.org/?author=%d">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), $author_id );
+		$html_email .= sprintf( '<p style="%s">Published <strong>%s, 2012</strong> by <a href="%s">Certain Author</a></p>', esc_attr( $p_style ), wp_date( 'F j' ), esc_url( get_author_posts_url( $author_id ) ) );
 		$html_email .= "\n\n";
 		$html_email .= "<p>This is some post content.</p>\n";
 
