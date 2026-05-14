@@ -4,12 +4,12 @@ document.addEventListener("DOMContentLoaded", function(){
 	if(!optIn || !field) return;
 
 	optIn.addEventListener("change", () => {
-		if (this.checked) {
+		if (optIn.checked) {
 			field.disabled = false;
-			fieldset.removeAttribute('aria-disabled');
+			field.removeAttribute('aria-disabled');
 		} else {
 			field.disabled = true;
-			fieldset.setAttribute('aria-disabled', 'true');
+			field.setAttribute('aria-disabled', 'true');
 		}
 	});
 });
