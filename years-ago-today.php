@@ -324,8 +324,7 @@ class c2c_YearsAgoToday {
 	 * @return string
 	 */
 	private static function get_html_email_template() {
-		return <<<HTML
-<!DOCTYPE html>
+		return '<!DOCTYPE html>
 <html>
 <head>
 	<meta name="viewport" content="width=device-width" />
@@ -339,8 +338,7 @@ class c2c_YearsAgoToday {
 		<div class="footer" style="font-size:13px;color:#888;margin-top:48px;border-top:1px solid #eee;padding-top:16px;">{{footer}}</div>
 	</div>
 </body>
-</html>
-HTML;
+</html>';
 	}
 
 	/**
