@@ -1335,7 +1335,7 @@ HTML;
 				"\t\t\t\t\t" . '<label><input type="radio" name="%1$s" value="%2$s"%3$s> %4$s &mdash; %5$s</label><br>' . "\n",
 				esc_attr( self::$meta_email_content_pref ),
 				esc_attr( $mode ),
-				checked( $mode, get_user_option( self::$meta_email_content_pref, $user->ID ) ?: self::$email_content_default, false ),
+				checked( $mode, self::get_user_email_content_pref( $user->ID ), false ),
 				esc_html( ucfirst( $mode ) ),
 				'<span class="description">' . esc_html( $desc ) . '</span>'
 			);
