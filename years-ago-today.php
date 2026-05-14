@@ -1449,12 +1449,15 @@ class c2c_YearsAgoToday {
 
 		// Styles.
 		echo '<style>
+			body {
+				background-color: #fbfbfb;
+			}
 			p {
 				max-width: 600px;
 				margin: 30px auto;
 			}
 			p.text-container {
-				max-width: white-space:pre-wrap;
+				white-space: pre-wrap;
 			}
 			p.header {
 				font-style: italic;
