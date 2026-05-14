@@ -8,7 +8,7 @@
  * Text Domain: years-ago-today
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Description: Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in years past.
+ * Description: Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in previous years.
  *
  * Compatible with WordPress 5.5 through 6.8+, and PHP through at least 8.5+.
  *
@@ -47,7 +47,7 @@ class c2c_YearsAgoToday {
 
 	/**
 	 * Meta key name for flag to indicate if user has opted into being notified of
-	 * posts published on that day in years past.
+	 * posts published on that day in previous years.
 	 *
 	 * @var string
 	 * @access public
@@ -92,7 +92,7 @@ class c2c_YearsAgoToday {
 
 	/**
 	 * Default value for the meta value to indicate the user wants the daily email
-	 * of posts published on that day in years past.
+	 * of posts published on that day in previous years.
 	 *
 	 * @var string
 	 * @access public
@@ -387,12 +387,12 @@ class c2c_YearsAgoToday {
 					 * @param string $email_body The body of the email. Use "%1$s" as a
 					 *                           placeholder for site name and "%2$s" for date.
 					 *                           Default 'No posts were published to the site
-					 *                           %1$s on %2$s in any past year.'.
+					 *                           %1$s on %2$s in any previous year.'.
 					 */
 					apply_filters(
 						'c2c_years_ago_today-email-body-no-posts',
 						/* translators: 1: name of the site, 2: date string for today */
-						__( 'No posts were published to the site %1$s on %2$s in any past year.', 'years-ago-today' )
+						__( 'No posts were published to the site %1$s on %2$s in any previous year.', 'years-ago-today' )
 					),
 					$site_name,
 					self::get_formatted_date_string()
@@ -709,7 +709,7 @@ class c2c_YearsAgoToday {
 	 * @return string
 	 */
 	public static function get_optin_label() {
-		return __( 'Email me daily about posts published on this day in years past.', 'years-ago-today' );
+		return __( 'Email me daily about posts published on this day in previous years.', 'years-ago-today' );
 	}
 
 	/**
@@ -755,7 +755,7 @@ class c2c_YearsAgoToday {
 
 		$opt_in_explanation = sprintf(
 			/* translators: %s: site name */
-			__( 'You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site %s, which is using the Years Ago Today plugin.', 'years-ago-today' ),
+			__( 'You received this email because you have opted into receiving a daily email about posts published on this day in previous years to the site %s, which is using the Years Ago Today plugin.', 'years-ago-today' ),
 			wp_specialchars_decode( get_option('blogname'), ENT_QUOTES )
 		);
 		if ( $is_html ) {
@@ -1280,7 +1280,7 @@ class c2c_YearsAgoToday {
 
 	/**
 	 * Adds the checkbox to user profiles to allow them to opt into receiving a
-	 * daily email about posts published in years past.
+	 * daily email about posts published in previous years.
 	 *
 	 * @since 1.0
 	 * @since 1.4 Added $user arg.
@@ -1303,7 +1303,7 @@ class c2c_YearsAgoToday {
 
 		$label = $is_current_user_profile_page
 			? self::get_optin_label()
-			: __( 'Email this user daily about posts published on this day in years past.', 'years-ago-today' );
+			: __( 'Email this user daily about posts published on this day in previous years.', 'years-ago-today' );
 
 		echo "\t\t<table class=\"form-table\">\n";
 		echo "\t\t<tr>\n";
@@ -1351,7 +1351,7 @@ class c2c_YearsAgoToday {
 
 	/**
 	 * Saves value of checkbox to allow user to opt into receiving daily emails
-	 * about posts published on this day in years past.
+	 * about posts published on this day in previous years.
 	 *
 	 * @since 1.0
 	 *

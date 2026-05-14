@@ -8,11 +8,11 @@ Requires at least: 5.5
 Tested up to: 6.8
 Stable tag: 1.6
 
-Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in years past.
+Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in previous years.
 
 == Description ==
 
-This plugin provides a simply admin dashboard widget that lists all of the posts published to your site on this day in years past. Users have the option (via their profiles) to opt into receiving a daily email that provides a listing and links to all of the posts published to your site on this day in years past.
+This plugin provides a simply admin dashboard widget that lists all of the posts published to your site on this day in previous years. Users have the option (via their profiles) to opt into receiving a daily email that provides a listing and links to all of the posts published to your site on this day in previous years.
 
 Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | [Plugin Directory Page](https://wordpress.org/plugins/years-ago-today/) | [GitHub](https://github.com/coffee2code/years-ago-today/) | [Author Homepage](https://coffee2code.com/)
 
@@ -27,9 +27,9 @@ Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | 
 
 == Screenshots ==
 
-1. A screenshot of the admin dashboard showing posts published on the current day in past years.
-2. A screenshot of the admin dashboard when no posts were published on the current day in any past year.
-3. Profile option for opting into receiving a daily email of posts published on the current day in past years.
+1. The admin dashboard showing posts published on the current day in previous years.
+2. The admin dashboard when no posts were published on the current day in any previous year.
+3. Profile option for opting into receiving a daily email of posts published on the current day in previous years.
 
 
 == Frequently Asked Questions ==

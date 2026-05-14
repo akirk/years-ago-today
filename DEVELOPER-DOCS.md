@@ -43,7 +43,7 @@ The `c2c_years_ago_today-email-body-no-posts` filter is used to customize the co
 
 #### Arguments:
 
-* **$text** _(string)_: The content of the email. You can optionally include "%1$s" as a placeholder for the site name and "%2$s" as a placeholder for the date. Default '`No posts were published to the site %1$s on <strong>%2$s</strong> in any past year.`'.
+* **$text** _(string)_: The content of the email. You can optionally include "%1$s" as a placeholder for the site name and "%2$s" as a placeholder for the date. Default '`No posts were published to the site %1$s on <strong>%2$s</strong> in any previous year.`'.
 
 #### Example:
 

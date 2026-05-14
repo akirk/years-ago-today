@@ -1,6 +1,6 @@
 # Years Ago Today
 
-A plugin for WordPress that adds an admin dashboard widget (and optional daily email) that lists posts published to your site on this day in years past.
+A plugin for WordPress that adds an admin dashboard widget (and optional daily email) that lists posts published to your site on this day in previous years.
 
 This plugin can be found in the WordPress Plugin Directory: https://wordpress.org/plugins/years-ago-today/
 

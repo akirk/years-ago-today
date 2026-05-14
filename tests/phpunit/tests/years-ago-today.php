@@ -33,15 +33,15 @@ class Years_Ago_Today_Test extends WP_UnitTestCase {
 
 
 -------------------------------
-You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.
+You received this email because you have opted into receiving a daily email about posts published on this day in previous years to the site Test Blog, which is using the Years Ago Today plugin.
 
-If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in years past."
+If you wish to discontinue receiving these emails, simply log into the site and visit your profile at {$profile_url} to uncheck the checkbox labeled "Email me daily about posts published on this day in previous years."
 
 HTML;
 
 		self::$html_footer = <<<HTML
-<p>You received this email because you have opted into receiving a daily email about posts published on this day in years past on the site Test Blog, which is using the Years Ago Today plugin.</p>
-<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at <a href="{$profile_url}">{$profile_url}</a> to uncheck the checkbox labeled &quot;Email me daily about posts published on this day in years past.&quot;</p>
+<p>You received this email because you have opted into receiving a daily email about posts published on this day in previous years to the site Test Blog, which is using the Years Ago Today plugin.</p>
+<p>If you wish to discontinue receiving these emails, simply log into the site and visit your profile at <a href="{$profile_url}">{$profile_url}</a> to uncheck the checkbox labeled &quot;Email me daily about posts published on this day in previous years.&quot;</p>
 
 HTML;
 
@@ -515,7 +515,7 @@ HTML;
 	 */
 
 	public function test_get_optin_label() {
-		$this->assertEquals( 'Email me daily about posts published on this day in years past.', c2c_YearsAgoToday::get_optin_label() );
+		$this->assertEquals( 'Email me daily about posts published on this day in previous years.', c2c_YearsAgoToday::get_optin_label() );
 	}
 
 	public function test_get_optin_label_is_translatable() {
@@ -555,7 +555,7 @@ HTML;
 
 		$this->assertEquals(
 			sprintf(
-				'= Years Ago Today on Test Blog =' . "\n\n" . 'No posts were published to the site %1$s on %2$s in any past year.',
+				'= Years Ago Today on Test Blog =' . "\n\n" . 'No posts were published to the site %1$s on %2$s in any previous year.',
 				'Test Blog',
 				self::get_formatted_date()
 			),
@@ -564,7 +564,7 @@ HTML;
 
 		$this->assertStringContainsString(
 			sprintf(
-				'<p>No posts were published to the site %1$s on %2$s in any past year.</p>',
+				'<p>No posts were published to the site %1$s on %2$s in any previous year.</p>',
 				'Test Blog',
 				self::get_formatted_date()
 			),
@@ -960,7 +960,7 @@ HTML;
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" />
-					Email me daily about posts published on this day in years past.
+					Email me daily about posts published on this day in previous years.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, you&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.</p>
 				<fieldset id="years-ago-today-content-type" disabled aria-disabled="true"><legend class="screen-reader-text">Email content type</legend>
@@ -990,7 +990,7 @@ HTML;
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" checked='checked' />
-					Email me daily about posts published on this day in years past.
+					Email me daily about posts published on this day in previous years.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, you&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. You can opt out at any time via this checkbox.</p>
 				<fieldset id="years-ago-today-content-type"><legend class="screen-reader-text">Email content type</legend>
@@ -1020,7 +1020,7 @@ HTML;
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" />
-					Email this user daily about posts published on this day in years past.
+					Email this user daily about posts published on this day in previous years.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.</p>
 				<fieldset id="years-ago-today-content-type" disabled aria-disabled="true"><legend class="screen-reader-text">Email content type</legend>
@@ -1062,7 +1062,7 @@ HTML;
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" checked='checked' />
-					Email this user daily about posts published on this day in years past.
+					Email this user daily about posts published on this day in previous years.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.</p>
 				<fieldset id="years-ago-today-content-type"><legend class="screen-reader-text">Email content type</legend>
@@ -1104,7 +1104,7 @@ HTML;
 			<td>
 				<label for="c2c_years_ago_today_daily_email_optin">
 					<input name="c2c_years_ago_today_daily_email_optin" type="checkbox" id="c2c_years_ago_today_daily_email_optin" value="1" aria-describedby="years-ago-today-explainer" checked='checked' />
-					Email this user daily about posts published on this day in years past.
+					Email this user daily about posts published on this day in previous years.
 				</label>
 				<p id="years-ago-today-explainer" class="description">If checked, they&#039;ll be sent one email a day that lists posts published on this calendar day in previous years. They can opt out at any time via this checkbox on their profile.</p>
 				<fieldset id="years-ago-today-content-type"><legend class="screen-reader-text">Email content type</legend>
