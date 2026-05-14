@@ -164,6 +164,7 @@ HTML;
 			array( 'action', 'c2c_years_ago_daily_cron', 'cron_email',                     10 ),
 			array( 'action', 'admin_enqueue_scripts',    'enqueue_admin_style',            10 ),
 			array( 'action', 'save_post',                'clear_transient_on_publish',     10 ),
+			array( 'action', 'load-profile.php',         'handle_email_template_preview',  10 ),
 		);
 	}
 
@@ -1608,4 +1609,212 @@ HTML;
 
 		$this->assertEquals( $expected, $template );
 	}
+
+	/*
+	 * handle_email_template_preview()
+	 */
+
+	/**
+	 * Prepares admin profile screen context and preview query args.
+	 *
+	 * @param array $user_args  Args for user factory create().
+	 * @param array $get_args   Additional $_GET query args.
+	 */
+	private function setup_email_preview_environment( $user_args = array( 'role' => 'subscriber' ), $get_args = array() ) {
+		require_once ABSPATH . 'wp-admin/includes/screen.php';
+
+		$user_id = $this->factory->user->create( $user_args );
+		wp_set_current_user( $user_id );
+
+		set_current_screen( 'profile' );
+
+		$_GET['preview-years-ago-today-email'] = '1';
+		foreach ( $get_args as $key => $value ) {
+			$_GET[ $key ] = $value;
+		}
+	}
+
+	private function cleanup_email_preview_environment() {
+		unset( $_GET['preview-years-ago-today-email'], $_GET['content-type'], $_GET['type'], $_GET['force'] );
+		set_current_screen( 'front' );
+		wp_set_current_user( 0 );
+	}
+
+	private function capture_email_preview_output() {
+		ob_start();
+		try {
+			c2c_YearsAgoToday::handle_email_template_preview();
+		} finally {
+			return ob_get_clean();
+		}
+	}
+
+	public function test_handle_email_template_preview__bail_if_preview_query_arg_missing() {
+		require_once ABSPATH . 'wp-admin/includes/screen.php';
+
+		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+		set_current_screen( 'profile' );
+
+		$this->assertNull( c2c_YearsAgoToday::handle_email_template_preview() );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__bail_if_preview_query_arg_not_one() {
+		$this->setup_email_preview_environment();
+		$_GET['preview-years-ago-today-email'] = '0';
+
+		$this->assertNull( c2c_YearsAgoToday::handle_email_template_preview() );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__bail_if_not_on_profile_screen() {
+		require_once ABSPATH . 'wp-admin/includes/screen.php';
+
+		$user_id = $this->factory->user->create( array( 'role' => 'subscriber' ) );
+		wp_set_current_user( $user_id );
+		set_current_screen( 'dashboard' );
+		$_GET['preview-years-ago-today-email'] = '1';
+
+		$this->assertNull( c2c_YearsAgoToday::handle_email_template_preview() );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__bail_if_user_not_logged_in() {
+		require_once ABSPATH . 'wp-admin/includes/screen.php';
+
+		wp_set_current_user( 0 );
+		set_current_screen( 'profile' );
+		$_GET['preview-years-ago-today-email'] = '1';
+
+		$this->assertNull( c2c_YearsAgoToday::handle_email_template_preview() );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__subscriber_can_preview_html_list() {
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+
+		$this->setup_email_preview_environment(
+			array( 'role' => 'subscriber' ),
+			array(
+				'content-type' => 'list',
+				'type'         => 'html',
+			)
+		);
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'This is a preview of the HTML version of the Years Ago Today email.', $output );
+		$this->assertStringContainsString( '<strong>Subject:</strong> ' . c2c_YearsAgoToday::get_email_subject(), $output );
+		$this->assertStringContainsString( 'Return to profile', $output );
+		$this->assertStringContainsString( admin_url( 'profile.php' ), $output );
+		$this->assertStringContainsString( self::$default_title, $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__subscriber_can_preview_plaintext() {
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+
+		$this->setup_email_preview_environment(
+			array( 'role' => 'subscriber' ),
+			array(
+				'content-type' => 'list',
+				'type'         => 'text',
+			)
+		);
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'This is a preview of the plaintext version of the Years Ago Today email.', $output );
+		$this->assertStringContainsString( 'class="text-container"', $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__excerpt_content_type_shows_excerpt_notice() {
+		$this->setup_email_preview_environment(
+			array( 'role' => 'subscriber' ),
+			array(
+				'content-type' => 'excerpt',
+				'type'         => 'html',
+			)
+		);
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'The email includes excerpts of each post.', $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__invalid_type_defaults_to_html() {
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+
+		$this->setup_email_preview_environment(
+			array( 'role' => 'subscriber' ),
+			array(
+				'content-type' => 'list',
+				'type'         => 'invalid',
+			)
+		);
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'This is a preview of the HTML version of the Years Ago Today email.', $output );
+		$this->assertStringNotContainsString( 'class="text-container"', $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__invalid_content_type_uses_user_preference() {
+		$this->setup_email_preview_environment( array( 'role' => 'subscriber' ), array( 'type' => 'html' ) );
+		update_user_option( get_current_user_id(), c2c_YearsAgoToday::$meta_email_content_pref, 'excerpt' );
+		$_GET['content-type'] = 'bogus';
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'The email includes excerpts of each post.', $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__no_posts_without_force_shows_notice() {
+		$this->setup_email_preview_environment(
+			array( 'role' => 'subscriber' ),
+			array(
+				'content-type' => 'list',
+				'type'         => 'html',
+			)
+		);
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'No posts found for today. No email would be sent.', $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
+	public function test_handle_email_template_preview__force_shows_body_when_no_posts() {
+		$this->setup_email_preview_environment(
+			array( 'role' => 'subscriber' ),
+			array(
+				'content-type' => 'list',
+				'type'         => 'text',
+				'force'        => '1',
+			)
+		);
+
+		$output = $this->capture_email_preview_output();
+
+		$this->assertStringContainsString( 'No posts were published to the site Test Blog on', $output );
+		$this->assertStringNotContainsString( 'No posts found for today. No email would be sent.', $output );
+
+		$this->cleanup_email_preview_environment();
+	}
+
 }

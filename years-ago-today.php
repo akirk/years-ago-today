@@ -150,6 +150,9 @@ class c2c_YearsAgoToday {
 
 		// Maybe clear transients when a post gets published.
 		add_action( 'save_post',                array( __CLASS__, 'clear_transient_on_publish' ), 10, 2 );
+
+		// Handle previewing the email template when viewing user profile page.
+		add_action( 'load-profile.php',         array( __CLASS__, 'handle_email_template_preview' ) );
 	}
 
 	/**
@@ -1404,6 +1407,107 @@ HTML;
 		}
 
 		return $pref ?: self::$email_content_default;
+	}
+
+	/**
+	 * Handles the email template preview.
+	 *
+	 * @since 2.0
+	 */
+	public static function handle_email_template_preview() {
+		$query_key = 'preview-years-ago-today-email';
+
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		// Bail if not on the email template preview page.
+		if (
+			! is_admin() ||
+			! is_user_logged_in() ||
+			! current_user_can( 'read' ) ||
+			! isset( $_GET[ $query_key ] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Value is only checked for presence.
+			'1' !== $_GET[ $query_key ] ||    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Value is only used for a comparison.
+			! $screen ||
+			'profile' !== $screen->id
+		) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Value is only used for a comparison.
+		$content_type = $_GET['content-type'] ?? self::$email_content_default;
+		if ( ! in_array( $content_type, self::get_email_content_types(), true ) ) {
+			$content_type = self::get_user_email_content_pref( get_current_user_id() );
+		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Value is only used for a comparison.
+		$type = $_GET['type'] ?? 'html';
+		if ( ! in_array( $type, array( 'text', 'html' ), true ) ) {
+			$type = 'html';
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Value is only checked for presence.
+		$force = $_GET['force'] ?? false;
+		if ( $force ) {
+			add_filter( 'c2c_years_ago_today-email-if-no-posts', '__return_true' );
+		}
+
+		// Styles.
+		echo '<style>
+			p {
+				max-width: 600px;
+				margin: 30px auto;
+			}
+			p.text-container {
+				max-width: white-space:pre-wrap;
+			}
+			p.header {
+				font-style: italic;
+			}
+			p.header, p.footer {
+				text-align: center;
+			}
+			p.footer {
+				margin-top: 50px;
+			}
+		</style>';
+
+		// Provide context for the email preview.
+		echo '<p class="header">';
+		echo esc_html( sprintf(
+			/* translators: 1: type of email (plaintext or HTML), 2: sentence describing content type (if excerpt or full) */
+			__( 'This is a preview of the %1$s version of the Years Ago Today email. %2$s', 'years-ago-today' ),
+			( $type === 'text' ? __( 'plaintext', 'years-ago-today' ) : __( 'HTML', 'years-ago-today' ) ),
+			( $content_type !== 'list' ? sprintf(
+				/* translators: %s: type of content (excerpts or full content) */
+				__( 'The email includes %s of each post.', 'years-ago-today' ),
+				( $content_type === 'excerpt' ? __( 'excerpts', 'years-ago-today' ) : __( 'full content', 'years-ago-today' ) )
+			) : '' )
+		) );
+		echo '</p>';
+
+		// Get the email body.
+		$body = self::get_email_body( $content_type )[ $type ];
+		if ( 'text' === $type ) {
+			$body = '<p class="text-container">' . $body . '</p>';
+		}
+
+		echo '<p class="header"><strong>' . esc_html__( 'Subject:', 'years-ago-today' ) . '</strong> ' . esc_html( self::get_email_subject() ) . '</p>';
+
+		if ( $body ) {
+			echo wp_kses_post( $body );
+		} else {
+			echo "<p><em>" . esc_html__( 'No posts found for today. No email would be sent.', 'years-ago-today' ) . "</em></p>";
+		}
+
+		printf(
+			'<p class="footer"><a href="%s">%s</a></p>',
+			esc_url( admin_url( 'profile.php' ) ),
+			esc_html__( 'Return to profile', 'years-ago-today' )
+		);
+
+		if ( defined( 'WP_RUNNING_TESTS' ) && WP_RUNNING_TESTS ) {
+			return;
+		}
+
+		die;
 	}
 
 } // end c2c_YearsAgoToday

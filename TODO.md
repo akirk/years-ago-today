@@ -14,5 +14,8 @@ The following list comprises ideas, suggestions, and known issues, all of which 
   - Make the statuses filterable for custom post status support
 * Unit tests: Add tests for `option_save()`
 * Widget could allow specifying a specific date to list posts from that given date
+* Email previewer:
+  - On a day with no past posts, simulate matching posts by either getting a random selection of posts (and noting in the preamble that no posts were posted on this day so random posts were chosen so that the email can be evaluated) or injecting fake data into the email.
+  - Add a form above or below the email preview that allows for customization of the preview, rather than relying on the explicit links provided in the profile or URL hacking.
 
 Feel free to make your own suggestions or champion for something already on the list (via the [plugin's support forum on WordPress.org](https://wordpress.org/support/plugin/years-ago-today/) or on [GitHub](https://github.com/coffee2code/years-ago-today/) as an issue or PR).
