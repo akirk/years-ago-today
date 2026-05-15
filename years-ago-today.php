@@ -1332,13 +1332,31 @@ class c2c_YearsAgoToday {
 		echo '<legend class="screen-reader-text">' . esc_html__( 'Email content type', 'years-ago-today' ) . "</legend>\n";
 
 		foreach ( self::get_email_content_types( false ) as $mode => $desc ) {
+			$preview_links = sprintf(
+				/* translators: 1: link to preview text version of email, 2: link to preview HTML version of email */
+				__( 'Preview the email: %1$s &bull; %2$s', 'years-ago-today' ),
+				'<a href="' .
+					esc_url( add_query_arg( array(
+						'preview-years-ago-today-email' => '1',
+						'content-type' => $mode,
+						'type' => 'text',
+						'force' => '1'
+					), admin_url( 'profile.php' ) ) ) . '">' . esc_html__( 'Text', 'years-ago-today' ) . '</a>',
+				'<a href="' .
+					esc_url( add_query_arg( array(
+						'preview-years-ago-today-email' => '1',
+						'content-type' => $mode,
+						'type' => 'html',
+						'force' => '1'
+					), admin_url( 'profile.php' ) ) ) . '">' . esc_html__( 'HTML', 'years-ago-today' ) . '</a>'
+			);
 			printf(
 				"\t\t\t\t\t" . '<label><input type="radio" name="%1$s" value="%2$s"%3$s> %4$s &mdash; %5$s</label><br>' . "\n",
 				esc_attr( self::$meta_email_content_pref ),
 				esc_attr( $mode ),
 				checked( $mode, self::get_user_email_content_pref( $user->ID ), false ),
 				esc_html( ucfirst( $mode ) ),
-				'<span class="description">' . esc_html( $desc ) . '</span>'
+				'<span class="description">' . esc_html( $desc ) . ' ' . wp_kses( $preview_links, array( 'a' => array( 'href' => array() ) ) ) . '</span>'
 			);
 		}
 
