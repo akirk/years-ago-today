@@ -1,5 +1,5 @@
 === Years Ago Today ===
-Contributors: coffee2code
+Contributors: coffee2code, audrey
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6ARCFJ9TX3522
 Tags: dashboard, admin, on this day, history, coffee2code
 License: GPLv2 or later
