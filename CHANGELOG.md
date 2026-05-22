@@ -34,6 +34,7 @@
 * Change: Revamp dashboard output, more semantically putting each year within `section` tags
 * Change: Align `get_first_published_year()` query with `get_posts()`
 * Change: Incorporate a hash of post types into the first published year cache key
+* Fix: Properly clear the first published year cache entry on deactivation by using the correct cache key
 * Change: Ensure list bullets are consistently visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
 * New: Enqueue JS on profile pages
