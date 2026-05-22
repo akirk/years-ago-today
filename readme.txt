@@ -12,7 +12,7 @@ Admin dashboard widget (and optional daily email) that lists posts published to 
 
 == Description ==
 
-This plugin provides a simply admin dashboard widget that lists all of the posts published to your site on this day in previous years. Users have the option (via their profiles) to opt into receiving a daily email that provides a listing and links to all of the posts published to your site on this day in previous years.
+This plugin provides a simply admin dashboard widget that lists all of the posts published to your site on this day in previous years. The same listing can be shown on the front-end via the "Years Ago Today" block (WordPress 7.0+) or the `[years-ago-today]` shortcode. Users have the option (via their profiles) to opt into receiving a daily email that provides a listing and links to all of the posts published to your site on this day in previous years.
 
 Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | [Plugin Directory Page](https://wordpress.org/plugins/years-ago-today/) | [GitHub](https://github.com/coffee2code/years-ago-today/) | [Author Homepage](https://coffee2code.com/)
 
@@ -22,7 +22,8 @@ Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | 
 1. Install via the built-in WordPress plugin installer. Or download and unzip `years-ago-today.zip` inside the plugins directory for your site (typically `wp-content/plugins/`)
 2. Activate the plugin through the 'Plugins' admin menu in WordPress
 3. View the widget on your admin dashboard.
-4. (Optional.) To sign up for a daily email that lists posts published that day, go to your profile, set the checkbox for '"Years Ago Today" email', choose the style of email you wish to receive, and then press the "Update Profile" button to update your profile.
+4. (Optional.) To show the same listing on the front-end, insert the "Years Ago Today" block (WordPress 7.0+) or add the `[years-ago-today]` shortcode to a post or page.
+5. (Optional.) To sign up for a daily email that lists posts published that day, go to your profile, set the checkbox for '"Years Ago Today" email', choose the style of email you wish to receive, and then press the "Update Profile" button to update your profile.
 
 
 == Screenshots ==

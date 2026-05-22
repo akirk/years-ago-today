@@ -1,6 +1,10 @@
 # Changelog
 
 ## _(in-progress)_
+* New: Add front-end block and `[years-ago-today]` shortcode to display the same listing as the admin dashboard widget
+    * New: Add `get_widget_markup()` and `get_widget_inner_markup()` to centralize listing markup generation
+    * New: Register PHP-only block `coffee2code/years-ago-today` on WordPress 7.0+
+    * New: Add public CSS for block and shortcode output
 * New: Send full HTML of posts in the email alongside plain text version. Fixes #5. Props akirk.
     * New: Extract HTML email generation logic out from `get_email_body()` into new `get_html_email()`
     * New: Add `get_html_email_template()` to return the template used for HTML emails, with placeholders for subject, body, and footer

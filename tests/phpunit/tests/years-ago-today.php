@@ -165,6 +165,8 @@ HTML;
 			array( 'action', 'admin_enqueue_scripts',    'enqueue_admin_style',            10 ),
 			array( 'action', 'save_post',                'clear_transient_on_publish',     10 ),
 			array( 'action', 'load-profile.php',         'handle_email_template_preview',  10 ),
+			array( 'action', 'init',                     'register_shortcode',             10 ),
+			array( 'action', 'init',                     'register_block',                 10 ),
 		);
 	}
 
@@ -378,6 +380,85 @@ HTML;
 		);
 
 		$this->expectOutputRegex( '~^' . preg_quote( $expected ) . '$~', c2c_YearsAgoToday::wp_dashboard_years_ago_today() );
+	}
+
+	/*
+	 * get_widget_markup()
+	 */
+
+	public function test_get_widget_markup_matches_dashboard_output() {
+		$post1_id = $this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+		$post2_id = $this->factory->post->create( array( 'post_date' => $this->get_date( '2014' ) ) );
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015', false ) ) );
+
+		$expected = sprintf(
+			'<div class="years-ago-today-widget"><p><strong>2</strong> posts have been published on <strong>%s</strong> in previous years:</p><section class="years-ago-today-group" aria-labelledby="years-ago-today-year-2014"><h3 id="years-ago-today-year-2014" class="years-ago-today-year" role="heading" aria-level="3">2014</h3><ul class="years-ago-today-posts"><li><a href="%s">%s</a></li>
+</ul></section>
+<section class="years-ago-today-group" aria-labelledby="years-ago-today-year-2012"><h3 id="years-ago-today-year-2012" class="years-ago-today-year" role="heading" aria-level="3">2012</h3><ul class="years-ago-today-posts"><li><a href="%s">%s</a></li>
+</ul></section>
+</div>
+',
+			c2c_YearsAgoToday::get_formatted_date_string(),
+			esc_url( get_permalink( $post2_id ) ),
+			get_the_title( $post2_id ),
+			esc_url( get_permalink( $post1_id ) ),
+			get_the_title( $post1_id )
+		);
+
+		$this->assertSame( $expected, c2c_YearsAgoToday::get_widget_markup() );
+	}
+
+	/*
+	 * shortcode_years_ago_today()
+	 */
+
+	public function test_shortcode_is_registered() {
+		global $shortcode_tags;
+
+		$this->assertArrayHasKey( 'years-ago-today', $shortcode_tags );
+		$this->assertSame( array( 'c2c_YearsAgoToday', 'shortcode_years_ago_today' ), $shortcode_tags['years-ago-today'] );
+	}
+
+	public function test_shortcode_outputs_widget_markup() {
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+
+		$expected_fragment = '<strong>1</strong> post has been published on <strong>' . self::get_formatted_date() . '</strong> in a previous year:';
+
+		$this->assertStringContainsString( $expected_fragment, do_shortcode( '[years-ago-today]' ) );
+		$this->assertTrue( wp_style_is( 'c2c-years-ago-today', 'enqueued' ) );
+	}
+
+	/*
+	 * register_block()
+	 */
+
+	public function test_block_is_registered() {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		$this->assertTrue( $registry->is_registered( 'coffee2code/years-ago-today' ) );
+
+		$block = $registry->get_registered( 'coffee2code/years-ago-today' );
+
+		$this->assertSame( array( 'c2c_YearsAgoToday', 'render_block' ), $block->render_callback );
+		$this->assertSame( 'c2c-years-ago-today', $block->style );
+	}
+
+	public function test_render_block_outputs_widget_markup() {
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2012' ) ) );
+
+		$output = render_block(
+			array(
+				'blockName' => 'coffee2code/years-ago-today',
+				'attrs'     => array(),
+			)
+		);
+
+		$this->assertStringContainsString( 'years-ago-today-widget', $output );
+		$this->assertStringContainsString(
+			'<strong>1</strong> post has been published on <strong>' . self::get_formatted_date() . '</strong> in a previous year:',
+			$output
+		);
+		$this->assertTrue( wp_style_is( 'c2c-years-ago-today', 'enqueued' ) );
 	}
 
 	/*

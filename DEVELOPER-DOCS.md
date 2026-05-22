@@ -117,3 +117,12 @@ Note: This email address is only used if multiple users are set to receive the d
 // Customize the 'To:' address used for batched (aka BCC:) emails sent daily by Years Ago Today.
 add_filter( 'c2c_years_ago_today-to_address', static fn() => 'yearsagotoday@example.org' );
 ```
+
+## Block
+
+The plugin provides a "Years Ago Today" block (available on WordPress 7.0+). The block currently has no settings.
+
+
+## Shortcode
+
+The plugin provides a `[years-ago-today]` shortcode. The shortcode currently has no settings or attributes.

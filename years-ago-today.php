@@ -153,6 +153,10 @@ class c2c_YearsAgoToday {
 
 		// Handle previewing the email template when viewing user profile page.
 		add_action( 'load-profile.php',         array( __CLASS__, 'handle_email_template_preview' ) );
+
+		// Register shortcode and block for front-end display.
+		add_action( 'init',                     array( __CLASS__, 'register_shortcode' ) );
+		add_action( 'init',                     array( __CLASS__, 'register_block' ) );
 	}
 
 	/**
@@ -982,9 +986,32 @@ class c2c_YearsAgoToday {
 	 * @since 1.0
 	 */
 	public static function wp_dashboard_years_ago_today() {
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup is escaped during generation.
+		echo self::get_widget_markup();
+	}
+
+	/**
+	 * Returns markup for the Years Ago Today listing (dashboard widget, block, shortcode).
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	public static function get_widget_markup() {
+		return '<div class="years-ago-today-widget">' . self::get_widget_inner_markup() . "</div>\n";
+	}
+
+	/**
+	 * Returns the inner markup for the Years Ago Today listing (without a wrapper element).
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	public static function get_widget_inner_markup() {
 		$q = self::get_posts();
 
-		echo '<div class="years-ago-today-widget">';
+		ob_start();
 
 		// Output and return if no posts were published.
 		if ( ! $q->have_posts() ) {
@@ -999,8 +1026,8 @@ class c2c_YearsAgoToday {
 					array( 'strong' => array() )
 				)
 			);
-			echo '</div>';
-			return;
+			wp_reset_postdata();
+			return ob_get_clean();
 		}
 
 		// Print summary.
@@ -1057,7 +1084,131 @@ class c2c_YearsAgoToday {
 			echo "</ul></section>\n";
 		}
 
-		echo "</div>\n";
+		wp_reset_postdata();
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Registers the Years Ago Today shortcode.
+	 *
+	 * @since 2.0
+	 */
+	public static function register_shortcode() {
+		add_shortcode( 'years-ago-today', array( __CLASS__, 'shortcode_years_ago_today' ) );
+	}
+
+	/**
+	 * Handles output for the Years Ago Today shortcode.
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	public static function shortcode_years_ago_today() {
+		self::enqueue_public_style();
+
+		return self::get_widget_markup();
+	}
+
+	/**
+	 * Registers the Years Ago Today block.
+	 *
+	 * @since 2.0
+	 */
+	public static function register_block() {
+		if ( ! function_exists( 'register_block_type' ) ) {
+			return;
+		}
+
+		self::register_public_style();
+
+		$supports = array(
+			'html' => false,
+		);
+
+		if ( self::supports_php_only_blocks() ) {
+			$supports['autoRegister'] = true;
+		}
+
+		register_block_type(
+			'coffee2code/years-ago-today',
+			array(
+				'title'           => __( 'Years Ago Today', 'years-ago-today' ),
+				'description'     => __( 'Lists posts published on this day in previous years.', 'years-ago-today' ),
+				'category'        => 'widgets',
+				'icon'            => 'calendar',
+				'keywords'        => array(
+					__( 'on this day', 'years-ago-today' ),
+					__( 'history', 'years-ago-today' ),
+					__( 'archive', 'years-ago-today' ),
+				),
+				'render_callback' => array( __CLASS__, 'render_block' ),
+				'style'           => 'c2c-years-ago-today',
+				'supports'        => $supports,
+			)
+		);
+	}
+
+	/**
+	 * Renders the Years Ago Today block.
+	 *
+	 * @since 2.0
+	 *
+	 * @param array    $attributes Block attributes.
+	 * @param string   $content    Block content.
+	 * @param WP_Block $block      Block instance.
+	 * @return string
+	 */
+	public static function render_block( $attributes, $content, $block ) {
+		self::enqueue_public_style();
+
+		if ( function_exists( 'get_block_wrapper_attributes' ) && $block instanceof WP_Block ) {
+			return sprintf(
+				'<div %1$s>%2$s</div>',
+				wp_kses_data( get_block_wrapper_attributes( array( 'class' => 'years-ago-today-widget' ) ) ),
+				self::get_widget_inner_markup()
+			);
+		}
+
+		return self::get_widget_markup();
+	}
+
+	/**
+	 * Returns if PHP-only block registration is supported.
+	 *
+	 * @since 2.0
+	 *
+	 * @return bool
+	 */
+	public static function supports_php_only_blocks() {
+		global $wp_version;
+
+		return version_compare( $wp_version, '7.0', '>=' );
+	}
+
+	/**
+	 * Registers the public CSS stylesheet.
+	 *
+	 * @since 2.0
+	 */
+	public static function register_public_style() {
+		wp_register_style(
+			'c2c-years-ago-today',
+			plugins_url( 'assets/css/public.css', __FILE__ ),
+			array(),
+			self::version()
+		);
+	}
+
+	/**
+	 * Enqueues the public CSS stylesheet.
+	 *
+	 * @since 2.0
+	 */
+	public static function enqueue_public_style() {
+		self::register_public_style();
+		wp_enqueue_style( 'c2c-years-ago-today' );
 	}
 
 	/**
