@@ -10,7 +10,7 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Description: Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in previous years.
  *
- * Compatible with WordPress 5.5 through 7.0+, and PHP through at least 8.5+.
+ * Compatible with WordPress 5.6 through 7.0+, and PHP through at least 8.5+.
  *
  * =>> Read the accompanying readme.txt file for instructions and documentation.
  * =>> Also, visit the plugin's homepage for additional information and updates.

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: dashboard, admin, on this day, history, coffee2code
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Requires at least: 5.5
+Requires at least: 5.6
 Tested up to: 7.0
 Stable tag: 1.6
 
