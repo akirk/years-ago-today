@@ -591,6 +591,29 @@ HTML;
 		$this->assertEquals( '2011', c2c_YearsAgoToday::get_first_published_year() );
 	}
 
+	public function test_get_first_published_year_ignores_other_post_types() {
+		$this->factory->post->create(
+			array(
+				'post_type'  => 'page',
+				'post_date'  => $this->get_date( '2010' ),
+				'post_status' => 'publish',
+			)
+		);
+		$this->factory->post->create( array( 'post_date' => $this->get_date( '2015' ) ) );
+
+		wp_cache_delete( c2c_YearsAgoToday::get_first_published_year_cache_key(), c2c_YearsAgoToday::$cache_group );
+
+		$this->assertEquals( '2015', c2c_YearsAgoToday::get_first_published_year() );
+	}
+
+	public function test_get_first_published_year_cache_key_varies_by_post_types() {
+		$key_default = c2c_YearsAgoToday::get_first_published_year_cache_key();
+
+		add_filter( 'c2c_years_ago_today-post_types', static fn() => array( 'post', 'page' ) );
+
+		$this->assertNotSame( $key_default, c2c_YearsAgoToday::get_first_published_year_cache_key() );
+	}
+
 	/*
 	 * get_optin_label()
 	 */

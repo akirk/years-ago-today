@@ -32,6 +32,8 @@
     * New: Extract email address grouping logic out from `cron_email()` into new `get_users_to_email_grouped_by_content_type()`
 * Change: Output full month instead of 3-letter abbreviations
 * Change: Revamp dashboard output, more semantically putting each year within `section` tags
+* Change: Align `get_first_published_year()` query with `get_posts()`
+* Change: Incorporate a hash of post types into the first published year cache key
 * Change: Ensure list bullets are consistently visible in all dark mode schemes
 * New: Add descriptive help text to profile setting for accessibility and clarity
 * New: Enqueue JS on profile pages

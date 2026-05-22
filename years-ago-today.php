@@ -1237,7 +1237,7 @@ class c2c_YearsAgoToday {
 		 */
 		$first_year = apply_filters( 'c2c_years_ago_today-first_published_year', false );
 
-		$cache_key = 'first_published_year_' . get_current_blog_id();
+		$cache_key = self::get_first_published_year_cache_key();
 
 		// If not provided via filter, try to get it from the cache.
 		if ( false === $first_year ) {
@@ -1246,9 +1246,16 @@ class c2c_YearsAgoToday {
 
 		// If not in the cache, figure it out.
 		if ( false === $first_year ) {
-			// Query for the earliest published year.
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- This is the best way to get this value, which is then cached.
-			$first_year = $wpdb->get_var( "SELECT YEAR(MIN(post_date)) FROM $wpdb->posts WHERE post_status IN ( 'publish', 'private' )" );
+			$post_types     = self::get_post_types();
+			$placeholders   = implode( ', ', array_fill( 0, count( $post_types ), '%s' ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Aggregate query; placeholders are for post types.
+			$first_year = $wpdb->get_var(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- Aggregate query; placeholders are for post types.
+					"SELECT YEAR(MIN(post_date)) FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type IN ($placeholders)",
+					...$post_types
+				)
+			);
 
 			// If nothing was found, assume current year.
 			if ( ! $first_year ) {
@@ -1260,6 +1267,23 @@ class c2c_YearsAgoToday {
 		}
 
 		return $first_year;
+	}
+
+	/**
+	 * Returns the cache key for the first published year value.
+	 *
+	 * The key incorporates the included post types so a change via the
+	 * 'c2c_years_ago_today-post_types' filter does not yield a stale year.
+	 *
+	 * @since 2.0
+	 *
+	 * @return string
+	 */
+	public static function get_first_published_year_cache_key() {
+		$post_types = self::get_post_types();
+		sort( $post_types );
+
+		return 'first_published_year_' . get_current_blog_id() . '_' . md5( implode( ',', $post_types ) );
 	}
 
 	/**
