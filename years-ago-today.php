@@ -1516,6 +1516,10 @@ class c2c_YearsAgoToday {
 			echo "<p><em>" . esc_html__( 'No posts found for today. No email would be sent.', 'years-ago-today' ) . "</em></p>";
 		}
 
+		echo '<p class="header">';
+		esc_html_e( 'Note that there may be differences in how the email is displayed by different email clients.', 'years-ago-today' );
+		echo '</p>';
+
 		printf(
 			'<p class="footer"><a href="%s">%s</a></p>',
 			esc_url( admin_url( 'profile.php' ) ),

@@ -1713,6 +1713,7 @@ HTML;
 		$this->assertStringContainsString( 'Return to profile', $output );
 		$this->assertStringContainsString( admin_url( 'profile.php' ), $output );
 		$this->assertStringContainsString( self::$default_title, $output );
+		$this->assertStringContainsString( 'Note that there may be differences in how the email is displayed by different email clients.', $output );
 
 		$this->cleanup_email_preview_environment();
 	}
