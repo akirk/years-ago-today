@@ -1,0 +1,20 @@
+/*
+ * Front-end block and shortcode styles
+ */
+
+.years-ago-today-widget .years-ago-today-title {
+	margin: 0 0 0.5em;
+}
+
+.years-ago-today-widget .years-ago-today-posts {
+	list-style-position: inside;
+}
+
+.years-ago-today-widget .years-ago-today-year {
+	font-weight: bold;
+}
+
+.years-ago-today-widget .years-ago-today-posts li:not(.years-ago-today-year) {
+	margin-left: 1.5em;
+	list-style: initial;
+}
