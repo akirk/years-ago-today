@@ -991,14 +991,46 @@ class c2c_YearsAgoToday {
 	}
 
 	/**
-	 * Returns markup for the Years Ago Today listing (dashboard widget, block, shortcode).
+	 * Returns the default title for the front-end block and shortcode listing.
 	 *
 	 * @since 2.0
 	 *
 	 * @return string
 	 */
-	public static function get_widget_markup() {
-		return '<div class="years-ago-today-widget">' . self::get_widget_inner_markup() . "</div>\n";
+	public static function get_default_display_title() {
+		return _x( 'Years Ago Today', 'Title displayed above the front-end listing', 'years-ago-today' );
+	}
+
+	/**
+	 * Returns markup for the Years Ago Today listing (dashboard widget, block, shortcode).
+	 *
+	 * @since 2.0
+	 *
+	 * @param string|null $title Optional. Title to display above the listing. Null omits a title
+	 *                          (e.g. admin dashboard, which has its own widget title). Default null.
+	 * @return string
+	 */
+	public static function get_widget_markup( $title = null ) {
+		return '<div class="years-ago-today-widget">' . self::get_widget_title_markup( $title ) . self::get_widget_inner_markup() . "</div>\n";
+	}
+
+	/**
+	 * Returns markup for the listing title.
+	 *
+	 * @since 2.0
+	 *
+	 * @param string|null $title Title text. Null omits the title element.
+	 * @return string
+	 */
+	public static function get_widget_title_markup( $title = null ) {
+		if ( null === $title || '' === $title ) {
+			return '';
+		}
+
+		return sprintf(
+			'<h2 class="years-ago-today-title">%s</h2>' . "\n",
+			esc_html( $title )
+		);
 	}
 
 	/**
@@ -1103,12 +1135,23 @@ class c2c_YearsAgoToday {
 	 *
 	 * @since 2.0
 	 *
+	 * @param array  $atts    Shortcode attributes.
+	 * @param string $content Enclosed content (unused).
+	 * @param string $tag     Shortcode tag.
 	 * @return string
 	 */
-	public static function shortcode_years_ago_today() {
+	public static function shortcode_years_ago_today( $atts, $content = '', $tag = '' ) {
+		$atts = shortcode_atts(
+			array(
+				'title' => self::get_default_display_title(),
+			),
+			$atts,
+			'years-ago-today'
+		);
+
 		self::enqueue_public_style();
 
-		return self::get_widget_markup();
+		return self::get_widget_markup( $atts['title'] );
 	}
 
 	/**
@@ -1143,6 +1186,13 @@ class c2c_YearsAgoToday {
 					__( 'history', 'years-ago-today' ),
 					__( 'archive', 'years-ago-today' ),
 				),
+				'attributes'      => array(
+					'title' => array(
+						'label'   => __( 'Title', 'years-ago-today' ),
+						'type'    => 'string',
+						'default' => self::get_default_display_title(),
+					),
+				),
 				'render_callback' => array( __CLASS__, 'render_block' ),
 				'style'           => 'c2c-years-ago-today',
 				'supports'        => $supports,
@@ -1163,15 +1213,24 @@ class c2c_YearsAgoToday {
 	public static function render_block( $attributes, $content, $block ) {
 		self::enqueue_public_style();
 
+		$attributes = wp_parse_args(
+			$attributes,
+			array(
+				'title' => self::get_default_display_title(),
+			)
+		);
+
+		$markup = self::get_widget_title_markup( $attributes['title'] ) . self::get_widget_inner_markup();
+
 		if ( function_exists( 'get_block_wrapper_attributes' ) && $block instanceof WP_Block ) {
 			return sprintf(
 				'<div %1$s>%2$s</div>',
 				wp_kses_data( get_block_wrapper_attributes( array( 'class' => 'years-ago-today-widget' ) ) ),
-				self::get_widget_inner_markup()
+				$markup
 			);
 		}
 
-		return self::get_widget_markup();
+		return self::get_widget_markup( $attributes['title'] );
 	}
 
 	/**

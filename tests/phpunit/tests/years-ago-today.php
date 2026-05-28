@@ -424,8 +424,23 @@ HTML;
 
 		$expected_fragment = '<strong>1</strong> post has been published on <strong>' . self::get_formatted_date() . '</strong> in a previous year:';
 
-		$this->assertStringContainsString( $expected_fragment, do_shortcode( '[years-ago-today]' ) );
+		$output = do_shortcode( '[years-ago-today]' );
+
+		$this->assertStringContainsString( '<h2 class="years-ago-today-title">Years Ago Today</h2>', $output );
+		$this->assertStringContainsString( $expected_fragment, $output );
 		$this->assertTrue( wp_style_is( 'c2c-years-ago-today', 'enqueued' ) );
+	}
+
+	public function test_shortcode_title_attribute() {
+		$this->assertStringContainsString(
+			'<h2 class="years-ago-today-title">On This Day</h2>',
+			do_shortcode( '[years-ago-today title="On This Day"]' )
+		);
+
+		$this->assertStringNotContainsString(
+			'years-ago-today-title',
+			do_shortcode( '[years-ago-today title=""]' )
+		);
 	}
 
 	/*
@@ -454,11 +469,33 @@ HTML;
 		);
 
 		$this->assertStringContainsString( 'years-ago-today-widget', $output );
+		$this->assertStringContainsString( '<h2 class="years-ago-today-title">Years Ago Today</h2>', $output );
 		$this->assertStringContainsString(
 			'<strong>1</strong> post has been published on <strong>' . self::get_formatted_date() . '</strong> in a previous year:',
 			$output
 		);
 		$this->assertTrue( wp_style_is( 'c2c-years-ago-today', 'enqueued' ) );
+	}
+
+	public function test_render_block_custom_title_attribute() {
+		$output = render_block(
+			array(
+				'blockName' => 'coffee2code/years-ago-today',
+				'attrs'     => array(
+					'title' => 'Custom Heading',
+				),
+			)
+		);
+
+		$this->assertStringContainsString( '<h2 class="years-ago-today-title">Custom Heading</h2>', $output );
+	}
+
+	public function test_block_has_title_attribute() {
+		$block = WP_Block_Type_Registry::get_instance()->get_registered( 'coffee2code/years-ago-today' );
+
+		$this->assertArrayHasKey( 'title', $block->attributes );
+		$this->assertSame( 'string', $block->attributes['title']['type'] );
+		$this->assertSame( 'Years Ago Today', $block->attributes['title']['default'] );
 	}
 
 	/*

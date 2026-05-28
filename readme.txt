@@ -22,7 +22,7 @@ Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | 
 1. Install via the built-in WordPress plugin installer. Or download and unzip `years-ago-today.zip` inside the plugins directory for your site (typically `wp-content/plugins/`)
 2. Activate the plugin through the 'Plugins' admin menu in WordPress
 3. View the widget on your admin dashboard.
-4. (Optional.) To show the same listing on the front-end, insert the "Years Ago Today" block (WordPress 7.0+) or add the `[years-ago-today]` shortcode to a post or page.
+4. (Optional.) To show the same listing on the front-end, insert the "Years Ago Today" block (WordPress 7.0+) or add the `[years-ago-today]` shortcode to a post or page. Both output a title which can be overridden or omitted.
 5. (Optional.) To sign up for a daily email that lists posts published that day, go to your profile, set the checkbox for '"Years Ago Today" email', choose the style of email you wish to receive, and then press the "Update Profile" button to update your profile.
 
 

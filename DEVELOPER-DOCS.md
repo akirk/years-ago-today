@@ -120,9 +120,18 @@ add_filter( 'c2c_years_ago_today-to_address', static fn() => 'yearsagotoday@exam
 
 ## Block
 
-The plugin provides a "Years Ago Today" block (available on WordPress 7.0+). The block currently has no settings.
+The plugin provides a "Years Ago Today" block (available on WordPress 7.0+). The block currently has a single setting, "Title", which defaults to "Years Ago Today". The title can be deleted to prevent the output of a title.
 
 
 ## Shortcode
 
-The plugin provides a `[years-ago-today]` shortcode. The shortcode currently has no settings or attributes.
+The plugin provides a `[years-ago-today]` shortcode.
+
+### Attributes
+
+* **title**: The title for the widget.
+
+#### Examples:
+
+* Explicitly set a title: `[years-ago-today title="On This Day in History"]`
+* Omit a title from being displayed: `[years-ago-today title=""]`
