@@ -8,7 +8,7 @@ Requires at least: 5.6
 Tested up to: 7.0
 Stable tag: 1.6
 
-Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in previous years.
+Lists posts published to your site on this day in previous years via admin dashboard widget, block, shortcode, and/or optional daily email.
 
 == Description ==
 

@@ -8,7 +8,7 @@
  * Text Domain: years-ago-today
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Description: Admin dashboard widget (and optional daily email) that lists posts published to your site on this day in previous years.
+ * Description: Lists posts published to your site on this day in previous years via admin dashboard widget, block, shortcode, and/or optional daily email.
  *
  * Compatible with WordPress 5.6 through 7.0+, and PHP through at least 8.5+.
  *
