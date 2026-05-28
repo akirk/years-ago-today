@@ -71,6 +71,7 @@
     * Change: Update uses of `current_time()` to more modern `wp_date()`
     * Change: Remove use of deprecated (in PHP 8.5, noop'd in 8.1) `setAccessible()`
     * New: Add `get_formatted_date()` helper
+* New: Add more potential TODO items
 
 ## 1.6 _(2024-08-09)_
 * Fix: Convert use of deprecated string interpolation syntax to prevent notice under PHP8.2. Props Simounet.
