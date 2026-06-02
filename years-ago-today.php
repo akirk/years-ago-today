@@ -1710,6 +1710,10 @@ class c2c_YearsAgoToday {
 			}
 			p.text-container {
 				white-space: pre-wrap;
+				background-color: #fff;
+				border: 1px solid #eee;
+				border-radius: 6px;
+				padding: 32px 24px;
 			}
 			p.header {
 				font-style: italic;
