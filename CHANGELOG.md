@@ -60,6 +60,7 @@
 * Change: Drop compatibilities with versions of WP older than 5.6
 * Change: Note compatibility through PHP 8.5+
 * Change: Update copyright date (2026)
+* Change: Add new screenshots and update existing screenshots
 * New: Add `.gitattributes` file to exclude files from GitHub packaging
 * Unit tests:
     * New: Add multisite tests

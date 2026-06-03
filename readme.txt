@@ -30,7 +30,10 @@ Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | 
 
 1. The admin dashboard showing posts published on the current day in previous years.
 2. The admin dashboard when no posts were published on the current day in any previous year.
-3. Profile option for opting into receiving a daily email of posts published on the current day in previous years.
+3. Profile option for opting into receiving a daily email of posts published on the current day in previous years. Also shown are links for previewing each style of email.
+4. Preview of the HTML email with the default basic listing of posts by year.
+5. Preview of the HTML email, but with full post content included.
+6. Preview of the plain text email.
 
 
 == Frequently Asked Questions ==
