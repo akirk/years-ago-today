@@ -1,6 +1,13 @@
 # Changelog
 
-## _(in-progress)_
+## 2.0 _(2026-06-04)_
+
+### Highlights:
+
+This recommended release adds a block, adds a shortcode, adds an email previewer, adds support for additional post types via filter, improves performance and sending of emails, prevents translations from containing unintended markup, notes compatibility through WP 7.0+ and PHP 8.5+, drops compatibility with versions of WP older than 5.6, and much more.
+
+### Details:
+
 * New: Add front-end block and `[years-ago-today]` shortcode to display the same listing as the admin dashboard widget
     * New: Add `get_widget_markup()` and `get_widget_inner_markup()` to centralize listing markup generation
     * New: Register PHP-only block `coffee2code/years-ago-today` on WordPress 7.0+

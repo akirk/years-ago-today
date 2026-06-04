@@ -184,7 +184,7 @@ HTML;
 	}
 
 	public function test_plugin_version() {
-		$this->assertEquals( '1.6', c2c_YearsAgoToday::version() );
+		$this->assertEquals( '2.0', c2c_YearsAgoToday::version() );
 	}
 
 	public function test_class_is_available() {
