@@ -35,6 +35,8 @@ Links: [Plugin Homepage](https://coffee2code.com/wp-plugins/years-ago-today/) | 
 5. Preview of the HTML email, but with full post content included.
 6. Preview of the plain text email.
 
+Email previews include a date picker, arrows to skip to dates with posts from previous years, and a button to send a test email to your own address. If today has no matching posts, a date with posts is selected automatically. Test emails use the previewed content style and your saved image preference.
+
 
 == Frequently Asked Questions ==
 
