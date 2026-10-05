@@ -927,7 +927,7 @@ class c2c_YearsAgoToday {
 	 * @param string[] $emails The already-verified email addresses that should be emailed for the content type.
 	 * @param bool     $embed_images Embed images from this site's uploads. Default false.
 	 * @param string   $date Reference date in Y-m-d format. Default today.
-	 * @return int Count of the number of users emailed.
+	 * @return int Number of recipients accepted by the mail transport.
 	 */
 	public static function send_email_of_type( $type, $emails, $embed_images = false, $date = '' ) {
 		// Bail if no one to email.
@@ -977,6 +977,7 @@ class c2c_YearsAgoToday {
 		};
 
 		// Chunk and send.
+		$sent = 0;
 		foreach ( array_chunk( $emails, $batch_size ) as $chunk ) {
 			$headers = $default_headers;
 
@@ -989,11 +990,13 @@ class c2c_YearsAgoToday {
 			}
 
 			add_action( 'phpmailer_init', $mailer_hook, 10, 1 );
-			wp_mail( $to_address, $subject, $html, $headers );
+			if ( wp_mail( $to_address, $subject, $html, $headers ) ) {
+				$sent += count( $chunk );
+			}
 			remove_action( 'phpmailer_init', $mailer_hook, 10 );
 		}
 
-		return count( $emails );
+		return $sent;
 	}
 
 	/**
@@ -1899,16 +1902,8 @@ class c2c_YearsAgoToday {
 			check_admin_referer( 'send-years-ago-today-test' );
 			// Send only to the logged-in user; no recipient can be supplied in the request.
 			$user = wp_get_current_user();
-			$error = null;
-			$on_failure = static function ( $mail_error ) use ( &$error ) {
-				$error = $mail_error;
-			};
-			add_action( 'wp_mail_failed', $on_failure );
-			try {
-				$sent = self::send_email_of_type( $content_type, array( $user->user_email ), (bool) get_user_option( self::$meta_email_embed_images, $user->ID ), $date );
-			} finally {
-				remove_action( 'wp_mail_failed', $on_failure );
-			}
+			$sent = self::send_email_of_type( $content_type, array( $user->user_email ), (bool) get_user_option( self::$meta_email_embed_images, $user->ID ), $date );
+			$result = $sent ? 'sent' : 'failed';
 
 			if ( ! defined( 'WP_RUNNING_TESTS' ) || ! WP_RUNNING_TESTS ) {
 				wp_safe_redirect( add_query_arg( array(
@@ -1916,12 +1911,12 @@ class c2c_YearsAgoToday {
 					'content-type' => $content_type,
 					'type' => $type,
 					'date' => $date,
-					'test-result' => $sent && ! $error ? 'sent' : 'failed',
+					'test-result' => $result,
 					'force' => $force ? '1' : false,
 				), admin_url( 'profile.php' ) ) );
 				exit;
 			}
-			$message = $sent && ! $error
+			$message = 'sent' === $result
 				? __( 'Test email sent to your email address.', 'years-ago-today' )
 				: __( 'The test email could not be sent.', 'years-ago-today' );
 		}
@@ -1968,7 +1963,7 @@ class c2c_YearsAgoToday {
 		echo '<a href="' . esc_url( admin_url( 'profile.php' ) ) . '">' . esc_html__( 'Return to profile', 'years-ago-today' ) . '</a></div>';
 
 		if ( $message ) {
-			echo '<div class="notice ' . ( 'failed' === $result || ! empty( $error ) ? 'notice-error' : 'notice-success' ) . '" role="status"><p>' . esc_html( $message ) . '</p></div>';
+			echo '<div class="notice ' . ( 'failed' === $result ? 'notice-error' : 'notice-success' ) . '" role="status"><p>' . esc_html( $message ) . '</p></div>';
 		}
 		if ( ! $requested_date && $date !== wp_date( 'Y-m-d' ) ) {
 			echo '<div class="notice notice-info"><p>' . esc_html__( 'Today has no posts from previous years. Showing another date with posts.', 'years-ago-today' ) . '</p></div>';

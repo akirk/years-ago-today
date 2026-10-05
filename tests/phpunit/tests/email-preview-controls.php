@@ -72,9 +72,10 @@ class Test_Years_Ago_Today_Preview_Controls extends WP_UnitTestCase {
 		$original_method = $_SERVER['REQUEST_METHOD'] ?? null;
 		$original_screen = get_current_screen();
 		$mail = array();
-		$intercept = static function ( $result, $args ) use ( &$mail ) {
+		$send_result = true;
+		$intercept = static function ( $result, $args ) use ( &$mail, &$send_result ) {
 			$mail[] = $args;
-			return true;
+			return $send_result;
 		};
 		wp_set_current_user( $user_id );
 		set_current_screen( 'profile' );
@@ -95,6 +96,16 @@ class Test_Years_Ago_Today_Preview_Controls extends WP_UnitTestCase {
 			$this->assertStringContainsString( 'name="date" value="2019-03-15"', $output );
 			$this->assertStringContainsString( 'Test email sent to your email address.', $output );
 
+
+			$send_result = false;
+			ob_clean();
+			c2c_YearsAgoToday::handle_email_template_preview();
+			$failure_output = ob_get_contents();
+			$this->assertCount( 2, $mail );
+			$this->assertStringContainsString( 'The test email could not be sent.', $failure_output );
+			$this->assertStringContainsString( 'notice-error', $failure_output );
+			$this->assertStringNotContainsString( 'Test email sent to your email address.', $failure_output );
+
 			$reject_nonce = static function () {
 				return static function () { throw new RuntimeException( 'Invalid nonce rejected.' ); };
 			};
@@ -108,7 +119,7 @@ class Test_Years_Ago_Today_Preview_Controls extends WP_UnitTestCase {
 			} finally {
 				remove_filter( 'wp_die_handler', $reject_nonce );
 			}
-			$this->assertCount( 1, $mail );
+			$this->assertCount( 2, $mail );
 		} finally {
 			ob_end_clean();
 			remove_filter( 'pre_wp_mail', $intercept, 10 );
