@@ -1926,64 +1926,53 @@ class c2c_YearsAgoToday {
 				: __( 'The test email could not be sent.', 'years-ago-today' );
 		}
 
-		// Styles.
+		// Use WordPress admin controls in this standalone preview.
+		echo '<!DOCTYPE html><html lang="' . esc_attr( get_bloginfo( 'language' ) ) . '"><head>';
+		echo '<meta charset="' . esc_attr( get_bloginfo( 'charset' ) ) . '"><meta name="viewport" content="width=device-width, initial-scale=1">';
+		echo '<title>' . esc_html__( 'Email preview — Years Ago Today', 'years-ago-today' ) . '</title>';
+		wp_admin_css( 'common', true );
+		wp_admin_css( 'forms', true );
+		wp_admin_css( 'buttons', true );
 		echo '<style>
-			body {
-				background-color: #fbfbfb;
+			body { margin: 0; padding: 32px 16px; background: #f0f0f1; color: #1d2327; }
+			.yat-preview-toolbar { max-width: 650px; margin: 0 auto 24px; padding: 24px; background: #fff; border: 1px solid #c3c4c7; box-sizing: border-box; }
+			.yat-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+			.yat-preview-heading h1 { margin: 0; font-size: 23px; line-height: 1.3; font-weight: 400; }
+			.yat-preview-toolbar p.header { margin: 0; color: #646970; }
+			.yat-preview-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 0 10px; }
+			.yat-preview-actions form { margin: 0; }
+			.yat-preview-date-controls { display: flex; align-items: center; gap: 6px; }
+			.yat-preview-date-controls input[type=date] { min-height: 40px; margin: 0; min-width: 0; max-width: 160px; }
+			.yat-preview-date-controls .yat-preview-arrow { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 0; font-size: 22px; line-height: 30px; }
+			.yat-preview-toolbar .yat-preview-help { margin: 0; font-size: 12px; color: #646970; }
+			.yat-preview-toolbar p.yat-preview-subject { margin-top: 20px; padding-top: 16px; border-top: 1px solid #dcdcde; color: #1d2327; overflow-wrap: anywhere; }
+			.yat-preview-toolbar .notice { margin: 0 0 16px; }
+			.yat-preview-message { max-width: 650px; margin: 0 auto; font-family: Arial, sans-serif; font-size: 16px; }
+			.yat-preview-message p { font-size: inherit; }
+			.yat-preview-message .text-container { white-space: pre-wrap; overflow-wrap: anywhere; margin: 20px 0; background: #fff; border: 1px solid #c3c4c7; padding: 24px; }
+			.yat-preview-footer { max-width: 650px; margin: 24px auto 0; text-align: center; color: #646970; }
+			.yat-preview-footer p { margin: 8px 0; }
+			@media (max-width: 540px) {
+				body { padding: 16px 12px; }
+				.yat-preview-toolbar { padding: 16px; }
+				.yat-preview-heading { align-items: flex-start; }
+				.yat-preview-heading h1 { font-size: 20px; }
+				.yat-preview-actions { align-items: stretch; }
+				.yat-preview-actions form { width: 100%; }
+				.yat-preview-send .button { width: 100%; }
+				.yat-preview-date-controls input[type=date] { flex: 1; width: 0; max-width: none; }
 			}
-			p {
-				max-width: 600px;
-				margin: 30px auto;
-			}
-			p.text-container {
-				white-space: pre-wrap;
-				background-color: #fff;
-				border: 1px solid #eee;
-				border-radius: 6px;
-				padding: 32px 24px;
-			}
-			p.header {
-				font-style: italic;
-			}
-			p.header, p.footer {
-				text-align: center;
-			}
-			p.footer {
-				margin-top: 50px;
-			}
-		</style>';
+		</style></head><body>';
+		echo '<section class="wp-core-ui yat-preview-toolbar" aria-label="' . esc_attr__( 'Email preview controls', 'years-ago-today' ) . '">';
+		echo '<div class="yat-preview-heading"><h1>' . esc_html__( 'Email preview', 'years-ago-today' ) . '</h1>';
+		echo '<a href="' . esc_url( admin_url( 'profile.php' ) ) . '">' . esc_html__( 'Return to profile', 'years-ago-today' ) . '</a></div>';
 
 		if ( $message ) {
-			echo '<p class="header" role="status">' . esc_html( $message ) . '</p>';
+			echo '<div class="notice ' . ( 'failed' === $result || ! empty( $error ) ? 'notice-error' : 'notice-success' ) . '" role="status"><p>' . esc_html( $message ) . '</p></div>';
 		}
 		if ( ! $requested_date && $date !== wp_date( 'Y-m-d' ) ) {
-			echo '<p class="header">' . esc_html__( 'Today has no posts from previous years. Showing another date with posts.', 'years-ago-today' ) . '</p>';
+			echo '<div class="notice notice-info"><p>' . esc_html__( 'Today has no posts from previous years. Showing another date with posts.', 'years-ago-today' ) . '</p></div>';
 		}
-
-		$navigation = self::get_adjacent_email_dates( $date );
-		$preview_args = array( $query_key => '1', 'content-type' => $content_type, 'type' => $type );
-		echo '<form method="get" action="' . esc_url( admin_url( 'profile.php' ) ) . '"><p class="header">';
-		foreach ( $preview_args as $name => $value ) {
-			echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
-		}
-		if ( $force ) {
-			echo '<input type="hidden" name="force" value="1">';
-		}
-		if ( $navigation['previous'] ) {
-			echo '<a aria-label="' . esc_attr__( 'Previous date with posts', 'years-ago-today' ) . '" href="' . esc_url( add_query_arg( array_merge( $preview_args, array( 'date' => $navigation['previous'] ) ), admin_url( 'profile.php' ) ) ) . '">&lsaquo;</a> ';
-		}
-		echo '<input type="date" name="date" value="' . esc_attr( $date ) . '" aria-label="' . esc_attr__( 'Preview date', 'years-ago-today' ) . '"> ';
-		if ( $navigation['next'] ) {
-			echo '<a aria-label="' . esc_attr__( 'Next date with posts', 'years-ago-today' ) . '" href="' . esc_url( add_query_arg( array_merge( $preview_args, array( 'date' => $navigation['next'] ) ), admin_url( 'profile.php' ) ) ) . '">&rsaquo;</a>';
-		}
-		echo '<button type="submit">' . esc_html__( 'Show date', 'years-ago-today' ) . '</button> ';
-		echo '</p></form>';
-
-		echo '<form method="post" action="' . esc_url( add_query_arg( array_merge( $preview_args, array( 'date' => $date, 'force' => $force ? '1' : false ) ), admin_url( 'profile.php' ) ) ) . '"><p class="header">';
-		wp_nonce_field( 'send-years-ago-today-test' );
-		echo '<button type="submit" name="send-years-ago-today-test" value="1">' . esc_html__( 'Send test email to me', 'years-ago-today' ) . '</button>';
-		echo '<br><small>' . esc_html__( 'Uses the previewed content style and your saved image preference.', 'years-ago-today' ) . '</small>';
-		echo '</p></form>';
 
 		// Provide context for the email preview.
 		echo '<p class="header">';
@@ -1999,20 +1988,51 @@ class c2c_YearsAgoToday {
 		) );
 		echo '</p>';
 
+		$navigation = self::get_adjacent_email_dates( $date );
+		$preview_args = array( $query_key => '1', 'content-type' => $content_type, 'type' => $type );
+		echo '<div class="yat-preview-actions"><form method="get" action="' . esc_url( admin_url( 'profile.php' ) ) . '"><div class="yat-preview-date-controls">';
+		foreach ( $preview_args as $name => $value ) {
+			echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
+		}
+		if ( $force ) {
+			echo '<input type="hidden" name="force" value="1">';
+		}
+		if ( $navigation['previous'] ) {
+			echo '<a class="button button-secondary yat-preview-arrow" aria-label="' . esc_attr__( 'Previous date with posts', 'years-ago-today' ) . '" href="' . esc_url( add_query_arg( array_merge( $preview_args, array( 'date' => $navigation['previous'] ) ), admin_url( 'profile.php' ) ) ) . '">&lsaquo;</a> ';
+		} else {
+			echo '<span class="button disabled yat-preview-arrow" aria-hidden="true">&lsaquo;</span>';
+		}
+		echo '<input type="date" name="date" value="' . esc_attr( $date ) . '" aria-label="' . esc_attr__( 'Preview date', 'years-ago-today' ) . '"> ';
+		if ( $navigation['next'] ) {
+			echo '<a class="button button-secondary yat-preview-arrow" aria-label="' . esc_attr__( 'Next date with posts', 'years-ago-today' ) . '" href="' . esc_url( add_query_arg( array_merge( $preview_args, array( 'date' => $navigation['next'] ) ), admin_url( 'profile.php' ) ) ) . '">&rsaquo;</a>';
+		} else {
+			echo '<span class="button disabled yat-preview-arrow" aria-hidden="true">&rsaquo;</span>';
+		}
+		echo '<button class="button button-secondary" type="submit">' . esc_html__( 'Show date', 'years-ago-today' ) . '</button> ';
+		echo '</div></form>';
+
+		echo '<form class="yat-preview-send" method="post" action="' . esc_url( add_query_arg( array_merge( $preview_args, array( 'date' => $date, 'force' => $force ? '1' : false ) ), admin_url( 'profile.php' ) ) ) . '">';
+		wp_nonce_field( 'send-years-ago-today-test' );
+		echo '<button class="button button-primary" type="submit" name="send-years-ago-today-test" value="1">' . esc_html__( 'Send test email to me', 'years-ago-today' ) . '</button>';
+		echo '</form></div>';
+		echo '<p class="yat-preview-help">' . esc_html__( 'Uses the previewed content style and your saved image preference.', 'years-ago-today' ) . '</p>';
+
 		// Get the email body.
 		$body = self::get_email_body( $content_type, true, $date )[ $type ];
 		if ( 'text' === $type ) {
 			$body = '<p class="text-container">' . $body . '</p>';
 		}
 
-		echo '<p class="header"><strong>' . esc_html__( 'Subject:', 'years-ago-today' ) . '</strong> ' . esc_html( self::get_email_subject( $date ) ) . '</p>';
+		echo '<p class="header yat-preview-subject"><strong>' . esc_html__( 'Subject:', 'years-ago-today' ) . '</strong> ' . esc_html( self::get_email_subject( $date ) ) . '</p>';
 
+		echo '</section><main class="yat-preview-message">';
 		if ( $body ) {
 			echo wp_kses_post( $body );
 		} else {
 			echo "<p><em>" . esc_html__( 'No posts found for today. No email would be sent.', 'years-ago-today' ) . "</em></p>";
 		}
 
+		echo '</main><footer class="yat-preview-footer">';
 		echo '<p class="header">';
 		esc_html_e( 'Note that there may be differences in how the email is displayed by different email clients.', 'years-ago-today' );
 		echo '</p>';
@@ -2022,6 +2042,8 @@ class c2c_YearsAgoToday {
 			esc_url( admin_url( 'profile.php' ) ),
 			esc_html__( 'Return to profile', 'years-ago-today' )
 		);
+
+		echo '</footer></body></html>';
 
 		if ( defined( 'WP_RUNNING_TESTS' ) && WP_RUNNING_TESTS ) {
 			return;
