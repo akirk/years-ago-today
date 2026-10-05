@@ -64,6 +64,13 @@ class c2c_YearsAgoToday {
 	public static $meta_email_content_pref = 'c2c_years_ago_today_email_content';
 
 	/**
+	 * User meta key for embedding uploaded images in HTML emails.
+	 *
+	 * @var string
+	 */
+	public static $meta_email_embed_images = 'c2c_years_ago_today_email_embed_images';
+
+	/**
 	 * The default email content type.
 	 *
 	 * One of either 'list', 'excerpt', or 'full'. See `get_email_content_types()` for actual acceptable values.
@@ -855,9 +862,10 @@ class c2c_YearsAgoToday {
 	 * Returns an associative array of email content types and the email addresses
 	 * of users who have opted into emails of each content type.
 	 *
+	 * @param bool $group_by_image_pref Also separate recipients who prefer embedded images.
 	 * @return array
 	 */
-	public static function get_users_to_email_grouped_by_content_type() {
+	public static function get_users_to_email_grouped_by_content_type( $group_by_image_pref = false ) {
 		$users = self::get_users_to_email();
 
 		// Bail if no one has opted into getting an email.
@@ -870,6 +878,9 @@ class c2c_YearsAgoToday {
 		foreach ( $users as $user ) {
 			if ( is_email( $user->user_email ) ) {
 				$type = self::get_user_email_content_pref( $user->ID );
+				if ( $group_by_image_pref && get_user_option( self::$meta_email_embed_images, $user->ID ) ) {
+					$type .= ':embedded';
+				}
 				if ( ! isset( $emails[ $type ] ) ) {
 					$emails[ $type ] = array();
 				}
@@ -887,14 +898,15 @@ class c2c_YearsAgoToday {
 	 */
 	public static function cron_email() {
 		// Get list of users who want the daily email and bail if there aren't any.
-		$emails = self::get_users_to_email_grouped_by_content_type();
+		$emails = self::get_users_to_email_grouped_by_content_type( true );
 		if ( ! $emails ) {
 			return;
 		}
 
 		// Mail each email content type to its associated users.
 		foreach ( array_keys( $emails ) as $type ) {
-			self::send_email_of_type( $type, $emails[ $type ] );
+			$parts = explode( ':', $type );
+			self::send_email_of_type( $parts[0], $emails[ $type ], isset( $parts[1] ) );
 		}
 	}
 
@@ -907,9 +919,10 @@ class c2c_YearsAgoToday {
 	 *
 	 * @param string   $type   The email content type.
 	 * @param string[] $emails The already-verified email addresses that should be emailed for the content type.
+	 * @param bool     $embed_images Embed images from this site's uploads. Default false.
 	 * @return int Count of the number of users emailed.
 	 */
-	public static function send_email_of_type( $type, $emails ) {
+	public static function send_email_of_type( $type, $emails, $embed_images = false ) {
 		// Bail if no one to email.
 		if ( ! $emails ) {
 			return 0;
@@ -941,10 +954,15 @@ class c2c_YearsAgoToday {
 			? wpautop( esc_html( $plain ) )
 			: $body['html'];
 
-		$mailer_hook = static function ( $phpmailer ) use ( $html, $plain ) {
+		$embedded = $embed_images ? self::get_embedded_email_images( $html ) : array( 'html' => $html, 'images' => array() );
+
+		$mailer_hook = static function ( $phpmailer ) use ( $embedded, $plain ) {
 			$phpmailer->isHTML( true );
-			$phpmailer->Body    = $html;
+			$phpmailer->Body    = $embedded['html'];
 			$phpmailer->AltBody = $plain;
+			foreach ( $embedded['images'] as $cid => $image ) {
+				$phpmailer->addEmbeddedImage( $image['path'], $cid, basename( $image['path'] ), 'base64', $image['mime'] );
+			}
 		};
 
 		// Chunk and send.
@@ -965,6 +983,57 @@ class c2c_YearsAgoToday {
 		}
 
 		return count( $emails );
+	}
+
+	/**
+	 * Rewrites local upload image URLs as Content-ID references for email.
+	 * Unavailable files and external images retain their original URLs.
+	 *
+	 * @param string $html Email HTML.
+	 * @return array HTML and images keyed by Content-ID.
+	 */
+	private static function get_embedded_email_images( $html ) {
+		$uploads = wp_upload_dir();
+		$base_path = realpath( $uploads['basedir'] );
+		$base_url = trailingslashit( $uploads['baseurl'] );
+		$images = array();
+
+		if ( ! $base_path ) {
+			return array( 'html' => $html, 'images' => $images );
+		}
+
+		$html = preg_replace_callback( '/<img\b[^>]*>/i', static function ( $match ) use ( $base_url, $base_path, &$images ) {
+			$dom = new DOMDocument();
+			@$dom->loadHTML( '<?xml encoding="UTF-8">' . $match[0], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+			$img = $dom->getElementsByTagName( 'img' )->item( 0 );
+			if ( ! $img ) {
+				return $match[0];
+			}
+			$src = $img->getAttribute( 'src' );
+			if ( 0 !== strpos( $src, $base_url ) ) {
+				return $match[0];
+			}
+
+			$relative = rawurldecode( strtok( substr( $src, strlen( $base_url ) ), '?#' ) );
+			$path = realpath( $base_path . '/' . $relative );
+			if ( ! $path || 0 !== strpos( $path, $base_path . DIRECTORY_SEPARATOR ) || ! is_readable( $path ) ) {
+				return $match[0];
+			}
+			$info = @getimagesize( $path );
+			if ( ! $info || ! in_array( $info['mime'], array( 'image/jpeg', 'image/png', 'image/gif', 'image/webp' ), true ) ) {
+				return $match[0];
+			}
+
+			$cid = 'yat-' . md5( $path ) . '@yat';
+			$images[ $cid ] = array( 'path' => $path, 'mime' => $info['mime'] );
+			$img->setAttribute( 'src', 'cid:' . $cid );
+			$img->removeAttribute( 'srcset' );
+			$img->removeAttribute( 'sizes' );
+			$img->removeAttribute( 'loading' );
+			return $dom->saveHTML( $img );
+		}, $html );
+
+		return array( 'html' => $html, 'images' => $images );
 	}
 
 	/**
@@ -1594,6 +1663,14 @@ class c2c_YearsAgoToday {
 			);
 		}
 
+		printf(
+			'<p><label><input type="checkbox" name="%1$s" value="1"%2$s> %3$s</label><br><span class="description">%4$s</span></p>',
+			esc_attr( self::$meta_email_embed_images ),
+			checked( (bool) get_user_option( self::$meta_email_embed_images, $user->ID ), true, false ),
+			esc_html__( 'Embed images in HTML emails', 'years-ago-today' ),
+			esc_html__( 'Include photos uploaded to this site in the email so they can display without downloading remote images. This increases the email size. External images still load remotely.', 'years-ago-today' )
+		);
+
 		echo "\t\t\t\t</fieldset>\n";
 
 		echo "\t\t\t</td>\n";
@@ -1629,6 +1706,13 @@ class c2c_YearsAgoToday {
 			if ( in_array( $value, self::get_email_content_types(), true ) ) {
 				update_user_option( $user_id, self::$meta_email_content_pref, $value );
 			}
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies profile nonces.
+		if ( isset( $_POST[ self::$meta_email_embed_images ] ) && '1' === wp_unslash( $_POST[ self::$meta_email_embed_images ] ) ) {
+			update_user_option( $user_id, self::$meta_email_embed_images, 1 );
+		} else {
+			delete_user_option( $user_id, self::$meta_email_embed_images );
 		}
 	}
 
