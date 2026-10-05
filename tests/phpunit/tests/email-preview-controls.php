@@ -53,7 +53,10 @@ class Test_Years_Ago_Today_Preview_Controls extends WP_UnitTestCase {
 
 	public function test_falls_back_to_a_date_with_posts_and_validates_requested_dates() {
 		$year = (int) wp_date( 'Y' );
-		$day = '01-15' === wp_date( 'm-d' ) ? '02-15' : '01-15';
+		$day = '01-15';
+		if ( '01-15' === wp_date( 'm-d' ) ) {
+			$day = '02-15';
+		}
 		$this->factory->post->create( array( 'post_date' => ( $year - 1 ) . '-' . $day . ' 12:00:00' ) );
 
 		$this->assertSame( $year . '-' . $day, $this->invoke( 'get_email_preview_date' ) );
