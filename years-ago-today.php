@@ -596,6 +596,9 @@ class c2c_YearsAgoToday {
 		$size = self::get_html_email_image_size( $size );
 
 		$content = apply_filters( 'the_content', get_the_content() );
+		if ( '' === trim( $content ) ) {
+			return $content;
+		}
 
 		// Build a DOM document - tolerant mode prevents fatal errors on bad markup.
 		$dom = new DOMDocument();
