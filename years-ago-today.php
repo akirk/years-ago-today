@@ -1608,11 +1608,18 @@ class c2c_YearsAgoToday {
 	 * @since 1.0
 	 *
 	 * @param  int  $user_id The user ID.
-	 * @return bool          True if the option saved successfully.
+	 * @return void|false False if the current user cannot edit this user.
 	 */
 	public static function option_save( $user_id ) {
 		if ( ! current_user_can( 'edit_user', $user_id ) ) {
 			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
+		if ( isset( $_POST[ self::$option_name ] ) && self::$enabled_option_value === sanitize_text_field( wp_unslash( $_POST[ self::$option_name ] ) ) ) {
+			update_user_option( $user_id, self::$option_name, self::$enabled_option_value );
+		} else {
+			delete_user_option( $user_id, self::$option_name );
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
@@ -1623,18 +1630,6 @@ class c2c_YearsAgoToday {
 				update_user_option( $user_id, self::$meta_email_content_pref, $value );
 			}
 		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
-		if ( isset( $_POST[ self::$option_name ] ) ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Core already verifies nonces, but also the value is only used for a comparison.
-			$value = sanitize_text_field( wp_unslash( $_POST[ self::$option_name ] ) );
-
-			if ( self::$enabled_option_value === $value ) {
-				return update_user_option( $user_id, self::$option_name, self::$enabled_option_value );
-			}
-		}
-
-		return delete_user_option( $user_id, self::$option_name );
 	}
 
 	/**

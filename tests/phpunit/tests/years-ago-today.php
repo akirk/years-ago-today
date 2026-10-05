@@ -1636,6 +1636,10 @@ HTML;
 				$this->assertSame( $preference, get_user_option( c2c_YearsAgoToday::$meta_email_content_pref, $user_id ) );
 				$this->assertSame( c2c_YearsAgoToday::$enabled_option_value, get_user_option( c2c_YearsAgoToday::$option_name, $user_id ) );
 			}
+
+			unset( $_POST[ c2c_YearsAgoToday::$option_name ] );
+			c2c_YearsAgoToday::option_save( $user_id );
+			$this->assertFalse( get_user_option( c2c_YearsAgoToday::$option_name, $user_id ) );
 		} finally {
 			$_POST = $original_post;
 			wp_set_current_user( $original_user_id );
