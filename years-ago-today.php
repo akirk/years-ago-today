@@ -957,7 +957,11 @@ class c2c_YearsAgoToday {
 			? wpautop( esc_html( $plain ) )
 			: $body['html'];
 
-		$embedded = $embed_images ? self::get_embedded_email_images( $html ) : array( 'html' => $html, 'images' => array() );
+		if ( $embed_images ) {
+			$embedded = self::get_embedded_email_images( $html );
+		} else {
+			$embedded = array( 'html' => $html, 'images' => array() );
+		}
 
 		$mailer_hook = static function ( $phpmailer ) use ( $embedded, $plain ) {
 			$phpmailer->isHTML( true );

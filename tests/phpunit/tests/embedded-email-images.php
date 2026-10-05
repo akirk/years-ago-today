@@ -51,7 +51,11 @@ class Test_Years_Ago_Today_Embedded_Images extends WP_UnitTestCase {
 
 	public function test_keeps_mismatched_explicit_protocols_and_external_hosts_remote() {
 		$scheme = wp_parse_url( $this->image_url, PHP_URL_SCHEME );
-		$url = ( 'https' === $scheme ? 'http' : 'https' ) . substr( $this->image_url, strlen( $scheme ) );
+		if ( 'https' === $scheme ) {
+			$url = 'http' . substr( $this->image_url, strlen( $scheme ) );
+		} else {
+			$url = 'https' . substr( $this->image_url, strlen( $scheme ) );
+		}
 		$html = '<img src="' . esc_url( $url ) . '"><img src="//example.org/photo.jpg">';
 		$result = $this->embed( $html );
 
@@ -110,7 +114,10 @@ class Test_Years_Ago_Today_Embedded_Images extends WP_UnitTestCase {
 		require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
 		require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
 		require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
-		$original_mailer = isset( $GLOBALS['phpmailer'] ) ? $GLOBALS['phpmailer'] : null;
+		$original_mailer = null;
+		if ( isset( $GLOBALS['phpmailer'] ) ) {
+			$original_mailer = $GLOBALS['phpmailer'];
+		}
 		$mailer = new class extends \PHPMailer\PHPMailer\PHPMailer {
 			public $messages = array();
 			public function send() {
