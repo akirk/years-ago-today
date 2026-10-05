@@ -40,6 +40,25 @@ class Test_Years_Ago_Today_Embedded_Images extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'loading=', $result['html'] );
 	}
 
+
+	public function test_embeds_protocol_relative_local_images() {
+		$url = preg_replace( '/^https?:/', '', $this->image_url );
+		$result = $this->embed( '<img src="' . esc_url( $url ) . '">' );
+
+		$this->assertCount( 1, $result['images'] );
+		$this->assertStringContainsString( 'src="cid:', $result['html'] );
+	}
+
+	public function test_keeps_mismatched_explicit_protocols_and_external_hosts_remote() {
+		$scheme = wp_parse_url( $this->image_url, PHP_URL_SCHEME );
+		$url = ( 'https' === $scheme ? 'http' : 'https' ) . substr( $this->image_url, strlen( $scheme ) );
+		$html = '<img src="' . esc_url( $url ) . '"><img src="//example.org/photo.jpg">';
+		$result = $this->embed( $html );
+
+		$this->assertSame( $html, $result['html'] );
+		$this->assertSame( array(), $result['images'] );
+	}
+
 	public function test_leaves_external_and_missing_images_unchanged() {
 		$html = '<img src="https://example.org/photo.jpg"><img src="' . esc_url( $this->image_url . '.missing' ) . '">';
 		$result = $this->embed( $html );

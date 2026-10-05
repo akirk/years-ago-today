@@ -1013,6 +1013,9 @@ class c2c_YearsAgoToday {
 				return $match[0];
 			}
 			$src = $img->getAttribute( 'src' );
+			if ( '//' === substr( $src, 0, 2 ) ) {
+				$src = wp_parse_url( $base_url, PHP_URL_SCHEME ) . ':' . $src;
+			}
 			if ( 0 !== strpos( $src, $base_url ) ) {
 				return $match[0];
 			}
